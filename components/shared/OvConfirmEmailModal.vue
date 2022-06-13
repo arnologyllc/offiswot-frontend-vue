@@ -65,7 +65,6 @@ export default {
     },
   },
   mounted() {
-    console.log(document.documentElement.clientWidth)
     if (document.documentElement.clientWidth <= 425) {
       this.dialogWidth = '315px'
     }

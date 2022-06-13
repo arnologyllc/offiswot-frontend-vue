@@ -63,16 +63,23 @@
         ></login-buttons>
       </el-form>
     </div>
+    <confirm-email
+      :email="payload.email"
+      :model="isOpenEmailDialog"
+      @close="isOpenEmailDialog = false"
+    ></confirm-email>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
+import ConfirmEmail from '@/components/shared/OvConfirmEmailModal.vue'
 export default {
   name: 'RegisterPage',
   components: {
     LoginButtons,
+    ConfirmEmail
   },
   layout: 'auth',
   data() {
@@ -101,6 +108,8 @@ export default {
           },
         ],
       },
+
+      isOpenEmailDialog: false,
     }
   },
   computed: {
@@ -117,24 +126,40 @@ export default {
         this.$cookies.set('token', v.access_token)
       }
     },
-    loginErrorData(v) {
-      for (const i in v) {
-        if (typeof v[i] !== 'string') {
-          for (const j in v[i]) {
-            this.$notify.error({
-              title: 'Error',
-              dangerouslyUseHTMLString: true,
-              message: `${i}: ${v[i][j]}`,
-            })
+    loginErrorData: {
+      deep: true,
+      handler(v) {
+        if(v === 'Please Verify Email' || v.error === 'Please Verify Email') {
+          this.isOpenEmailDialog = true;
+        }
+        if(v === "Email Or username not found") {
+          this.$router.push(`/register?email=${this.payload.email}`)
+        }
+        if (typeof v !== 'string') {
+          for (const i in v) {
+            if (typeof v[i] !== 'string') {
+              for (const j in v[i]) {
+                this.$notify.error({
+                  title: 'Error',
+                  dangerouslyUseHTMLString: true,
+                  message: `${i}: ${v[i][j]}`,
+                })
+              }
+            } else {
+              this.$notify.error({
+                title: 'Error',
+                message: v[i],
+              })
+            }
           }
-        } else {
-          this.$notify.error({
-            title: 'Error',
-            message: v[i],
-          })
         }
       }
     },
+  },
+  mounted() {
+    if (this.$route.query.email) {
+      this.payload.email = this.$route.query.email
+    }
   },
   methods: {
     onSubmit() {

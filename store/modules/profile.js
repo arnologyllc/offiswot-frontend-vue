@@ -13,6 +13,7 @@ const state = {
   const mutations = {
     GET_PROFILE_SUCCESS: (state, data) => {
       state.profileSuccessData = data
+      localStorage.setItem('timezone', data.settings.server_timezone)
     },
     GET_PROFILE_FAILURE: (state, data) => {
       state.profileFailureData = data
