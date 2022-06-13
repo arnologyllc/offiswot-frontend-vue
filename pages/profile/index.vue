@@ -85,7 +85,7 @@
               </div>
             </div>
           </div>
-          <div v-else class="user-workspaces__container">
+          <div v-else-if="responseWorkspaces && !responseWorkspaces.length" class="user-workspaces__container">
             <el-button class="user-workspaces__create-btn">
               <span>Create</span>
             </el-button>
