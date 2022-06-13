@@ -37,6 +37,7 @@ const mutations = {
     state.registerSuccessData = data
   },
   REGISTER_FAILURE: (state, data) => {
+    state.registerFailureData = null
     state.registerFailureData = data
   },
   REGISTER_PROCESS: (state, data) => {
@@ -46,6 +47,7 @@ const mutations = {
     state.resendSuccessData = data
   },
   RESEND_FAILURE: (state, data) => {
+    state.resendFailureData = null
     state.resendFailureData = data
   },
   LOGIN_PROCESS: (state, data) => {
@@ -55,6 +57,7 @@ const mutations = {
     state.loginSuccessData = data
   },
   LOGIN_FAILURE: (state, data) => {
+    state.loginErrorData = null
     state.loginErrorData = data
   },
   FORGOT_PROCESS: (state, data) => {
@@ -73,6 +76,7 @@ const mutations = {
     state.resetSuccessData = data
   },
   RESET_FAILURE: (state, data) => {
+    state.resetErrorData = null
     state.resetErrorData = data
   },
 }
@@ -91,6 +95,13 @@ const actions = {
         commit('REGISTER_SUCCESS', data.user)
       })
       .catch((e) => {
+        try {
+          JSON.parse(e.response.data)
+        } catch {
+          commit('REGISTER_FAILURE', e.response.data)
+          commit('REGISTER_PROCESS', false)
+          return
+        }
         commit('REGISTER_FAILURE', JSON.parse(e.response.data))
       })
       .finally(() => {
@@ -117,7 +128,14 @@ const actions = {
         commit('LOGIN_SUCCESS', data)
       })
       .catch((e) => {
-        commit('LOGIN_FAILURE', e.response.data)
+        try {
+          JSON.parse(e.response.data)
+        } catch {
+          commit('LOGIN_FAILURE', e.response.data)
+          commit('LOGIN_PROCESS', false)
+          return
+        }
+        commit('LOGIN_FAILURE', JSON.parse(e.response.data))
       })
       .finally(() => {
         commit('LOGIN_PROCESS', false)
@@ -133,7 +151,14 @@ const actions = {
         commit('FORGOT_SUCCESS', data)
       })
       .catch((e) => {
-        commit('FORGOT_FAILURE', e.response.data)
+        try {
+          JSON.parse(e.response.data)
+        } catch {
+          commit('FORGOT_FAILURE', e.response.data)
+          commit('FORGOT_FAILURE', false)
+          return
+        }
+        commit('FORGOT_FAILURE', JSON.parse(e.response.data))
       })
       .finally(() => {
         commit('FORGOT_PROCESS', false)
@@ -141,7 +166,7 @@ const actions = {
   },
   resetPassword({ commit }, payload) {
     const formData = new FormData()
-    for(const i in payload) {
+    for (const i in payload) {
       formData.append(i, payload[i])
     }
     commit('RESET_PROCESS', true)
@@ -151,7 +176,14 @@ const actions = {
         commit('RESET_SUCCESS', data)
       })
       .catch((e) => {
-        commit('RESET_FAILURE', e.response.data)
+        try {
+          JSON.parse(e.response.data)
+        } catch {
+          commit('RESET_FAILURE', e.response.data)
+          commit('RESET_PROCESS', false)
+          return
+        }
+        commit('RESET_FAILURE', JSON.parse(e.response.data))
       })
       .finally(() => {
         commit('RESET_PROCESS', false)
