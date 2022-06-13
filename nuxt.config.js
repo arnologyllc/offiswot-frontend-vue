@@ -63,5 +63,7 @@ export default {
     transpile: [/^element-ui/],
   },
 
+  serverMiddleware: ["./server"],
+
   loading: { color: "#4156F6" },
 }
