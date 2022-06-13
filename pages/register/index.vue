@@ -178,6 +178,14 @@ export default {
         callback()
       }
     }
+    const validatePassSymbols = (rule, value, callback) => {
+      const regex = /^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[a-zA-Z0-9]*)$/
+      if(regex.test(value)) {
+        callback(new Error('Password must include at least 1 lowercase, uppercase, 1 number and 1 special character'))
+      } else {
+        callback()
+      }
+    }
     return {
       //  Request Body
       payload: {
@@ -200,15 +208,16 @@ export default {
       //  Validation Rules
       rules: {
         email: [
-          { required: true, message: 'Email is required', trigger: 'blur' },
+          { required: true, message: 'Please enter Email address', trigger: 'blur' },
           {
             type: 'email',
-            message: 'Please input correct email address',
+            message: 'Please input a valid email address',
             trigger: 'blur',
           },
         ],
         username: [
-          { required: true, message: 'Username is required', trigger: 'blur' },
+          { required: true, message: 'Please enter username', trigger: 'blur' },
+          { min: 3, max: 25, message: "Username must include minimum 3 and maximum 25 characters", trigger: 'blur' }
         ],
         password: [
           { required: true, message: 'Password is required', trigger: 'blur' },
@@ -218,12 +227,13 @@ export default {
             trigger: 'blur',
           },
           { validator: validatePass, trigger: 'blur' },
+          { validator: validatePassSymbols, trigger: 'blur' }
         ],
         password_confirmation: [
-          { required: true, message: 'Confirm your password', trigger: 'blur' },
+          { required: true, message: 'Please enter the password again', trigger: 'blur' },
           {
             min: 8,
-            message: 'Password length should me more than 8 chars',
+            message: 'Password length should me more than 8 characters',
             trigger: 'blur',
           },
           { validator: validatePass2, trigger: 'blur' },
@@ -246,24 +256,45 @@ export default {
         this.isOpenEmailDialog = true
       }
     },
-    registerFailureData(v) {
-      for (const i in v) {
-        if (typeof v[i] !== 'string') {
-          for (const j in v[i]) {
-            this.$notify.error({
-              title: 'Error',
-              dangerouslyUseHTMLString: true,
-              message: `${i}: ${v[i][j]}`,
-            })
+    registerFailureData: {
+      deep: true,
+      handler(v) {
+        if (v === 'Account exists, please login.') {
+          this.$router.push(`/login?email=${this.payload.email}`)
+        }
+        if (v === 'Email already exists but is not verified.') {
+          this.isOpenEmailDialog = true
+        }
+        if (typeof v !== 'string') {
+          for (const i in v) {
+            if (typeof v[i] !== 'string') {
+              for (const j in v[i]) {
+                this.$notify.error({
+                  title: 'Error',
+                  dangerouslyUseHTMLString: true,
+                  message: `${i}: ${v[i][j]}`,
+                })
+              }
+            } else {
+              this.$notify.error({
+                title: 'Error',
+                message: v[i],
+              })
+            }
           }
         } else {
           this.$notify.error({
             title: 'Error',
-            message: v[i],
+            message: v,
           })
         }
-      }
+      },
     },
+  },
+  mounted() {
+    if (this.$route.query.email) {
+      this.payload.email = this.$route.query.email
+    }
   },
   methods: {
     onSubmit() {
@@ -348,6 +379,7 @@ export default {
     }
     .form-item {
       position: relative;
+      margin-bottom: 30px;
       ::v-deep input {
         &::placeholder {
           transition: 0.25s;
