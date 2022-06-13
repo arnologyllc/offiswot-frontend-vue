@@ -38,6 +38,10 @@ const state = {
           commit('GET_PROFILE_PROCESS', false)
         })
     },
+    async getWorkSpaces() {
+      const res = await this.$api.get('workspaces')
+      return res.status === 200 ? res.data : JSON.parse(res.response.data);
+    }
   }
   export default {
     namespaced: true,
