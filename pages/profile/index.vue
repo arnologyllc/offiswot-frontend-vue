@@ -1,43 +1,48 @@
 <template>
   <div>
-    <div 
-      v-loading.fullscreen.lock="profileLoading"
-      class="main" 
-    >
+    <div v-loading.fullscreen.lock="profileLoading" class="main">
       <div class="main__user-container">
-        <div class="user-box__title">
-          Your Profile
-        </div>
+        <div class="user-box__title">Your Profile</div>
         <div class="user-box__info">
-          <img class="user-box__avatar" width="119px" height="119px" :src="avatarURL" alt="user_avatar">
+          <img
+            class="user-box__avatar"
+            width="119px"
+            height="119px"
+            :src="avatarURL"
+            alt="user_avatar"
+          />
           <div class="user-box__user-info">
             <div class="user-box__user-fullname user-box__title">
               <span>{{ userFullName }}</span>
               <img
-                class="user-box__user-edit-icon" 
-                src="@/assets/images/icons/edit-icon.svg" 
+                class="user-box__user-edit-icon"
+                src="@/assets/images/icons/edit-icon.svg"
                 alt="edit_icon"
-              >  
+              />
             </div>
             <div class="user-box__specialty">{{ specialty }}</div>
             <div class="user-box__credentials">
               <div class="user-box__flex-box">
-                <img 
-                  src="@/assets/images/icons/email1-icon.svg" 
+                <img
+                  src="@/assets/images/icons/email1-icon.svg"
                   alt="email_icon"
-                >  
+                />
                 <div>
                   {{ profileSuccessData ? profileSuccessData.user.email : '' }}
                 </div>
               </div>
               <div class="user-box__flex-box">
-                <img 
-                  style="margin-bottom: 3px" 
-                  src="@/assets/images/icons/phone-icon.svg" 
+                <img
+                  style="margin-bottom: 3px"
+                  src="@/assets/images/icons/phone-icon.svg"
                   alt="phone_icon"
-                >
+                />
                 <div>
-                  {{ profileSuccessData ? profileSuccessData.user.phone_number : '' }}
+                  {{
+                    profileSuccessData
+                      ? profileSuccessData.user.phone_number
+                      : ''
+                  }}
                 </div>
               </div>
             </div>
@@ -49,16 +54,21 @@
         <div class="user-workspaces">
           <div class="user-workspaces__header">
             <div class="user-workspaces__title">your workspaces</div>
-            <el-button 
-              v-if="isWithWorkspaces" 
-              type="text" 
+            <el-button
+              v-if="isWithWorkspaces"
+              type="text"
               class="user-workspaces__create-btn-outline"
             >
               <span>+ Create workspace</span>
             </el-button>
           </div>
           <div v-if="isWithWorkspaces">
-            <div v-for="(item, i) in responseWorkspaces.myWorkspaces" :key="`workspace_${i}`" class="user-workspaces__container" :class="{'small' : isWithWorkspaces}">
+            <div
+              v-for="(item, i) in responseWorkspaces.myWorkspaces"
+              :key="`workspace_${i}`"
+              class="user-workspaces__container"
+              :class="{ small: isWithWorkspaces }"
+            >
               <div class="user-workspaces__workspace-name">
                 {{ item.name }}
               </div>
@@ -68,9 +78,9 @@
                 </el-button>
                 <el-button class="user-workspaces__icon-btn">
                   <img
-                    src="@/assets/images/icons/edit-icon.svg" 
+                    src="@/assets/images/icons/edit-icon.svg"
                     alt="edit_icon"
-                  > 
+                  />
                 </el-button>
               </div>
             </div>
@@ -80,10 +90,11 @@
               <span>Create</span>
             </el-button>
             <div class="user-workspaces__container-text">
-              Create a workspace for ... some more text Lorem Ipsum is simply dummy 
-              text of the printing and typesetting industry. 
-              Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 
-              when an unknown printer took a galley of type and scrambled it to make a ty 
+              Create a workspace for ... some more text Lorem Ipsum is simply
+              dummy text of the printing and typesetting industry. Lorem Ipsum
+              has been the industry's standard dummy text ever since the 1500s,
+              when an unknown printer took a galley of type and scrambled it to
+              make a ty
             </div>
           </div>
           <div class="user-workspaces__header-bottom">
@@ -111,25 +122,30 @@ export default {
       'profileFailureData',
     ]),
     avatarURL() {
-      if(this.profileSuccessData) {
+      if (this.profileSuccessData) {
         return `${this.profileSuccessData.avatarPath}/${this.profileSuccessData.user.avatar}`
-      }else return ''
+      } else return ''
     },
     userFullName() {
-      if(this.profileSuccessData) {
+      if (this.profileSuccessData) {
         return `${this.profileSuccessData.user.name} ${this.profileSuccessData.user.lastname} ${this.profileSuccessData.user.surname}`
-      }else return ''
+      } else return ''
     },
     specialty() {
-      if(this.profileSuccessData) {
-        return this.profileSuccessData.specialties.find(el => el.id === this.profileSuccessData.user.speciality_id).name 
-      }else return ''
+      if (this.profileSuccessData) {
+        return this.profileSuccessData.specialties.find(
+          (el) => el.id === this.profileSuccessData.user.speciality_id
+        ).name
+      } else return ''
     },
     isWithWorkspaces() {
-      if(this.responseWorkspaces && this.responseWorkspaces.myWorkspaces.length) {
+      if (
+        this.responseWorkspaces &&
+        this.responseWorkspaces.myWorkspaces.length
+      ) {
         return true
-      }else return false
-    }
+      } else return false
+    },
   },
   watch: {
     profileFailureData(v) {
@@ -154,10 +170,10 @@ export default {
   async created() {
     this.getUserProfile()
     try {
-      this.responseWorkspaces = await this.$store.dispatch("profile/getWorkSpaces")
-    } catch(e) {
-      console.error(e);
-    } 
+      this.responseWorkspaces = await this.$store.dispatch(
+        'profile/getWorkSpaces'
+      )
+    } catch {}
   },
   methods: {
     getUserProfile() {
@@ -192,7 +208,7 @@ export default {
     cursor: pointer;
   }
   &__info {
-    padding: 36px 75px 0 75px ;
+    padding: 36px 75px 0 75px;
     display: flex;
   }
   &__avatar {
@@ -201,7 +217,7 @@ export default {
   &__user-info {
     padding-left: 39px;
   }
-  &__user-fullname{
+  &__user-fullname {
     padding-left: 0;
   }
   &__specialty {
@@ -221,14 +237,13 @@ export default {
   }
   &__flex-box {
     display: flex;
-    align-items: center;  
+    align-items: center;
     img {
       margin-right: 5px;
     }
   }
   &__flex-box:last-child {
     margin-left: 15px;
-  
   }
 }
 .change-picture {
@@ -314,7 +329,7 @@ export default {
 }
 .small {
   min-height: 88px;
-  background: linear-gradient(90.09deg, #BD7AE3 2.21%, $ov-primary 98.06%);
+  background: linear-gradient(90.09deg, #bd7ae3 2.21%, $ov-primary 98.06%);
   flex-direction: row;
   align-items: center;
 }
@@ -352,7 +367,7 @@ export default {
     &__user-edit-icon {
       margin-left: 5px;
     }
-  }  
+  }
   .change-picture {
     margin-left: 97px;
     margin-bottom: 18px;
