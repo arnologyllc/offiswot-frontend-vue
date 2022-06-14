@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="default-layout">
     <Header />
       <Nuxt />
     <Footer />
@@ -21,4 +21,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.default-layout {
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+  background-color: $ov-gray-bg;
+}
 </style>

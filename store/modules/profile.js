@@ -1,7 +1,7 @@
 const state = {
   profileSuccessData: null,
   profileFailureData: null,
-  profileLoading: false,
+  profileLoading: true,
 }
 
 const getters = {
