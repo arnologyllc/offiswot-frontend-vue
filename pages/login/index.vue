@@ -48,7 +48,7 @@
             </template>
           </el-input>
           <div class="forgot-password">
-            <el-checkbox v-model="payload.remember" class="remember-checkbox"
+            <el-checkbox v-model="payload.remember_me" class="remember-checkbox"
               >Remember me</el-checkbox
             >
             <el-button type="text" @click="$router.push('/password/forgot')"
@@ -79,7 +79,7 @@ export default {
   name: 'RegisterPage',
   components: {
     LoginButtons,
-    ConfirmEmail
+    ConfirmEmail,
   },
   layout: 'auth',
   data() {
@@ -88,7 +88,7 @@ export default {
       payload: {
         email: null,
         password: null,
-        remember: false,
+        remember_me: false,
       },
 
       //  Show Password/Not Show Password
@@ -123,16 +123,22 @@ export default {
     loginSuccessData(v) {
       if (v) {
         this.$router.push('/')
-        this.$cookies.set('token', v.access_token)
+        this.$cookies.set('token', v.access_token, {
+          options: {
+            expires: this.payload.remember_me
+              ? 9999
+              : Math.round(v.expires_in / 60 / 24),
+          },
+        })
       }
     },
     loginErrorData: {
       deep: true,
       handler(v) {
-        if(v === 'Please Verify Email' || v.error === 'Please Verify Email') {
-          this.isOpenEmailDialog = true;
+        if (v === 'Please Verify Email' || v.error === 'Please Verify Email') {
+          this.isOpenEmailDialog = true
         }
-        if(v === "Email Or username not found") {
+        if (v === 'Email Or username not found') {
           this.$router.push(`/register?email=${this.payload.email}`)
         }
         if (typeof v !== 'string') {
@@ -153,7 +159,7 @@ export default {
             }
           }
         }
-      }
+      },
     },
   },
   mounted() {
