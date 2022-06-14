@@ -64,7 +64,7 @@ export default {
   },
 
   server: { 
-    port: process.env.PORT || 4002,
+    port: process.env.PORT || 3000,
   },
 
   loading: { color: "#4156F6" },
