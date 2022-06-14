@@ -1,1 +1,1 @@
-web: npm run generate
+web:nuxt start
