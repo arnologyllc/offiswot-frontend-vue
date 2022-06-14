@@ -58,6 +58,7 @@
               v-if="isWithWorkspaces"
               type="text"
               class="user-workspaces__create-btn-outline"
+              @click="createWorkSpace"
             >
               <span>+ Create workspace</span>
             </el-button>
@@ -85,8 +86,14 @@
               </div>
             </div>
           </div>
-          <div v-else-if="responseWorkspaces && !responseWorkspaces.length" class="user-workspaces__container">
-            <el-button class="user-workspaces__create-btn">
+          <div
+            v-else-if="responseWorkspaces && !responseWorkspaces.length"
+            class="user-workspaces__container"
+          >
+            <el-button
+              class="user-workspaces__create-btn"
+              @click="createWorkSpace"
+            >
               <span>Create</span>
             </el-button>
             <div class="user-workspaces__container-text">
@@ -176,6 +183,9 @@ export default {
     } catch {}
   },
   methods: {
+    createWorkSpace() {
+      this.$router.push('/create-workspace/step1')
+    },
     getUserProfile() {
       this.$store.dispatch('profile/getProfile')
     },
