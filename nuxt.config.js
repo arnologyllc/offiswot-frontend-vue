@@ -63,7 +63,7 @@ export default {
     transpile: [/^element-ui/],
   },
 
-  server: {
+  server: { 
     port: process.env.PORT || 4002,
   },
 
