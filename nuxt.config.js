@@ -23,7 +23,7 @@ export default {
 
   buildModules: [
     '@nuxtjs/eslint-module',
-    '@nuxtjs/style-resources',
+    "@nuxtjs/style-resources",
     [
       'nuxt-compress',
       {
@@ -35,11 +35,13 @@ export default {
         },
       },
     ],
+
   ],
 
   styleResources: {
-    scss: ['@/assets/styles/_variables.scss'],
+    scss: ["@/assets/styles/_variables.scss"]
   },
+
 
   modules: [
     '@nuxtjs/axios',
@@ -57,29 +59,15 @@ export default {
     'cookie-universal-nuxt',
   ],
 
-  generate: {
+  build: {
     transpile: [/^element-ui/],
-
-    done(generator) {
-      // Copy dist files to public/_nuxt
-      if (
-        generator.nuxt.options.dev === false &&
-        generator.nuxt.options.mode === 'spa'
-      ) {
-        const publicDir = join(
-          generator.nuxt.options.rootDir,
-          'public',
-          '_nuxt'
-        )
-        removeSync(publicDir)
-        copySync(join(generator.nuxt.options.generate.dir, '_nuxt'), publicDir)
-        copySync(
-          join(generator.nuxt.options.generate.dir, '200.html'),
-          join(publicDir, 'index.html')
-        )
-      }
-    },
   },
 
-  loading: { color: '#4156F6' },
+  server: {
+    port: 8000, // default: 3000     
+    host: '0.0.0.0', // default: localhost  
+  },
+
+  loading: { color: "#4156F6" },
 }
+
