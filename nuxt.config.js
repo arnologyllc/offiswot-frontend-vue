@@ -63,5 +63,9 @@ export default {
     transpile: [/^element-ui/],
   },
 
+  server: {
+    port: process.env.PORT || 4002,
+  },
+
   loading: { color: "#4156F6" },
 }
