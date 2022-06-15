@@ -1,4 +1,4 @@
-const state = {
+const state = () => ({
   registerSuccessData: null,
   registerFailureData: null,
   resendSuccessData: null,
@@ -13,7 +13,7 @@ const state = {
   loginLoading: false,
   forgotLoading: false,
   resetLoading: false,
-}
+})
 
 const getters = {
   registerSuccessData: (state) => state.registerSuccessData,

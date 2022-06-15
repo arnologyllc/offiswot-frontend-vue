@@ -1,4 +1,4 @@
-const state = {
+const state = () => ({
     isLoadingIndustries: false,
     isLoadingSubmit: false,
     industriesList: {
@@ -7,7 +7,7 @@ const state = {
     industriesError: null,
     createWorkspaceSuccess: null,
     createWorkspaceError: null,
-}
+})
 
 const getters = {
     isLoadingIndustries: (state) => state.isLoadingIndustries,

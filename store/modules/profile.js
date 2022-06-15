@@ -1,8 +1,8 @@
-const state = {
+const state = () => ({
   profileSuccessData: null,
   profileFailureData: null,
   profileLoading: true,
-}
+})
 
 const getters = {
   profileSuccessData: (state) => state.profileSuccessData,
