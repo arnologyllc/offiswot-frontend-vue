@@ -145,7 +145,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import ConfirmEmail from '@/components/shared/OvConfirmEmailModal.vue'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
 import floatingInput from '@/mixins/floatingInput'
@@ -180,8 +180,12 @@ export default {
     }
     const validatePassSymbols = (rule, value, callback) => {
       const regex = /^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[a-zA-Z0-9]*)$/
-      if(regex.test(value)) {
-        callback(new Error('Password must include at least 1 lowercase, uppercase, 1 number and 1 special character'))
+      if (regex.test(value)) {
+        callback(
+          new Error(
+            'Password must include at least 1 lowercase, uppercase, 1 number and 1 special character'
+          )
+        )
       } else {
         callback()
       }
@@ -208,7 +212,11 @@ export default {
       //  Validation Rules
       rules: {
         email: [
-          { required: true, message: 'Please enter Email address', trigger: 'blur' },
+          {
+            required: true,
+            message: 'Please enter Email address',
+            trigger: 'blur',
+          },
           {
             type: 'email',
             message: 'Please input a valid email address',
@@ -217,7 +225,13 @@ export default {
         ],
         username: [
           { required: true, message: 'Please enter username', trigger: 'blur' },
-          { min: 3, max: 25, message: "Username must include minimum 3 and maximum 25 characters", trigger: 'blur' }
+          {
+            min: 3,
+            max: 25,
+            message:
+              'Username must include minimum 3 and maximum 25 characters',
+            trigger: 'blur',
+          },
         ],
         password: [
           { required: true, message: 'Password is required', trigger: 'blur' },
@@ -227,10 +241,14 @@ export default {
             trigger: 'blur',
           },
           { validator: validatePass, trigger: 'blur' },
-          { validator: validatePassSymbols, trigger: 'blur' }
+          { validator: validatePassSymbols, trigger: 'blur' },
         ],
         password_confirmation: [
-          { required: true, message: 'Please enter the password again', trigger: 'blur' },
+          {
+            required: true,
+            message: 'Please enter the password again',
+            trigger: 'blur',
+          },
           {
             min: 8,
             message: 'Password length should me more than 8 characters',
@@ -297,10 +315,11 @@ export default {
     }
   },
   methods: {
+    ...mapActions('auth', ['registerUser']),
     onSubmit() {
       this.$refs.registerForm.validate((valid) => {
         if (valid) {
-          this.$store.dispatch('auth/registerUser', this.payload)
+          this.registerUser(this.payload)
         } else {
           this.$message.error('Wrong!')
           return false

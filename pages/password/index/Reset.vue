@@ -76,7 +76,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
 export default {
   name: 'PasswordReset',
@@ -174,10 +174,11 @@ export default {
     },
   },
   methods: {
+    ...mapActions("auth", ["resetPassword"]),
     onSubmit() {
       this.$refs.resetForm.validate((valid) => {
         if (valid) {
-          this.$store.dispatch('auth/resetPassword', this.payload)
+          this.resetPassword(this.payload)
         } else {
           this.$message.error('Wrong!')
           return false

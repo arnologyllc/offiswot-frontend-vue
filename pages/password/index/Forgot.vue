@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
 export default {
   name: 'PasswordForgot',
@@ -97,10 +97,11 @@ export default {
     },
   },
   methods: {
+    ...mapActions("auth", ["forgotPassword"]),
     onSubmit() {
       this.$refs.forgotForm.validate((valid) => {
         if (valid) {
-          this.$store.dispatch('auth/forgotPassword', this.payload)
+          this.forgotPassword(this.payload)
         } else {
           this.$message.error('Wrong!')
           return false

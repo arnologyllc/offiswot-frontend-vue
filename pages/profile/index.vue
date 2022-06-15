@@ -114,7 +114,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 export default {
   name: 'ProfilePage',
   data() {
@@ -175,19 +175,15 @@ export default {
     },
   },
   async created() {
-    this.getUserProfile()
+    this.getProfile()
     try {
-      this.responseWorkspaces = await this.$store.dispatch(
-        'profile/getWorkSpaces'
-      )
+      this.responseWorkspaces = await this.getWorkSpaces()
     } catch {}
   },
   methods: {
+    ...mapActions("profile", ["getWorkSpaces", "getProfile"]),
     createWorkSpace() {
       this.$router.push('/create-workspace/step1')
-    },
-    getUserProfile() {
-      this.$store.dispatch('profile/getProfile')
     },
   },
 }

@@ -17,7 +17,7 @@
       click on th link sent for verifying your email.</span
     >
     <span slot="footer" class="dialog-footer">
-      <a href="" class="dialog-footer__action" @click.prevent="resendEmail"
+      <a href="" class="dialog-footer__action" @click.prevent="resendEmail(email)"
         >Resend Verification Email</a
       >
     </span>
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 export default {
   name: 'OvConfirmEmailModal',
   props: {
@@ -75,9 +75,7 @@ export default {
     })
   },
   methods: {
-    resendEmail() {
-      this.$store.dispatch('auth/resendEmail', this.email)
-    },
+    ...mapActions("auth", ["resendEmail"])
   },
 }
 </script>
