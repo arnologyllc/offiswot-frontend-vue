@@ -261,6 +261,11 @@ export default {
       isOpenEmailDialog: false,
     }
   },
+  head() {
+    return {
+      title: "Register"
+    }
+  },
   computed: {
     ...mapGetters('auth', [
       'registerFailureData',

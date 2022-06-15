@@ -122,6 +122,11 @@ export default {
       responseWorkspaces: null,
     }
   },
+  head() {
+    return {
+      title: "Profile"
+    }
+  },
   computed: {
     ...mapGetters('profile', [
       'profileLoading',

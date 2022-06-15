@@ -112,6 +112,11 @@ export default {
       isOpenEmailDialog: false,
     }
   },
+  head() {
+    return {
+      title: "Login"
+    }
+  },
   computed: {
     ...mapGetters('auth', [
       'loginSuccessData',

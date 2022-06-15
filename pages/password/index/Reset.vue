@@ -141,6 +141,11 @@ export default {
       },
     }
   },
+  head() {
+    return {
+      title: "Reset Password"
+    }
+  },
   computed: {
     ...mapGetters('auth', [
       'resetSuccessData',

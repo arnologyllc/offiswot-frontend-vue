@@ -63,6 +63,11 @@ export default {
       },
     }
   },
+  head() {
+    return {
+      title: "Forgot Password"
+    }
+  },
   computed: {
     ...mapGetters('auth', [
       'forgotSuccessData',

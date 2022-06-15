@@ -79,6 +79,11 @@ export default {
       },
     }
   },
+  head() {
+    return {
+      title: "Create Workspace | Step 1"
+    }
+  },
   computed: {
     ...mapGetters('workspace', [
       'isLoadingIndustries',
