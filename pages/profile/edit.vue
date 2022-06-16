@@ -311,7 +311,6 @@ export default {
       this.editProfile(this.payload)
     },
     onAvatarUpload(e) {
-      console.log('aaa', e)
       this.payload.avatar = e.raw
       this.avatarSrc = URL.createObjectURL(e.raw)
     },
