@@ -17,8 +17,6 @@
             v-model="payload.email"
             class="main__form--box__input"
             placeholder="E-mail"
-            @focus="isShow.email = true"
-            @blur="onInputBlur('email')"
           >
             <template slot="prefix">
               <img
@@ -27,11 +25,6 @@
               />
             </template>
           </el-input>
-          <span
-            class="form-item__label"
-            :class="{ invisible: !isShow.email, active: isBlured('email') }"
-            >E-mail</span
-          >
         </el-form-item>
         <el-form-item prop="username" class="form-item">
           <el-input
@@ -39,21 +32,11 @@
             v-model="payload.username"
             class="main__form--box__input"
             placeholder="Username"
-            @focus="isShow.username = true"
-            @blur="onInputBlur('username')"
           >
             <template slot="prefix">
               <img src="@/assets/images/icons/user-icon.svg" alt="user_icon" />
             </template>
           </el-input>
-          <span
-            class="form-item__label"
-            :class="{
-              invisible: !isShow.username,
-              active: isBlured('username'),
-            }"
-            >Username</span
-          >
         </el-form-item>
         <el-form-item prop="password" class="form-item">
           <el-input
@@ -62,8 +45,6 @@
             class="main__form--box__input"
             placeholder="Password"
             :type="showPassword ? 'text' : 'password'"
-            @blur="onInputBlur('password')"
-            @focus="isShow.password = true"
           >
             <template slot="prefix">
               <img
@@ -83,14 +64,6 @@
               />
             </template>
           </el-input>
-          <span
-            class="form-item__label"
-            :class="{
-              invisible: !isShow.password,
-              active: isBlured('password'),
-            }"
-            >Password</span
-          >
         </el-form-item>
         <el-form-item prop="password_confirmation" class="form-item">
           <el-input
@@ -99,8 +72,6 @@
             class="main__form--box__input"
             placeholder="Confirm password"
             :type="showConfirmPassword ? 'text' : 'password'"
-            @blur="onInputBlur('password_confirmation')"
-            @focus="isShow.password_confirmation = true"
           >
             <template slot="prefix">
               <img
@@ -120,14 +91,6 @@
               />
             </template>
           </el-input>
-          <span
-            class="form-item__label"
-            :class="{
-              invisible: !isShow.password_confirmation,
-              active: isBlured('password_confirmation'),
-            }"
-            >Password</span
-          >
         </el-form-item>
         <login-buttons
           login-title="Register"
@@ -148,14 +111,12 @@
 import { mapGetters, mapActions } from 'vuex'
 import ConfirmEmail from '@/components/shared/OvConfirmEmailModal.vue'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
-import floatingInput from '@/mixins/floatingInput'
 export default {
   name: 'LoginPage',
   components: {
     ConfirmEmail,
     LoginButtons,
   },
-  mixins: [floatingInput],
   layout: 'auth',
   data() {
     //  Custom Validations
@@ -197,12 +158,6 @@ export default {
         username: null,
         password: null,
         password_confirmation: null,
-      },
-      isShow: {
-        email: false,
-        username: false,
-        password: false,
-        password_confirmation: false,
       },
 
       //  Show Password/Not Show Password
@@ -336,15 +291,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.4s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
 .main {
   width: 100%;
   position: relative;
@@ -412,33 +358,6 @@ export default {
           &::placeholder {
             opacity: 0;
           }
-        }
-      }
-      &__label {
-        color: $ov-text--subtitle;
-        font-size: 11px;
-        position: absolute;
-        z-index: 10;
-        left: 0;
-        top: -10px;
-        left: 47px;
-        top: -19px;
-        background: $ov-gray-bg;
-        height: 22px;
-        transition: 0.25s;
-        opacity: 1;
-        &.invisible {
-          opacity: 0;
-        }
-        &.active {
-          color: $ov-primary;
-        }
-      }
-    }
-    & .is-error {
-      ::v-deep {
-        .form-item__label {
-          color: red;
         }
       }
     }
