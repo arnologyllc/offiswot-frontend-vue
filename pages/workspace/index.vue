@@ -284,6 +284,7 @@ export default {
     &--chat {
       display: flex;
       gap: 0 14px;
+      align-items: center;
       margin-bottom: 16px;
       cursor: pointer;
       img {
