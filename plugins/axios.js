@@ -7,7 +7,7 @@ export default function ({ $axios, app }, inject) {
       }
     })
 
-    api.setBaseURL('https://offiswot-api.arnologyapps.com/api/')
+    api.setBaseURL(process.env.apiUrl)
   
     inject('api', api)
   }

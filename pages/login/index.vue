@@ -114,7 +114,7 @@ export default {
   },
   head() {
     return {
-      title: "Login"
+      title: 'Login',
     }
   },
   computed: {
@@ -127,7 +127,6 @@ export default {
   watch: {
     loginSuccessData(v) {
       if (v) {
-        this.$router.push('/')
         this.$cookies.set('token', v.access_token, {
           options: {
             expires: this.payload.remember_me
@@ -135,6 +134,7 @@ export default {
               : Math.round(v.expires_in / 60 / 24),
           },
         })
+        this.$router.push('/')
       }
     },
     loginErrorData: {
@@ -173,7 +173,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions("auth", ["loginUser"]),
+    ...mapActions('auth', ['loginUser']),
     onSubmit() {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {

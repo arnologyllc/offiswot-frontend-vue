@@ -75,7 +75,7 @@
                 {{ item.name }}
               </div>
               <div class="user-workspaces__buttons">
-                <el-button class="user-workspaces__create-btn">
+                <el-button class="user-workspaces__create-btn" @click="openWorkspace(item.id)">
                   <span>Open</span>
                 </el-button>
                 <el-button class="user-workspaces__icon-btn">
@@ -136,7 +136,7 @@ export default {
     ]),
     avatarURL() {
       if (this.profileSuccessData) {
-        return `${this.profileSuccessData.avatarPath}/${this.profileSuccessData.user.avatar}`
+        return `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.profileSuccessData.user.avatar}`
       } else return ''
     },
     userFullName() {
@@ -189,8 +189,11 @@ export default {
   methods: {
     ...mapActions("profile", ["getWorkSpaces", "getProfile"]),
     createWorkSpace() {
-      this.$router.push('/create-workspace/step1')
+      this.$router.push('/create-workspace')
     },
+    openWorkspace(id) {
+      this.$router.push(`/workspace/staff/${id}`)
+    }
   },
 }
 </script>
@@ -225,6 +228,7 @@ export default {
   }
   &__avatar {
     border-radius: 50%;
+    object-fit: cover;
   }
   &__user-info {
     padding-left: 39px;

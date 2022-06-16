@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import Header from '@/components/global/Header.vue'
+import Header from '~/components/global/auth/Header.vue'
 import Footer from '@/components/global/Footer.vue'
 export default {
   name: 'AuthLayout',
