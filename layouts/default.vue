@@ -4,19 +4,19 @@
     <div class="default-layout__pages">
       <Nuxt />
     </div>
-    <Footer />
+    <Footer v-if="!$route.path.includes('workspace')" />
   </div>
 </template>
 
 <script>
 import auth from '@/middleware/auth'
-import Header from '@/components/global/Header.vue'
-import Footer from '@/components/global/Footer.vue'
+import Header from '@/components/global/default/Header'
+import Footer from '@/components/global/Footer'
 export default {
   name: 'DefaultLayout',
   components: {
-    Header,
     Footer,
+    Header
   },
   middleware: [auth],
 }

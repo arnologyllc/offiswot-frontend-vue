@@ -294,7 +294,7 @@ export default {
       if (this.payload.phone_number) {
         this.payload.phone_number = this.payload.phone_number.toString()
       }
-      this.avatarSrc = `${this.profileSuccessData.avatarPath}/${this.profileSuccessData.user.avatar}`
+      this.avatarSrc = `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.profileSuccessData.user.avatar}`
     },
     editProfileData(v) {
       if(v) {

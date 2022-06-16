@@ -72,6 +72,11 @@ export default {
     timing: false
   },
 
+  env: {
+    apiUrl: 'https://offiswot-api.arnologyapps.com/api/',
+    serverUrl: 'https://offiswot-api.arnologyapps.com'
+  },
+
   loading: { color: "#4156F6" },
 }
 
