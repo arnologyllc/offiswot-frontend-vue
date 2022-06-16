@@ -1,7 +1,9 @@
 <template>
   <div class="default-layout">
     <Header />
+    <div class="default-layout__pages">
       <Nuxt />
+    </div>
     <Footer />
   </div>
 </template>
@@ -26,5 +28,8 @@ export default {
   height: 100vh;
   overflow-y: auto;
   background-color: $ov-gray-bg;
+  &__pages {
+    padding-top: 80px;
+  }
 }
 </style>

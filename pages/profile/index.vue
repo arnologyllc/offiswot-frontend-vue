@@ -18,6 +18,7 @@
                 class="user-box__user-edit-icon"
                 src="@/assets/images/icons/edit-icon.svg"
                 alt="edit_icon"
+                @click="$router.push('/profile/edit')"
               />
             </div>
             <div class="user-box__specialty">{{ specialty }}</div>

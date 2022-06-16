@@ -39,7 +39,7 @@ export default {
   background-attachment: fixed;
   width: 100%;
   min-height: calc(100vh - 286px);
-  padding: 50px 0 150px 18%;
+  padding: 130px 0 150px 18%;
   overflow-y: auto;
   position: relative;
 
