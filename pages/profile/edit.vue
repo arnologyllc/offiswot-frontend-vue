@@ -5,27 +5,37 @@
       ref="editForm"
       class="main__form"
       hide-required-asterisk
+      label-position="top"
       :model="payload"
+      @submit.native.prevent="onSubmit"
     >
       <el-row>
         <el-col :span="24" class="main__title">Complete your profile</el-col>
       </el-row>
       <el-row :gutter="70">
         <el-col :span="8" class="main__form--picture">
-          <img
-            :src="`${profileSuccessData.avatarPath}/${profileSuccessData.user.avatar}`"
-            alt="avatar"
-          />
-          <el-upload class="main__form--upload">
-            <el-button size="small" type="text">Upload picture</el-button>
-          </el-upload>
+          <img :src="avatarSrc" alt="avatar" />
+          <el-form-item prop="avatar">
+            <el-upload
+              v-model="payload.avatar"
+              :show-file-list="false"
+              class="main__form--upload"
+              action="#"
+              accept="image/*"
+              :on-change="onAvatarUpload"
+            >
+              <el-button size="small" type="text">Upload picture</el-button>
+            </el-upload>
+          </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item prop="date_of_birth">
+          <el-form-item prop="date_of_birth" label="Date of birth">
             <el-date-picker
               v-model="payload.date_of_birth"
               class="main__form--input date-picker"
               type="date"
+              format="yyyy-MM-dd"
+              value-format="yyyy-MM-dd"
               placeholder="Date of birth"
             >
             </el-date-picker>
@@ -42,15 +52,22 @@
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item prop="languages">
+          <el-form-item prop="languages" label="Lanugages">
             <el-select
               v-model="payload.languages"
               multiple
               class="main__form--input select"
               placeholder="Languages"
-            ></el-select>
+            >
+              <el-option
+                v-for="(item, index) in languagesList"
+                :key="`lang_${index}`"
+                :value="item.id"
+                :label="item.name"
+              ></el-option>
+            </el-select>
           </el-form-item>
-          <el-form-item prop="experience">
+          <el-form-item prop="experience" label="Experience">
             <el-input
               v-model="payload.experience"
               type="number"
@@ -62,7 +79,7 @@
       </el-row>
       <el-row :gutter="70">
         <el-col :span="8">
-          <el-form-item prop="name">
+          <el-form-item prop="name" label="Name">
             <el-input
               v-model="payload.name"
               class="main__form--input"
@@ -71,7 +88,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item prop="phone_number">
+          <el-form-item prop="phone_number" label="Phone Number">
             <phone
               v-model="payload.phone_number"
               color="#4156F6"
@@ -85,7 +102,7 @@
       </el-row>
       <el-row :gutter="70">
         <el-col :span="8">
-          <el-form-item prop="surname">
+          <el-form-item prop="surname" label="Surname">
             <el-input
               v-model="payload.surname"
               class="main__form--input"
@@ -94,19 +111,26 @@
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item prop="speciality_id">
+          <el-form-item prop="speciality_id" label="Speciality">
             <el-select
               v-model="payload.speciality_id"
-              multiple
               class="main__form--input select"
+              :filterable="true"
               placeholder="Speciality"
-            ></el-select>
+            >
+              <el-option
+                v-for="(item, index) in profileSuccessData.specialties"
+                :key="`spec_${index}`"
+                :value="item.id"
+                :label="item.name"
+              ></el-option>
+            </el-select>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row :gutter="70">
         <el-col :span="8">
-          <el-form-item prop="lastname">
+          <el-form-item prop="lastname" label="Last Name">
             <el-input
               v-model="payload.lastname"
               class="main__form--input"
@@ -115,25 +139,61 @@
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item prop="timezone">
+          <el-form-item prop="timezone" label="Timezone">
             <el-select
               v-model="payload.timezone"
               multiple
               class="main__form--input select"
               placeholder="Timezone"
-            ></el-select>
+            >
+              <el-option value="UTC+04" label="UTC+04"></el-option>
+            </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="8">
-        <el-upload class="main__form--upload">
-          <el-button type="text">
-              <div class="main__form--upload__cv">
-                <img src="@/assets/images/icons/download-icon.svg" alt="d">
-                <span class="text-primary">Upload CV</span>
-                <span class="hint">(.pdf)</span>
-              </div>
+          <el-form-item prop="cv" class="main__form--cv-item" label="CV">
+            <div class="main__form--upload__cv-box">
+              <el-upload
+                v-model="payload.cv"
+                class="main__form--upload"
+                action="https://offiswot-api.arnologyapps.com/api/update-profile"
+              >
+                <el-button type="text">
+                  <div class="main__form--upload__cv">
+                    <img
+                      src="@/assets/images/icons/download-icon.svg"
+                      alt="d"
+                    />
+                    <span class="text-primary">Upload CV</span>
+                    <span class="hint">(.pdf)</span>
+                  </div>
+                </el-button>
+              </el-upload>
+            </div>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row class="main__form--actions">
+        <el-col :span="12">
+          <el-button type="text" @click="$router.push('/profile')">
+            <div class="go-back__box">
+              <img
+                src="@/assets/images/icons/chevron-dark-icon.svg"
+                class="go-back__icon"
+                alt=""
+              />
+              <span class="go-back__text">Back</span>
+            </div>
           </el-button>
-        </el-upload>
+        </el-col>
+        <el-col :span="12" class="submit-button__box">
+          <el-button
+            class="submit-button"
+            native-type="submit"
+            :loading="isLoadingSubmit"
+          >
+            <span class="submit-button__text">Save</span>
+          </el-button>
         </el-col>
       </el-row>
     </el-form>
@@ -164,7 +224,15 @@ export default {
         languages: null,
         experience: null,
         timezone: null,
+        cv: null,
+        avatar: null,
       },
+      languagesList: [
+        { name: 'EN', id: 'en' },
+        { name: 'RU', id: 'ru' },
+        { name: 'HY', id: 'hy' },
+      ],
+      avatarSrc: null,
     }
   },
   head() {
@@ -177,6 +245,9 @@ export default {
       'profileLoading',
       'profileSuccessData',
       'profileFailureData',
+      'isLoadingSubmit',
+      'editProfileData',
+      'editFailureData',
     ]),
   },
   watch: {
@@ -198,12 +269,52 @@ export default {
         }
       }
     },
+    editFailureData(v) {
+      for (const i in v) {
+        if (typeof v[i] !== 'string') {
+          for (const j in v[i]) {
+            this.$notify.error({
+              title: 'Error',
+              dangerouslyUseHTMLString: true,
+              message: `${i}: ${v[i][j]}`,
+            })
+          }
+        } else {
+          this.$notify.error({
+            title: 'Error',
+            message: v[i],
+          })
+        }
+      }
+    },
+    profileSuccessData() {
+      for (const i in this.payload) {
+        this.payload[i] = this.profileSuccessData.user[i]
+      }
+      if (this.payload.phone_number) {
+        this.payload.phone_number = this.payload.phone_number.toString()
+      }
+      this.avatarSrc = `${this.profileSuccessData.avatarPath}/${this.profileSuccessData.user.avatar}`
+    },
+    editProfileData(v) {
+      if(v) {
+        this.$message.success('Success!')
+      }
+    }
   },
   created() {
     this.getProfile()
   },
   methods: {
-    ...mapActions('profile', ['getProfile']),
+    ...mapActions('profile', ['getProfile', 'editProfile']),
+    onSubmit() {
+      this.editProfile(this.payload)
+    },
+    onAvatarUpload(e) {
+      console.log('aaa', e)
+      this.payload.avatar = e.raw
+      this.avatarSrc = URL.createObjectURL(e.raw)
+    },
   },
 }
 </script>
@@ -247,9 +358,13 @@ export default {
         }
       }
       &__cv {
-          display: flex;
-          align-items: center;
-          gap: 0 4px;
+        display: flex;
+        align-items: center;
+        gap: 0 4px;
+      }
+      &__cv-box {
+        display: flex;
+        justify-content: center;
       }
     }
     &--radio-group {
@@ -367,10 +482,66 @@ export default {
         }
       }
     }
+    &--actions {
+      margin-top: 88px;
+    }
+    &--cv-item {
+      ::v-deep {
+        .el-form-item__label {
+          display: flex;
+          justify-content: center;
+        }
+      }
+    }
   }
   .hint {
-      font-size: 12px;
-      color: $ov-text--subtitle;
+    font-size: 12px;
+    color: $ov-text--subtitle;
+  }
+  .go-back {
+    &__box {
+      display: flex;
+      align-items: center;
+      gap: 12.5px;
+    }
+    &__text {
+      color: $ov-primary--light;
+      transition: 0.2s;
+      font-size: 17px;
+      font-weight: 500;
+      &:hover {
+        color: $ov-primary;
+      }
+    }
+    &__icon {
+      width: 9.5px;
+    }
+  }
+  .submit-button {
+    background: $ov-primary;
+    color: white;
+    text-transform: uppercase;
+    width: 220px;
+    height: 48px;
+    padding: 0;
+    padding-right: 8px;
+    border-radius: 6px;
+    ::v-deep span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    &__text {
+      width: 100%;
+      display: flex;
+      font-size: 17px;
+      font-weight: 700;
+      justify-content: center !important;
+    }
+    &__box {
+      display: flex;
+      justify-content: flex-end;
+    }
   }
 }
 </style>

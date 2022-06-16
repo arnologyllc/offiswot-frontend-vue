@@ -35,6 +35,8 @@ export default {
   background: white;
   display: flex;
   justify-content: space-between;
+  position: fixed;
+  z-index: 9999;
 
   &__left {
     display: flex;
