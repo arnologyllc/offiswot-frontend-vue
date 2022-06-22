@@ -34,7 +34,7 @@ const mutations = {
     state.isLoadingSubmit = data
   },
   EDIT_PROFILE_SUCCESS: (state, data) => {
-    state.editProfileData = data
+    state.editProfileData = data;
     state.isLoadingSubmit = false;
   },
   EDIT_PROFILE_FAILURE: (state, data) => {

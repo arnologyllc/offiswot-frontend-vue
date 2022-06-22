@@ -3,9 +3,10 @@
     <div v-if="profileSuccessData && workSpaces" class="main__inner">
       <div class="main__left">
         <el-select
+          v-model="selectedWorkspaceId"
           class="main__workspaces"
           placeholder="Workspace"
-          v-model="selectedWorkspaceId"
+          :disabled="!$route.path.includes('/workspace')"
         >
           <el-option
             v-for="(item, index) in workSpaces.myWorkspaces"
@@ -22,18 +23,22 @@
           <el-button-group>
             <el-button
               :disabled="!selectedWorkspaceId"
-              @click="$router.push(`/workspace/staff/${selectedWorkspaceId}`)"
               :class="{ active: $route.path.includes('/staff') }"
+              @click="$router.push(`/workspace/staff/${selectedWorkspaceId}`)"
               >Staff</el-button
             >
             <el-button
               :disabled="!selectedWorkspaceId"
               :class="{ active: $route.path.includes('/projects') }"
+              @click="
+                $router.push(`/workspace/projects/${selectedWorkspaceId}`)
+              "
               >Projects</el-button
             >
             <el-button
               :disabled="!selectedWorkspaceId"
               :class="{ active: $route.path.includes('/tasks') }"
+              @click="$router.push(`/workspace/tasks/${selectedWorkspaceId}`)"
               >Tasks</el-button
             >
           </el-button-group>
@@ -41,8 +46,8 @@
       </div>
       <div class="main__right">
         <el-input
-          class="main__search-input"
           v-model="search"
+          class="main__search-input"
           placeholder="Search"
           suffix-icon="el-icon-search"
         ></el-input>
@@ -52,10 +57,10 @@
           class="main__actions"
         ></el-button>
         <el-button
-          @click="$router.push('/profile')"
           type="text"
           icon="el-icon-setting"
           class="main__actions"
+          @click="$router.push('/profile')"
         ></el-button>
         <el-dropdown class="main__user-actions">
           <div class="main__user-actions--activator">
@@ -109,9 +114,13 @@ export default {
     },
     selectedWorkspaceId(v) {
       if (v) {
-        this.$router.push(`/workspace/staff/${v}`)
+        this.$router.push({ params: { id: v } })
       }
     },
+  },
+  async created() {
+    this.getProfile()
+    this.workSpaces = await this.getWorkSpaces()
   },
   methods: {
     ...mapActions('profile', ['getWorkSpaces', 'getProfile']),
@@ -125,10 +134,6 @@ export default {
       this.$api.post('logout')
       this.$router.push('/login')
     },
-  },
-  async created() {
-    this.getProfile()
-    this.workSpaces = await this.getWorkSpaces()
   },
 }
 </script>

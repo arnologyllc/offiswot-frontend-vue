@@ -148,7 +148,7 @@ export default {
       if (this.profileSuccessData) {
         return this.profileSuccessData.specialties.find(
           (el) => el.id === this.profileSuccessData.user.speciality_id
-        ).name
+        )?.name
       } else return ''
     },
     isWithWorkspaces() {
