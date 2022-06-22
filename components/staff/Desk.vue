@@ -212,7 +212,7 @@
       </div>
     </div>
     <div v-else class="desk__edit-footer">
-      <el-button class="desk__edit-footer--invite"> Invite Member </el-button>
+      <el-button class="desk__edit-footer--invite" @click="isOpenInviteModal = true"> Invite Member </el-button>
       <draggable
         v-if="availableMembers.length"
         group="users"
@@ -268,19 +268,23 @@
         class="tutorial-box__bottom-line"
       />
     </div>
+    <OvInviteMemberModal :model="isOpenInviteModal" @close="isOpenInviteModal" />
   </div>
 </template>
 
 <script>
 import draggable from 'vuedraggable'
+import OvInviteMemberModal from "@/components/shared/OvInviteMemberModal"
 
 import AllTablesList from '@/data/tablesList.json'
 import AllUsersList from '@/data/usersList.json'
+
 
 export default {
   name: 'DeskComponent',
   components: {
     draggable,
+    OvInviteMemberModal
   },
   props: {
     dragOptions: {
@@ -329,6 +333,8 @@ export default {
       reloadFooter: false,
 
       lastTableId: null,
+
+      isOpenInviteModal: false,
     }
   },
   mounted() {
