@@ -13,7 +13,7 @@
           : 'Invite member'
       }}
     </div>
-    <div class="dialog__body" v-if="!showSecondPage">
+    <div v-if="!showSecondPage" class="dialog__body">
       <div class="dialog__input--label">Enter email</div>
       <el-autocomplete
         v-model="userEmail"
@@ -26,9 +26,9 @@
       ></el-autocomplete>
       <div class="dialog__chips-box">
         <div
-          class="dialog__chip"
           v-for="(item, index) in selectedEmails"
           :key="`email_${index}`"
+          class="dialog__chip"
         >
           <div class="dialog__chip--text">{{ item.value }}</div>
           <div class="dialog__chip--icon" @click="removeChip(item)">
@@ -37,11 +37,11 @@
         </div>
       </div>
       <div class="dialog__invite">
-        <el-button @click="goNextPage" class="dialog__invite--btn">
+        <el-button class="dialog__invite--btn" @click="goNextPage">
           INVITE
         </el-button>
       </div>
-      <div @click="goNextPage" class="dialog__invite">
+      <div class="dialog__invite" @click="goNextPage">
         <el-button type="text" class="dialog__text-btn"> skip </el-button>
       </div>
     </div>
@@ -67,9 +67,7 @@
         workspace in settings (click <a href="">here</a>).
       </div>
       <div class="dialog__second-page--submit-box">
-        <el-button class="dialog__invite--btn">
-          SUBMIT
-        </el-button>
+        <el-button class="dialog__invite--btn"> SUBMIT </el-button>
       </div>
     </div>
   </el-dialog>
@@ -129,6 +127,13 @@ export default {
       ],
     }
   },
+  computed: {
+    dialogWidth() {
+      if (this.showSecondPage) {
+        return '918px'
+      } else return '432px'
+    },
+  },
   watch: {
     model() {
       this.dialogVisible = this.model
@@ -137,13 +142,6 @@ export default {
       if (!this.dialogVisible) {
         this.$emit('close')
       }
-    },
-  },
-  computed: {
-    dialogWidth() {
-      if (this.showSecondPage) {
-        return '918px'
-      } else return '432px'
     },
   },
   methods: {
