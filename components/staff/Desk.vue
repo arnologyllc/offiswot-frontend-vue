@@ -1,7 +1,7 @@
 <template>
   <div class="desk">
     <div class="desk__main" :class="{ 'edit-mode': !dragOptions.disabled }">
-      <div v-if="!reload">
+      <div>
         <div
           v-for="(item, index) in tablesList"
           :key="`row_${index}`"
@@ -317,7 +317,6 @@ export default {
       movingItem: null,
       futureItem: null,
       movingIndex: null,
-      reload: false,
 
       availableMembers: [],
 
@@ -466,10 +465,6 @@ export default {
       delete this.tablesList[index][subIndex][deleteIndex].professionId
       delete this.tablesList[index][subIndex][deleteIndex].projectStatus
       delete this.tablesList[index][subIndex][deleteIndex].disabled
-      this.reload = true
-      this.$nextTick(() => {
-        this.reload = false
-      })
     },
     setLastTableId() {
       const arr = []
