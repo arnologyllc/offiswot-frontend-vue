@@ -4,7 +4,7 @@ const state = () => ({
   profileLoading: true,
   isLoadingSubmit: false,
   editProfileData: null,
-  editFailureData: null,
+  editFailureData: null
 })
 
 const getters = {
@@ -23,7 +23,7 @@ const mutations = {
     localStorage.setItem('timezone', data.settings.server_timezone)
   },
   GET_PROFILE_FAILURE: (state, data) => {
-    state.profileFailureData = null;
+    state.profileFailureData = null
     state.profileFailureData = data
   },
   GET_PROFILE_PROCESS: (state, data) => {
@@ -34,13 +34,13 @@ const mutations = {
     state.isLoadingSubmit = data
   },
   EDIT_PROFILE_SUCCESS: (state, data) => {
-    state.editProfileData = data;
-    state.isLoadingSubmit = false;
+    state.editProfileData = data
+    state.isLoadingSubmit = false
   },
   EDIT_PROFILE_FAILURE: (state, data) => {
-    state.editFailureData = null;
+    state.editFailureData = null
     state.editFailureData = data
-    state.isLoadingSubmit = false;
+    state.isLoadingSubmit = false
   }
 }
 
@@ -56,9 +56,9 @@ const actions = {
         try {
           JSON.parse(e.response.data)
         } catch {
-          commit("GET_PROFILE_FAILURE", e.response.data)
-          commit("GET_PROFILE_PROCESS", false)
-          return;
+          commit('GET_PROFILE_FAILURE', e.response.data)
+          commit('GET_PROFILE_PROCESS', false)
+          return
         }
         commit('GET_PROFILE_FAILURE', JSON.parse(e.response.data))
       })
@@ -68,33 +68,40 @@ const actions = {
   },
   async getWorkSpaces() {
     const res = await this.$api.get('workspaces')
-    return res.status === 200 ? res.data : JSON.parse(res.response.data);
+    return res.status === 200 ? res.data : JSON.parse(res.response.data)
   },
   editProfile({ commit }, payload) {
-    console.log(payload);
-    payload.phone_number = payload.phone_number.toString().replaceAll("(", "").replaceAll(")", "").replaceAll(" ", "").replaceAll("-", "")
-    commit("EDIT_PROFILE_PROCESS", true)
+    payload.phone_number = payload.phone_number
+      .toString()
+      .replaceAll('(', '')
+      .replaceAll(')', '')
+      .replaceAll(' ', '')
+      .replaceAll('-', '')
+    commit('EDIT_PROFILE_PROCESS', true)
     const formData = new FormData()
-    if(typeof payload.avatar === 'string') {
+    if (typeof payload.avatar === 'string') {
       delete payload.avatar
     }
-    if(typeof payload.cv === 'string') {
+    if (typeof payload.cv === 'string') {
       delete payload.cv
     }
-    for(const i in payload) {
+    for (const i in payload) {
       formData.append(i, payload[i])
     }
-    this.$api.post('update-profile', formData).then(({ data }) => {
-      commit("EDIT_PROFILE_SUCCESS", data)
-    }).catch((e) => {
-      try {
-        JSON.parse(e.response.data)
-      } catch {
-        commit("EDIT_PROFILE_FAILURE", e.response.data)
-        return;
-      }
-      commit('EDIT_PROFILE_FAILURE', JSON.parse(e.response.data))
-    })
+    this.$api
+      .post('update-profile', formData)
+      .then(({ data }) => {
+        commit('EDIT_PROFILE_SUCCESS', data)
+      })
+      .catch((e) => {
+        try {
+          JSON.parse(e.response.data)
+        } catch {
+          commit('EDIT_PROFILE_FAILURE', e.response.data)
+          return
+        }
+        commit('EDIT_PROFILE_FAILURE', JSON.parse(e.response.data))
+      })
   }
 }
 export default {
@@ -102,5 +109,5 @@ export default {
   state,
   getters,
   actions,
-  mutations,
+  mutations
 }
