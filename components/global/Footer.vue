@@ -120,7 +120,8 @@ export default {
       &__image {
         cursor: pointer;
         & img:hover {
-          filter: invert(48%) sepia(9%) saturate(333%) hue-rotate(157deg) brightness(95%) contrast(88%);
+          filter: invert(48%) sepia(9%) saturate(333%) hue-rotate(157deg)
+            brightness(95%) contrast(88%);
         }
       }
     }

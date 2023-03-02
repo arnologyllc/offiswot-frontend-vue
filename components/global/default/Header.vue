@@ -82,6 +82,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import Cookies from 'js-cookie'
 
 export default {
   name: 'HeaderDefaultLayoutComponent',
@@ -130,7 +131,7 @@ export default {
         : this.$router.push('/login')
     },
     onLogout() {
-      this.$cookies.remove('token')
+      Cookies.remove('token')
       this.$api.post('logout')
       this.$router.push('/login')
     },
@@ -294,6 +295,25 @@ export default {
       height: 44px;
       border-radius: 50%;
       object-fit: cover;
+    }
+  }
+}
+@media (max-width: 910px) {
+  .el-button-group {
+    button {
+      padding: 7px 0 0 0;
+      text-align: left;
+    }
+  }
+}
+
+@media (max-width: 860px) {
+  .el-input {
+    padding: 0;
+    width: 150px !important;
+    ::v-deep &__inner {
+      padding: 0;
+      width: 150px !important;
     }
   }
 }
