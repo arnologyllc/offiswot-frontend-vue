@@ -308,4 +308,19 @@ export default {
     }
   }
 }
+@media (max-width: 990px) {
+  .main__form {
+    margin-top: 40px !important;
+  }
+}
+@media (max-width: 425px) {
+  .main__form {
+    max-width: 300px;
+  }
+  .forgot-password {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
 </style>
