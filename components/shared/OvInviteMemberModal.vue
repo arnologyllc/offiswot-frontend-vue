@@ -63,7 +63,7 @@
         </el-checkbox-group>
       </div>
       <div class="dialog__second-page--small-text">
-        You will be able to edit requried information abour memebers of the
+        You will be able to edit requried information about memebers of the
         workspace in settings (click <a href="">here</a>).
       </div>
       <div class="dialog__second-page--submit-box">

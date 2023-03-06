@@ -218,7 +218,7 @@ export default {
   },
   head() {
     return {
-      title: "Register"
+      title: 'Register',
     }
   },
   computed: {
@@ -371,6 +371,16 @@ export default {
   }
   .el-form-item__error {
     z-index: 1000;
+  }
+}
+
+@media (max-width: 500px) {
+  .main {
+    max-width: 333px;
+    padding: 50px 0;
+  }
+  .el-form-item__content {
+    margin-bottom: -10px;
   }
 }
 </style>
