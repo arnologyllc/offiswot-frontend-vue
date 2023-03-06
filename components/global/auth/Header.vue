@@ -5,7 +5,12 @@
       <span class="main__left--title">Online Office</span>
     </div>
     <div class="main__right">
-      <el-button plain class="main__right--button" @click="onRightButtonClick">{{ buttonText }}</el-button>
+      <el-button
+        plain
+        class="main__right--button"
+        @click="onRightButtonClick"
+        >{{ buttonText }}</el-button
+      >
     </div>
   </nav>
 </template>
@@ -16,13 +21,15 @@ export default {
   computed: {
     buttonText() {
       return this.$route.path === '/login' ? 'Sign up' : 'Sign in'
-    }
+    },
   },
   methods: {
     onRightButtonClick() {
-      this.$route.path === '/login' ? this.$router.push('/register') : this.$router.push('/login')
-    }
-  }
+      this.$route.path === '/login'
+        ? this.$router.push('/register')
+        : this.$router.push('/login')
+    },
+  },
 }
 </script>
 
@@ -59,7 +66,8 @@ export default {
       border-radius: 6px;
       font-weight: normal;
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         border-color: $ov-primary;
         color: $ov-primary;
       }
@@ -75,7 +83,7 @@ export default {
 @media (max-width: 425px) {
   .main {
     padding: 0 24px;
-
+    gap: 10px;
     &__left img {
       width: 48px;
       height: 48px;

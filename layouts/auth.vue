@@ -41,7 +41,7 @@ export default {
   background-attachment: fixed;
   width: 100%;
   min-height: calc(100vh - 286px);
-  padding: 130px 0 150px 18%;
+  padding: 170px 0 150px 18%;
   overflow-y: auto;
   position: relative;
 
@@ -77,8 +77,7 @@ export default {
   .main-layout-auth {
     background-image: none;
     background: #f5f7fb;
-    padding: 0;
-    padding-bottom: 157px;
+    padding: 60px 0 80px 0;
     ::v-deep {
       .main {
         margin: 50px auto;
@@ -89,7 +88,7 @@ export default {
       }
     }
     .go-back {
-      bottom: 97px;
+      bottom: 80px;
       width: 100%;
       display: flex;
       justify-content: center;
@@ -97,10 +96,19 @@ export default {
     }
   }
 }
+
+@media (max-width: 500px) {
+  .main-layout-auth {
+    .go-back {
+      left: -115px;
+    }
+  }
+}
+
 @media (max-width: 375px) {
   .main-layout-auth {
     background: $ov-gray-bg;
-    padding: 0 44px 119px 44px;
+    padding: 0 44px;
     ::v-deep {
       .main {
         width: 100% !important;
@@ -110,7 +118,7 @@ export default {
       }
     }
     .go-back {
-      bottom: 59px;
+      bottom: 60px;
       left: -100px;
     }
   }

@@ -87,6 +87,7 @@ export default {
   &__content {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+    column-gap: 20px;
   }
 
   &__rights {
@@ -120,7 +121,8 @@ export default {
       &__image {
         cursor: pointer;
         & img:hover {
-          filter: invert(48%) sepia(9%) saturate(333%) hue-rotate(157deg) brightness(95%) contrast(88%);
+          filter: invert(48%) sepia(9%) saturate(333%) hue-rotate(157deg)
+            brightness(95%) contrast(88%);
         }
       }
     }
@@ -155,15 +157,14 @@ export default {
     }
   }
 }
-@media (max-width: 425px) {
+@media (max-width: 500px) {
   .footer {
-    padding-left: 71px;
+    padding-left: 50px;
     padding-right: 0px;
     padding-bottom: 40px;
     &__content {
       justify-content: center;
       grid-template-columns: repeat(2, 1fr);
-      gap: 40px 0;
     }
     &__grid-item:last-child {
       display: grid;
@@ -182,11 +183,6 @@ export default {
       gap: 0 24px;
       margin-bottom: 24px;
     }
-  }
-}
-@media (max-width: 375px) {
-  .footer {
-    padding: 45px 0 22px 40px;
   }
 }
 </style>

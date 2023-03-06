@@ -237,7 +237,6 @@ export default {
             padding-left: 8px;
           }
           .el-input__suffix {
-            padding-right: 8px;
             cursor: pointer;
             &-inner {
               display: grid;
@@ -251,8 +250,8 @@ export default {
       display: flex;
       justify-content: space-between;
       ::v-deep .el-button {
-        font-size: 12px;
-        font-weight: 500;
+        font-size: 14px;
+        font-weight: 400;
         color: $ov-text--subtitle;
         &:hover {
           color: $ov-primary;
@@ -313,14 +312,21 @@ export default {
     margin-top: 40px !important;
   }
 }
-@media (max-width: 425px) {
+@media (max-width: 500px) {
   .main__form {
     max-width: 300px;
   }
+
   .forgot-password {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    text-align: center;
+  }
+}
+@media (max-width: 425px) {
+  .main-layout-auth {
+    margin: 20px auto;
   }
 }
 </style>
