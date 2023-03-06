@@ -19,8 +19,6 @@
 </template>
 
 <script>
-import login from '@/middleware/login'
-
 import Header from '~/components/global/auth/Header.vue'
 import Footer from '@/components/global/Footer.vue'
 export default {
@@ -29,7 +27,6 @@ export default {
     Header,
     Footer,
   },
-  middleware: [login],
 }
 </script>
 
@@ -77,7 +74,7 @@ export default {
 @media (max-width: 990px) {
   .main-layout-auth {
     background-image: none;
-    background: #f5f7fb;
+    background: #F5F7FB;
     padding: 0;
     padding-bottom: 157px;
     ::v-deep {
@@ -85,7 +82,7 @@ export default {
         margin: 50px auto;
         width: max-content;
         .form-item__label {
-          background: #f5f7fb;
+          background: #F5F7FB;
         }
       }
     }
@@ -98,15 +95,6 @@ export default {
     }
   }
 }
-
-@media (max-width: 425px){
-  .main-layout-auth {
-    .go-back{
-      left: -111px;
-    }
-  }
-}
-
 @media (max-width: 375px) {
   .main-layout-auth {
     background: $ov-gray-bg;

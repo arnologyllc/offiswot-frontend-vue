@@ -22,12 +22,12 @@
             </template>
           </el-input>
         </el-form-item>
-        <el-form-item prop="password">
+        <el-form-item prop="password" class="password-form-item">
           <el-input
             v-model="payload.password"
+            :type="showPassword ? 'text' : 'password'"
             class="main__form--box__input"
             placeholder="Password"
-            :type="showPassword ? 'text' : 'password'"
           >
             <template slot="prefix">
               <img
@@ -47,15 +47,15 @@
               />
             </template>
           </el-input>
+          <div class="forgot-password">
+            <el-checkbox v-model="payload.remember_me" class="remember-checkbox"
+              >Remember me</el-checkbox
+            >
+            <el-button type="text" @click="$router.push('/password/forgot')"
+              >Forgot Password?</el-button
+            >
+          </div>
         </el-form-item>
-        <div class="forgot-password">
-          <el-checkbox v-model="payload.remember_me" class="remember-checkbox"
-            >Remember me</el-checkbox
-          >
-          <el-button type="text" @click="$router.push('/password/forgot')"
-            >Forgot Password?</el-button
-          >
-        </div>
         <login-buttons
           :login-loading="loginLoading"
           login-title="Log In"
@@ -72,8 +72,6 @@
 </template>
 
 <script>
-import Cookies from 'js-cookie'
-
 import { mapGetters, mapActions } from 'vuex'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
 import ConfirmEmail from '@/components/shared/OvConfirmEmailModal.vue'
@@ -99,7 +97,7 @@ export default {
       //  Validation Rules
       rules: {
         email: [
-          { required: true, message: 'Email is required', trigger: 'blur' },
+          { required: true, message: 'email is required', trigger: 'blur' },
         ],
         password: [
           { required: true, message: 'Password is required', trigger: 'blur' },
@@ -129,11 +127,12 @@ export default {
   watch: {
     loginSuccessData(v) {
       if (v) {
-        Cookies.set('token', v.access_token, {
-          path: '/',
-          expires: this.payload.remember_me
-            ? 9999
-            : Math.round(v.expires_in / 60 / 24),
+        this.$cookies.set('token', v.access_token, {
+          options: {
+            expires: this.payload.remember_me
+              ? 9999
+              : Math.round(v.expires_in / 60 / 24),
+          },
         })
         this.$router.push('/')
       }
@@ -248,10 +247,8 @@ export default {
       }
     }
     .forgot-password {
-      margin-top: -5px;
-      margin-bottom: 15px;
+      margin-top: 24px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
       ::v-deep .el-button {
         font-size: 12px;
@@ -291,10 +288,15 @@ export default {
         ::v-deep {
           .el-checkbox {
             &__inner {
-              background-color: $ov-primary;
+              background: $ov-primary;
             }
           }
         }
+      }
+    }
+    .password-form-item {
+      ::v-deep .el-form-item__error {
+        display: none;
       }
     }
   }
@@ -304,22 +306,6 @@ export default {
     .el-input__inner {
       border-color: red !important;
     }
-  }
-}
-
-@media (max-width: 990px) {
-  .main__form {
-    margin-top: 40px !important;
-  }
-}
-@media (max-width: 425px) {
-  .main__form {
-    max-width: 300px;
-  }
-  .forgot-password {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
   }
 }
 </style>

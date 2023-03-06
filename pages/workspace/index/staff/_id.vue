@@ -20,7 +20,6 @@
           >
         </el-button-group>
         <el-button
-          v-if="currentComponent === 'Desk'"
           class="main-dash__header--edit-button"
           circle
           @click="dragOptions.disabled = false"
@@ -28,8 +27,8 @@
           <img src="@/assets/images/icons/edit-icon.svg" alt="/" />
         </el-button>
       </div>
-      <div v-if="currentComponent === 'Desk'"  class="main-dash__header--right" >
-        <el-button class="main-dash__header--meetings" round >
+      <div class="main-dash__header--right">
+        <el-button class="main-dash__header--meetings" round>
           <div class="main-dash__header--meetings__left">
             <img src="@/assets/images/icons/clock-icon.svg" alt="(-)" />
             <div class="main-dash__header--meetings__left--title">

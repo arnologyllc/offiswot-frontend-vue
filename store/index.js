@@ -12,7 +12,7 @@ const createStore = () => {
     modules: {
       auth,
       profile,
-      workspace,
+      workspace
     },
   })
 }

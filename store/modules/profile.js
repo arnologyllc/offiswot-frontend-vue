@@ -4,7 +4,7 @@ const state = () => ({
   profileLoading: true,
   isLoadingSubmit: false,
   editProfileData: null,
-  editFailureData: null,
+  editFailureData: null
 })
 
 const getters = {
@@ -14,7 +14,7 @@ const getters = {
 
   isLoadingSubmit: (state) => state.isLoadingSubmit,
   editProfileData: (state) => state.editProfileData,
-  editFailureData: (state) => state.editFailureData,
+  editFailureData: (state) => state.editFailureData
 }
 
 const mutations = {
@@ -41,7 +41,7 @@ const mutations = {
     state.editFailureData = null
     state.editFailureData = data
     state.isLoadingSubmit = false
-  },
+  }
 }
 
 const actions = {
@@ -102,12 +102,12 @@ const actions = {
         }
         commit('EDIT_PROFILE_FAILURE', JSON.parse(e.response.data))
       })
-  },
+  }
 }
 export default {
   namespaced: true,
   state,
   getters,
   actions,
-  mutations,
+  mutations
 }

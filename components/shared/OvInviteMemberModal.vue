@@ -63,20 +63,17 @@
         </el-checkbox-group>
       </div>
       <div class="dialog__second-page--small-text">
-        You will be able to edit requried information about members of the
+        You will be able to edit requried information abour memebers of the
         workspace in settings (click <a href="">here</a>).
       </div>
       <div class="dialog__second-page--submit-box">
-        <el-button class="dialog__invite--btn" @click="sendInvitation">
-          SUBMIT
-        </el-button>
+        <el-button class="dialog__invite--btn"> SUBMIT </el-button>
       </div>
     </div>
   </el-dialog>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
 export default {
   name: 'OvInviteMemberModal',
   props: {
@@ -84,27 +81,9 @@ export default {
   },
   data() {
     return {
-      data: {
-        emails: this.selectedEmails,
-        workspace_id: null,
-        required_fields: {
-          name: false,
-          surname: false,
-          lastname: false,
-          date_of_birth: false,
-          avatar: false,
-          gender: false,
-          phone_number: false,
-          speciality_id: false,
-          timezone: false,
-          languages: false,
-          experience: false,
-          cv: false,
-        },
-      },
       dialogVisible: false,
       emails: [
-        { value: 'manukyan0303@mail.ru', link: 'https://github.com/vuejs/vue' },
+        { value: 'aaa@email.ru', link: 'https://github.com/vuejs/vue' },
         { value: 'bbb@gmail.com', link: 'https://github.com/ElemeFE/element' },
         { value: 'cc@gmail.com', link: 'https://github.com/ElemeFE/cooking' },
         { value: 'ffff@mail.ru', link: 'https://github.com/ElemeFE/mint-ui' },
@@ -117,16 +96,16 @@ export default {
       ],
       checkboxItems: [
         'Name',
-        'Avatar',
+        'Picture',
         'Timezone',
-        'SurName',
+        'Surname',
         'Gender',
         'Languages',
-        'LastName',
+        'Last Name',
         'Phone number',
-        'Experience',
+        'Years of experience',
         'Date of birth',
-        'Speciality',
+        'Specialty',
         'Upload CV',
       ],
       userEmail: '',
@@ -134,16 +113,16 @@ export default {
       showSecondPage: false,
       checkList: [
         'Name',
-        'Avatar',
+        'Picture',
         'Timezone',
-        'SurName',
+        'Surname',
         'Gender',
         'Languages',
-        'LastName',
+        'Last Name',
         'Phone number',
-        'Experience',
+        'Years of experience',
         'Date of birth',
-        'Speciality',
+        'Specialty',
         'Upload CV',
       ],
     }
@@ -166,29 +145,6 @@ export default {
     },
   },
   methods: {
-    ...mapActions('workspace', ['inviteMemberInWorkspace']),
-    sendInvitation() {
-      for (const i in this.checkList) {
-        const item = this.checkList[i].toLowerCase().split(' ').join('_')
-        switch (item) {
-          case 'upload_cv':
-            this.data.required_fields.cv = true
-            break
-          case 'speciality':
-            this.data.required_fields.speciality_id = true
-            break
-          default:
-            this.data.required_fields[item] = true
-        }
-        this.data.workspace_id = this.$route.params.id
-        this.data.emails =
-          this.selectedEmails.length !== 0
-            ? this.selectedEmails.map((el) => el.value)
-            : []
-      }
-
-      this.inviteMemberInWorkspace(this.data)
-    },
     goNextPage() {
       this.showSecondPage = true
     },

@@ -146,16 +146,7 @@
               class="main__form--input select"
               placeholder="Timezone"
             >
-              <el-option 
-              value="UTC+04" 
-              label="UTC+04" 
-              >
-              </el-option>
-              <el-option 
-
-              value="UTC+03" 
-              label="UTC+03" 
-              ></el-option>
+              <el-option value="UTC+04" label="UTC+04"></el-option>
             </el-select>
           </el-form-item>
         </el-col>
@@ -214,7 +205,6 @@ import { mapGetters, mapActions } from 'vuex'
 
 import VuePhoneNumberInput from 'vue-phone-number-input'
 import 'vue-phone-number-input/dist/vue-phone-number-input.css'
-
 
 export default {
   name: 'EditProfile',
