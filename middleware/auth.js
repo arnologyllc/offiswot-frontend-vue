@@ -1,5 +1,6 @@
 export default function ({ app, redirect }) {
-    if(!app.$cookies.get('token')){
-      return redirect('/login');
-    }    
+    // If the user is not authenticated
+    if(!app.$cookies.get('token')) {
+        return redirect('/login');
+    }
   }
