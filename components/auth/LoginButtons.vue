@@ -2,7 +2,11 @@
   <div>
     <el-form-item class="submit-form-item">
       <div class="submit-button__outer">
-        <el-button class="submit-button" native-type="submit" :loading="loginLoading">
+        <el-button
+          class="submit-button"
+          native-type="submit"
+          :loading="loginLoading"
+        >
           <span class="submit-button__text">{{ loginTitle }}</span>
           <img src="@/assets/images/icons/chevron-icon.svg" alt="arrow" />
         </el-button>
@@ -15,9 +19,7 @@
       <el-button class="google-sign-button">
         <div class="google-sign-button__inner">
           <img src="@/assets/images/icons/google-icon.svg" alt="G" />
-          <span class="google-sign-button__inner--text"
-            >{{ socialTitle }}</span
-          >
+          <span class="google-sign-button__inner--text">{{ socialTitle }}</span>
         </div>
       </el-button>
     </el-form-item>
@@ -29,21 +31,21 @@ export default {
   name: 'LoginSubmitButtons',
   props: {
     loginTitle: {
-        type: String,
-        default: "",
+      type: String,
+      default: '',
     },
     socialTitle: {
-        type: String,
-        default: ""
+      type: String,
+      default: '',
     },
     showSocial: {
       type: Boolean,
-      default: true
+      default: true,
     },
     loginLoading: {
       type: Boolean,
       default: false,
-    }
+    },
   },
 }
 </script>
@@ -80,7 +82,7 @@ export default {
   }
 }
 .submit-button {
-  background: linear-gradient(90.32deg, #0CB1B9 0.28%, #4156F6 99.75%);;
+  background: linear-gradient(90.32deg, #0cb1b9 0.28%, #4156f6 99.75%);
   color: white;
   text-transform: uppercase;
   width: 220px;

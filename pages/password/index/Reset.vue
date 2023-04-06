@@ -110,8 +110,8 @@ export default {
       payload: {
         password: null,
         password_confirmation: null,
-        passwordToken: 'test',
-        email: 'test@test.test',
+        pinToken: null,
+        email: null,
       },
 
       //  Show Password/Not Show Password
@@ -143,7 +143,7 @@ export default {
   },
   head() {
     return {
-      title: "Reset Password"
+      title: 'Reset Password',
     }
   },
   computed: {
@@ -153,12 +153,19 @@ export default {
       'resetLoading',
     ]),
   },
+
   watch: {
     resetSuccessData(v) {
       if (v) {
-        this.$message.success(v.message)
+        this.payload.password = null
+        this.payload.password_confirmation = null
+        this.$notify.success({
+          title: 'Success',
+          message: v.data,
+        })
       }
     },
+
     resetErrorData(v) {
       for (const i in v) {
         if (typeof v[i] !== 'string') {
@@ -178,8 +185,14 @@ export default {
       }
     },
   },
+
+  mounted() {
+    this.payload.pinToken = this.$route.query.token
+    this.payload.email = this.$route.query.email
+  },
+
   methods: {
-    ...mapActions("auth", ["resetPassword"]),
+    ...mapActions('auth', ['resetPassword']),
     onSubmit() {
       this.$refs.resetForm.validate((valid) => {
         if (valid) {

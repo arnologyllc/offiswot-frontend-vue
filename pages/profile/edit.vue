@@ -10,11 +10,24 @@
       @submit.native.prevent="onSubmit"
     >
       <el-row>
-        <el-col :span="24" class="main__title">Complete your profile</el-col>
+        <el-col :span="12">
+          <el-button type="text" @click="$router.push('/profile')">
+            <div class="main__title">
+              <img
+                src="@/assets/images/icons/chevron-dark-icon.svg"
+                class="go-back__icon"
+                alt=""
+              />
+              <span :span="24" class="main__title__span"
+                >Complete your profile</span
+              >
+            </div>
+          </el-button>
+        </el-col>
       </el-row>
       <el-row :gutter="70">
         <el-col :span="8" class="main__form--picture">
-          <img :src="avatarSrc" alt="avatar" />
+          <img :src="avatarUrl" alt="avatar" />
           <el-form-item prop="avatar">
             <el-upload
               v-model="payload.avatar"
@@ -29,7 +42,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item prop="date_of_birth" label="Date of birth">
+          <el-form-item prop="date_of_birth">
             <el-date-picker
               v-model="payload.date_of_birth"
               class="main__form--input date-picker"
@@ -52,7 +65,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item prop="languages" label="Lanugages">
+          <el-form-item prop="languages">
             <el-select
               v-model="payload.languages"
               multiple
@@ -67,7 +80,7 @@
               ></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item prop="experience" label="Experience">
+          <el-form-item prop="experience">
             <el-input
               v-model="payload.experience"
               type="number"
@@ -79,7 +92,7 @@
       </el-row>
       <el-row :gutter="70">
         <el-col :span="8">
-          <el-form-item prop="name" label="Name">
+          <el-form-item prop="name">
             <el-input
               v-model="payload.name"
               class="main__form--input"
@@ -88,7 +101,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item prop="phone_number" label="Phone Number">
+          <el-form-item prop="phone_number">
             <phone
               v-model="payload.phone_number"
               color="#4156F6"
@@ -102,7 +115,7 @@
       </el-row>
       <el-row :gutter="70">
         <el-col :span="8">
-          <el-form-item prop="surname" label="Surname">
+          <el-form-item prop="surname">
             <el-input
               v-model="payload.surname"
               class="main__form--input"
@@ -111,7 +124,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item prop="speciality_id" label="Speciality">
+          <el-form-item prop="speciality_id">
             <el-select
               v-model="payload.speciality_id"
               class="main__form--input select"
@@ -130,7 +143,7 @@
       </el-row>
       <el-row :gutter="70">
         <el-col :span="8">
-          <el-form-item prop="lastname" label="Last Name">
+          <el-form-item prop="lastname">
             <el-input
               v-model="payload.lastname"
               class="main__form--input"
@@ -139,7 +152,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item prop="timezone" label="Timezone">
+          <el-form-item prop="timezone">
             <el-select
               v-model="payload.timezone"
               multiple
@@ -205,6 +218,7 @@ import { mapGetters, mapActions } from 'vuex'
 
 import VuePhoneNumberInput from 'vue-phone-number-input'
 import 'vue-phone-number-input/dist/vue-phone-number-input.css'
+import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
 
 export default {
   name: 'EditProfile',
@@ -249,6 +263,15 @@ export default {
       'editProfileData',
       'editFailureData',
     ]),
+
+    avatarUrl() {
+      if (this.profileSuccessData) {
+        if (this.profileSuccessData.user.avatar) {
+          return `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.profileSuccessData.user.avatar}`
+        }
+      }
+      return defaultAvatar
+    },
   },
   watch: {
     profileFailureData(v) {
@@ -294,13 +317,12 @@ export default {
       if (this.payload.phone_number) {
         this.payload.phone_number = this.payload.phone_number.toString()
       }
-      this.avatarSrc = `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.profileSuccessData.user.avatar}`
     },
     editProfileData(v) {
-      if(v) {
+      if (v) {
         this.$message.success('Success!')
       }
-    }
+    },
   },
   created() {
     this.getProfile()
@@ -328,6 +350,8 @@ export default {
     color: $ov-text--title;
     margin-bottom: 4px;
     margin-bottom: 41px;
+    display: flex;
+    gap: 20px;
   }
   &__form {
     min-height: calc(100vh - 286px);
@@ -482,7 +506,7 @@ export default {
       }
     }
     &--actions {
-      margin-top: 88px;
+      margin-top: 30px;
     }
     &--cv-item {
       ::v-deep {

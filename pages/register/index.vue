@@ -24,6 +24,16 @@
                 alt="email_icon"
               />
             </template>
+            <div
+              v-if="payload.email"
+              slot="suffix"
+              style="position: relative"
+              @click="focusElement('email')"
+            >
+              <span for="email" class="placeholder placeholder__email">
+                Email
+              </span>
+            </div>
           </el-input>
         </el-form-item>
         <el-form-item prop="username" class="form-item">
@@ -36,6 +46,20 @@
             <template slot="prefix">
               <img src="@/assets/images/icons/user-icon.svg" alt="user_icon" />
             </template>
+            <div
+              v-if="payload.username"
+              slot="suffix"
+              style="position: relative"
+              @click="focusElement('username')"
+            >
+              <span
+                for="username"
+                class="placeholder placeholder__username"
+                :class="payload.username ? 'active' : ''"
+              >
+                Username
+              </span>
+            </div>
           </el-input>
         </el-form-item>
         <el-form-item prop="password" class="form-item">
@@ -52,6 +76,16 @@
                 alt="password_icon"
               />
             </template>
+            <div
+              v-if="payload.password"
+              slot="suffix"
+              style="position: relative"
+              @click="focusElement('password')"
+            >
+              <span for="password" class="placeholder placeholder__password">
+                Password
+              </span>
+            </div>
             <template slot="suffix">
               <img
                 :src="
@@ -79,6 +113,19 @@
                 alt="password_icon"
               />
             </template>
+            <div
+              v-if="payload.password_confirmation"
+              slot="suffix"
+              style="position: relative"
+              @click="focusElement('password_confirmation')"
+            >
+              <span
+                for="password_confirmation"
+                class="placeholder placeholder__passwordConfirmation"
+              >
+                Confirm Password
+              </span>
+            </div>
             <template slot="suffix">
               <img
                 :src="
@@ -218,7 +265,7 @@ export default {
   },
   head() {
     return {
-      title: "Register"
+      title: 'Register',
     }
   },
   computed: {
@@ -285,6 +332,9 @@ export default {
           return false
         }
       })
+    },
+    focusElement(elem) {
+      this.$refs[elem].focus()
     },
   },
 }
@@ -363,6 +413,56 @@ export default {
     }
   }
 }
+
+.placeholder {
+  position: relative;
+  top: 0;
+  &__email {
+    left: -710%;
+    animation: showEmailPlaceholder 0.3s;
+    animation-fill-mode: forwards;
+  }
+  &__username {
+    left: -345%;
+    animation: showUsernamePlaceholder 0.3s;
+    animation-fill-mode: forwards;
+  }
+  &__password {
+    left: -350%;
+    animation: showPasswordPlaceholder 0.3s;
+    animation-fill-mode: forwards;
+  }
+  &__passwordConfirmation {
+    left: -135%;
+    animation: showPasswordConfirmationPlaceholder 0.3s;
+    animation-fill-mode: forwards;
+  }
+}
+
+@keyframes showEmailPlaceholder {
+  to {
+    left: -1000%;
+  }
+}
+
+@keyframes showUsernamePlaceholder {
+  to {
+    left: -550%;
+  }
+}
+
+@keyframes showPasswordPlaceholder {
+  to {
+    left: -555%;
+  }
+}
+
+@keyframes showPasswordConfirmationPlaceholder {
+  to {
+    left: -290%;
+  }
+}
+
 ::v-deep {
   .el-form-item.is-error {
     .el-input__inner {
@@ -371,6 +471,10 @@ export default {
   }
   .el-form-item__error {
     z-index: 1000;
+  }
+
+  .el-input__suffix-inner {
+    display: flex !important;
   }
 }
 </style>

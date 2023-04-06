@@ -74,15 +74,15 @@ export default {
 @media (max-width: 990px) {
   .main-layout-auth {
     background-image: none;
-    background: #F5F7FB;
+    background: #f5f7fb;
     padding: 0;
     padding-bottom: 157px;
     ::v-deep {
       .main {
-        margin: 50px auto;
+        margin: 100px auto 0;
         width: max-content;
         .form-item__label {
-          background: #F5F7FB;
+          background: #f5f7fb;
         }
       }
     }

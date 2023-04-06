@@ -13,17 +13,29 @@
       >
         <el-form-item prop="email">
           <el-input
+            ref="email"
             v-model="payload.email"
             class="main__form--box__input"
-            placeholder="email or Email"
+            placeholder="Email or username"
           >
             <template slot="prefix">
               <img src="@/assets/images/icons/user-icon.svg" alt="user_icon" />
             </template>
+
+            <div
+              v-if="payload.email"
+              slot="suffix"
+              style="position: relative"
+              @click="focusElement('email')"
+            >
+              <span for="email" class="placeholder"> Email or username </span>
+            </div>
           </el-input>
         </el-form-item>
         <el-form-item prop="password" class="password-form-item">
           <el-input
+            id="password"
+            ref="password"
             v-model="payload.password"
             :type="showPassword ? 'text' : 'password'"
             class="main__form--box__input"
@@ -35,6 +47,17 @@
                 alt="password_icon"
               />
             </template>
+
+            <div
+              v-if="payload.password"
+              slot="suffix"
+              style="position: relative"
+              @click="focusElement('password')"
+            >
+              <span for="password" class="password-placeholder">
+                Password
+              </span>
+            </div>
             <template slot="suffix">
               <img
                 :src="
@@ -97,7 +120,7 @@ export default {
       //  Validation Rules
       rules: {
         email: [
-          { required: true, message: 'email is required', trigger: 'blur' },
+          { required: true, message: 'Email is required', trigger: 'blur' },
         ],
         password: [
           { required: true, message: 'Password is required', trigger: 'blur' },
@@ -184,6 +207,9 @@ export default {
         }
       })
     },
+    focusElement(elem) {
+      this.$refs[elem].focus()
+    },
   },
 }
 </script>
@@ -233,6 +259,7 @@ export default {
             display: grid;
             align-items: center;
           }
+
           .el-input__prefix {
             padding-left: 8px;
           }
@@ -296,16 +323,50 @@ export default {
     }
     .password-form-item {
       ::v-deep .el-form-item__error {
-        display: none;
+        top: 45%;
       }
     }
   }
 }
+
+.placeholder {
+  position: relative;
+  top: 0;
+  left: -150%;
+  animation: showPlaceholder 0.3s;
+  animation-fill-mode: forwards;
+}
+
+.password-placeholder {
+  position: relative;
+  top: 0;
+  left: -355%;
+  animation: showPasswordPlaceholder 0.3s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes showPlaceholder {
+  to {
+    top: -100%;
+    left: -180%;
+  }
+}
+
+@keyframes showPasswordPlaceholder {
+  to {
+    top: -90%;
+    left: -410%;
+  }
+}
+
 ::v-deep {
   .el-form-item.is-error {
     .el-input__inner {
       border-color: red !important;
     }
+  }
+  .el-input__suffix-inner {
+    display: flex !important;
   }
 }
 </style>

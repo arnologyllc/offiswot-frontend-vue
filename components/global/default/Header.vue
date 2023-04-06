@@ -3,6 +3,7 @@
     <div v-if="profileSuccessData && workSpaces" class="main__inner">
       <div class="main__left">
         <el-select
+          v-if="$route.path.includes('/workspace')"
           v-model="selectedWorkspaceId"
           class="main__workspaces"
           placeholder="Workspace"
@@ -19,7 +20,15 @@
           </template>
         </el-select>
 
-        <div class="main__button-group">
+        <div v-else class="main__logo">
+          <img src="@/assets/images/ov-logo.svg" alt="" />
+          <span class="main__left--title">Online Office</span>
+        </div>
+
+        <div
+          v-if="$route.path.includes('/workspace')"
+          class="main__button-group"
+        >
           <el-button-group>
             <el-button
               :disabled="!selectedWorkspaceId"
@@ -82,6 +91,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
 
 export default {
   name: 'HeaderDefaultLayoutComponent',
@@ -99,8 +109,11 @@ export default {
     },
     avatarUrl() {
       if (this.profileSuccessData) {
-        return `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.profileSuccessData.user.avatar}`
-      } else return ''
+        if (this.profileSuccessData.user.avatar) {
+          return `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.profileSuccessData.user.avatar}`
+        }
+      }
+      return defaultAvatar
     },
   },
   watch: {
@@ -161,6 +174,13 @@ export default {
     display: flex;
     gap: 0 74px;
     align-items: center;
+  }
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
   }
 
   &__right {

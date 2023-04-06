@@ -3,7 +3,14 @@
     <div v-loading.fullscreen.lock="profileLoading" class="main">
       <div class="main__user-container">
         <div class="user-box__title">Your Profile</div>
-        <div class="user-box__info">
+        <div
+          class="user-box__info"
+          :style="
+            userFullName && specialty
+              ? 'align-items: center'
+              : 'align-items: space-between'
+          "
+        >
           <img
             class="user-box__avatar"
             width="119px"
@@ -13,16 +20,31 @@
           />
           <div class="user-box__user-info">
             <div class="user-box__user-fullname user-box__title">
-              <span>{{ userFullName }}</span>
+              <span v-if="userFullName" class="user-box__user-fullname-span">
+                {{ userFullName }}
+              </span>
               <img
+                v-if="userFullName"
                 class="user-box__user-edit-icon"
                 src="@/assets/images/icons/edit-icon.svg"
                 alt="edit_icon"
                 @click="$router.push('/profile/edit')"
               />
+              <el-button
+                v-else
+                class="user-box__user-edit-btn"
+                @click="$router.push('/profile/edit')"
+              >
+                <span>Edit Profile</span>
+              </el-button>
             </div>
-            <div class="user-box__specialty">{{ specialty }}</div>
-            <div class="user-box__credentials">
+            <div v-if="specialty" class="user-box__specialty">
+              {{ specialty }}
+            </div>
+            <div
+              class="user-box__credentials"
+              :style="specialty ? 'padding-top:30px' : 'padding-top:15px'"
+            >
               <div class="user-box__flex-box">
                 <img
                   src="@/assets/images/icons/email1-icon.svg"
@@ -34,6 +56,7 @@
               </div>
               <div class="user-box__flex-box">
                 <img
+                  v-if="userTelNumber"
                   style="margin-bottom: 3px"
                   src="@/assets/images/icons/phone-icon.svg"
                   alt="phone_icon"
@@ -75,7 +98,10 @@
                 {{ item.name }}
               </div>
               <div class="user-workspaces__buttons">
-                <el-button class="user-workspaces__create-btn" @click="openWorkspace(item.id)">
+                <el-button
+                  class="user-workspaces__create-btn"
+                  @click="openWorkspace(item.id)"
+                >
                   <span>Open</span>
                 </el-button>
                 <el-button class="user-workspaces__icon-btn">
@@ -98,14 +124,16 @@
               <span>Create</span>
             </el-button>
             <div class="user-workspaces__container-text">
-              Create a workspace for ... some more text Lorem Ipsum is simply
-              dummy text of the printing and typesetting industry. Lorem Ipsum
-              has been the industry's standard dummy text ever since the 1500s,
-              when an unknown printer took a galley of type and scrambled it to
-              make a ty
+              Thanks for joining Offiswot!<br />
+              Create a workspace for your team or company using our productivity
+              platform. Enjoy collaborating with each other easily and managing
+              your team members and the projects effectively.
             </div>
           </div>
-          <div class="user-workspaces__header-bottom">
+          <div
+            v-if="userInviteWorkspaces"
+            class="user-workspaces__header-bottom"
+          >
             <div class="user-workspaces__title">participate in workspace</div>
           </div>
         </div>
@@ -116,6 +144,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import defaultAvatar from '@/assets/images/icons/default-user-icon.jpg'
 export default {
   name: 'ProfilePage',
   data() {
@@ -125,7 +154,7 @@ export default {
   },
   head() {
     return {
-      title: "Profile"
+      title: 'Profile',
     }
   },
   computed: {
@@ -136,13 +165,39 @@ export default {
     ]),
     avatarURL() {
       if (this.profileSuccessData) {
-        return `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.profileSuccessData.user.avatar}`
-      } else return ''
+        if (this.profileSuccessData.user.avatar) {
+          return `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.profileSuccessData.user.avatar}`
+        }
+      }
+      return defaultAvatar
     },
     userFullName() {
       if (this.profileSuccessData) {
-        return `${this.profileSuccessData.user.name} ${this.profileSuccessData.user.lastname} ${this.profileSuccessData.user.surname}`
-      } else return ''
+        const [name, lastname, surname] = [
+          this.profileSuccessData.user.name
+            ? this.profileSuccessData.user.name
+            : '',
+          this.profileSuccessData.user.lastname
+            ? this.profileSuccessData.user.lastname
+            : '',
+          this.profileSuccessData.user.surname
+            ? this.profileSuccessData.user.surname
+            : '',
+        ]
+        if (name || lastname || surname) {
+          return `${name} ${lastname} ${surname}`
+        } else return null
+      } else return null
+    },
+    userTelNumber() {
+      if (this.profileSuccessData) {
+        return this.profileSuccessData.user.phone_number
+      } else return null
+    },
+    userInviteWorkspaces() {
+      if (this.profileSuccessData) {
+        return this.profileSuccessData.user.invite_workspaces.length
+      } else return null
     },
     specialty() {
       if (this.profileSuccessData) {
@@ -181,19 +236,19 @@ export default {
     },
   },
   async created() {
-    this.getProfile()
     try {
+      this.getProfile()
       this.responseWorkspaces = await this.getWorkSpaces()
     } catch {}
   },
   methods: {
-    ...mapActions("profile", ["getWorkSpaces", "getProfile"]),
+    ...mapActions('profile', ['getWorkSpaces', 'getProfile']),
     createWorkSpace() {
       this.$router.push('/create-workspace')
     },
     openWorkspace(id) {
       this.$router.push(`/workspace/staff/${id}`)
-    }
+    },
   },
 }
 </script>
@@ -215,12 +270,25 @@ export default {
     color: $ov-text--title;
     font-size: 24px;
     font-weight: 600;
-    line-height: 29px;
+    line-height: 14px;
+  }
+  &__user-fullname-span {
+    margin-right: 15px;
+    line-height: 40px;
   }
   &__user-edit-icon {
-    margin-left: 15px;
     margin-bottom: -3px;
     cursor: pointer;
+  }
+  &__user-edit-btn {
+    min-width: 137px;
+    height: 40px;
+    border-radius: 6px;
+    color: $ov-primary;
+    font-size: 16px;
+    font-weight: 600;
+    background: linear-gradient(90.32deg, #0cb1b9 0.28%, #4156f6 99.75%);
+    color: #fbfbfb;
   }
   &__info {
     padding: 36px 75px 0 75px;
@@ -244,7 +312,6 @@ export default {
   }
   &__credentials {
     display: flex;
-    padding-top: 30px;
     div {
       font-size: 14px;
       color: $ov-text--title;
@@ -263,7 +330,7 @@ export default {
   }
 }
 .change-picture {
-  margin: 5px 0 27px 89px;
+  margin: 5px 0 27px 77px;
   padding: 0;
   font-size: 14px;
   color: $ov-text--aqua;
@@ -314,6 +381,7 @@ export default {
     color: #fff;
     font-weight: 600;
     line-height: 22px;
+    text-align: justify;
   }
   &__buttons {
     display: flex;

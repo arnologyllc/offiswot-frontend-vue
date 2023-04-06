@@ -14,7 +14,7 @@
         <el-input
           v-model="payload.name"
           class="main__form--input"
-          placeholder="Company name"
+          placeholder="Workspace name"
         ></el-input>
       </el-form-item>
       <el-form-item prop="industry_id">
@@ -81,7 +81,7 @@ export default {
   },
   head() {
     return {
-      title: "Create Workspace"
+      title: 'Create Workspace',
     }
   },
   computed: {

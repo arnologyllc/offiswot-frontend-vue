@@ -31,16 +31,24 @@
         ></login-buttons>
       </el-form>
     </div>
+    <ConfirmModal
+      :email="payload.email"
+      :model="isOpenEmailDialog"
+      @close="isOpenEmailDialog = false"
+    ></ConfirmModal>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
+import ConfirmModal from '@/components/shared/OvConfirmPasswordChangeModal.vue'
+
 export default {
   name: 'PasswordForgot',
   components: {
     LoginButtons,
+    ConfirmModal,
   },
   layout: 'auth',
   data() {
@@ -61,11 +69,13 @@ export default {
           },
         ],
       },
+
+      isOpenEmailDialog: false,
     }
   },
   head() {
     return {
-      title: "Forgot Password"
+      title: 'Forgot Password',
     }
   },
   computed: {
@@ -79,7 +89,7 @@ export default {
     forgotSuccessData(v) {
       if (v) {
         this.$message.success(v.message)
-        this.$router.push('/password/reset')
+        this.isOpenEmailDialog = true
       }
     },
     forgotErrorData(v) {
@@ -102,7 +112,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions("auth", ["forgotPassword"]),
+    ...mapActions('auth', ['forgotPassword']),
     onSubmit() {
       this.$refs.forgotForm.validate((valid) => {
         if (valid) {
