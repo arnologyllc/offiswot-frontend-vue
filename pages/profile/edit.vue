@@ -26,7 +26,12 @@
         </el-col>
       </el-row>
       <el-row :gutter="70">
-        <el-col :span="8" class="main__form--picture">
+        <el-col
+          :xs="{ span: 24 }"
+          :sm="{ span: 12 }"
+          :md="{ span: 8 }"
+          class="main__form--picture"
+        >
           <img :src="avatarUrl" alt="avatar" />
           <el-form-item prop="avatar">
             <el-upload
@@ -41,7 +46,12 @@
             </el-upload>
           </el-form-item>
         </el-col>
-        <el-col :span="8">
+        <el-col
+          :span="8"
+          :xs="{ span: 24 }"
+          :sm="{ span: 12 }"
+          :md="{ span: 8 }"
+        >
           <el-form-item prop="date_of_birth">
             <el-date-picker
               v-model="payload.date_of_birth"
@@ -64,7 +74,12 @@
             </el-radio-group>
           </el-form-item>
         </el-col>
-        <el-col :span="8">
+        <el-col
+          :span="8"
+          :xs="{ span: 24 }"
+          :sm="{ span: 12 }"
+          :md="{ span: 8 }"
+        >
           <el-form-item prop="languages">
             <el-select
               v-model="payload.languages"
@@ -91,7 +106,12 @@
         </el-col>
       </el-row>
       <el-row :gutter="70">
-        <el-col :span="8">
+        <el-col
+          :span="8"
+          :xs="{ span: 24 }"
+          :sm="{ span: 12 }"
+          :md="{ span: 8 }"
+        >
           <el-form-item prop="name">
             <el-input
               v-model="payload.name"
@@ -100,7 +120,12 @@
             ></el-input>
           </el-form-item>
         </el-col>
-        <el-col :span="8">
+        <el-col
+          :span="8"
+          :xs="{ span: 24 }"
+          :sm="{ span: 12 }"
+          :md="{ span: 8 }"
+        >
           <el-form-item prop="phone_number">
             <phone
               v-model="payload.phone_number"
@@ -114,7 +139,12 @@
         </el-col>
       </el-row>
       <el-row :gutter="70">
-        <el-col :span="8">
+        <el-col
+          :span="8"
+          :xs="{ span: 24 }"
+          :sm="{ span: 12 }"
+          :md="{ span: 8 }"
+        >
           <el-form-item prop="surname">
             <el-input
               v-model="payload.surname"
@@ -123,7 +153,12 @@
             ></el-input>
           </el-form-item>
         </el-col>
-        <el-col :span="8">
+        <el-col
+          :span="8"
+          :xs="{ span: 24 }"
+          :sm="{ span: 12 }"
+          :md="{ span: 8 }"
+        >
           <el-form-item prop="speciality_id">
             <el-select
               v-model="payload.speciality_id"
@@ -142,7 +177,12 @@
         </el-col>
       </el-row>
       <el-row :gutter="70">
-        <el-col :span="8">
+        <el-col
+          :span="8"
+          :xs="{ span: 24 }"
+          :sm="{ span: 12 }"
+          :md="{ span: 8 }"
+        >
           <el-form-item prop="lastname">
             <el-input
               v-model="payload.lastname"
@@ -151,7 +191,12 @@
             ></el-input>
           </el-form-item>
         </el-col>
-        <el-col :span="8">
+        <el-col
+          :span="8"
+          :xs="{ span: 24 }"
+          :sm="{ span: 12 }"
+          :md="{ span: 8 }"
+        >
           <el-form-item prop="timezone">
             <el-select
               v-model="payload.timezone"
@@ -159,11 +204,20 @@
               class="main__form--input select"
               placeholder="Timezone"
             >
-              <el-option value="UTC+04" label="UTC+04"></el-option>
+              <template v-for="timezone in timeZonesList">
+                <el-option :key="timezone.name" :value="timezone.name">{{
+                  'UTC' + timezone.value
+                }}</el-option>
+              </template>
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="8">
+        <el-col
+          :span="8"
+          :xs="{ span: 24 }"
+          :sm="{ span: 12 }"
+          :md="{ span: 8 }"
+        >
           <el-form-item prop="cv" class="main__form--cv-item" label="CV">
             <div class="main__form--upload__cv-box">
               <el-upload
@@ -245,6 +299,38 @@ export default {
         { name: 'EN', id: 'en' },
         { name: 'RU', id: 'ru' },
         { name: 'HY', id: 'hy' },
+      ],
+      timeZonesList: [
+        { value: '-12', name: 'Pacific/Kwajalein' },
+        { value: '-11', name: 'Pacific/Samoa' },
+        { value: '-10', name: 'Pacific/Honolulu' },
+        { value: '-9', name: 'America/Juneau' },
+        { value: '-8', name: 'America/Los_Angeles' },
+        { value: '-7', name: 'America/Denver' },
+        { value: '-6', name: 'America/Mexico_City' },
+        { value: '-5', name: 'America/New_York' },
+        { value: '-4', name: 'America/Caracas' },
+        { value: '-3.5', name: 'America/St_Johns' },
+        { value: '-3', name: 'America/Sao_Paulo' },
+        { value: '-2', name: 'Atlantic/South_Georgia' },
+        { value: '-1', name: 'Atlantic/Azores' },
+        { value: '0', name: 'UTC' },
+        { value: '+1', name: 'Europe/Paris' },
+        { value: '+2', name: 'Europe/Helsinki' },
+        { value: '+3', name: 'Europe/Moscow' },
+        { value: '+3.5', name: 'Asia/Tehran' },
+        { value: '+4', name: 'Asia/Yerevan' },
+        { value: '+4.5', name: 'Asia/Kabul' },
+        { value: '+5', name: 'Asia/Karachi' },
+        { value: '+5.5', name: 'Asia/Calcutta' },
+        { value: '+6', name: 'Asia/Dhaka' },
+        { value: '+7', name: 'Asia/Bangkok' },
+        { value: '+8', name: 'Asia/Hong_Kong' },
+        { value: '+9', name: 'Asia/Tokyo' },
+        { value: '+9.5', name: 'Australia/Adelaide' },
+        { value: '+10', name: 'Australia/Sydney' },
+        { value: '+11', name: 'Pacific/Noumea' },
+        { value: '+12', name: 'Pacific/Auckland' },
       ],
       avatarSrc: null,
     }
@@ -362,7 +448,11 @@ export default {
     padding: 0 45px 21px 45px;
 
     &--picture {
+      display: flex;
       margin-bottom: 32px;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       img {
         width: 119px;
         height: 119px;
@@ -392,7 +482,11 @@ export default {
     }
     &--radio-group {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
+      &__item {
+        flex-basis: 30%;
+      }
       ::v-deep {
         .el-radio__inner {
           width: 24px;

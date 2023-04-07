@@ -441,25 +441,29 @@ export default {
 
 @keyframes showEmailPlaceholder {
   to {
-    left: -1000%;
+    top: -90%;
+    left: -830%;
   }
 }
 
 @keyframes showUsernamePlaceholder {
   to {
-    left: -550%;
+    top: -90%;
+    left: -410%;
   }
 }
 
 @keyframes showPasswordPlaceholder {
   to {
-    left: -555%;
+    top: -90%;
+    left: -410%;
   }
 }
 
 @keyframes showPasswordConfirmationPlaceholder {
   to {
-    left: -290%;
+    top: -90%;
+    left: -170%;
   }
 }
 
@@ -473,6 +477,9 @@ export default {
     z-index: 1000;
   }
 
+  .el-form-item__content {
+    margin-bottom: 20px;
+  }
   .el-input__suffix-inner {
     display: flex !important;
   }

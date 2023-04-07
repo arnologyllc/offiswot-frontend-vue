@@ -71,12 +71,14 @@ const actions = {
     return res.status === 200 ? res.data : JSON.parse(res.response.data)
   },
   editProfile({ commit }, payload) {
+    if (payload.phone_number) {
     payload.phone_number = payload.phone_number
       .toString()
       .replaceAll('(', '')
       .replaceAll(')', '')
       .replaceAll(' ', '')
       .replaceAll('-', '')
+    }
     commit('EDIT_PROFILE_PROCESS', true)
     const formData = new FormData()
     if (typeof payload.avatar === 'string') {

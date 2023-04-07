@@ -157,7 +157,11 @@ export default {
               : Math.round(v.expires_in / 60 / 24),
           },
         })
-        this.$router.push('/')
+        if (v.user.name) {
+          this.$router.push('/')
+        } else {
+          this.$router.push('/profile')
+        }
       }
     },
     loginErrorData: {
@@ -347,7 +351,7 @@ export default {
 
 @keyframes showPlaceholder {
   to {
-    top: -100%;
+    top: -90%;
     left: -180%;
   }
 }
@@ -364,6 +368,10 @@ export default {
     .el-input__inner {
       border-color: red !important;
     }
+  }
+
+  .el-form-item__content {
+    margin-bottom: 20px;
   }
   .el-input__suffix-inner {
     display: flex !important;

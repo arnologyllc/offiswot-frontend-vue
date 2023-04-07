@@ -4,12 +4,8 @@
       <div class="main__user-container">
         <div class="user-box__title">Your Profile</div>
         <div
+          :style="!(userFullName && specialty) ? 'align-items:center;' : ''"
           class="user-box__info"
-          :style="
-            userFullName && specialty
-              ? 'align-items: center'
-              : 'align-items: space-between'
-          "
         >
           <img
             class="user-box__avatar"
@@ -186,8 +182,8 @@ export default {
         ]
         if (name || lastname || surname) {
           return `${name} ${lastname} ${surname}`
-        } else return null
-      } else return null
+        } else return false
+      } else return false
     },
     userTelNumber() {
       if (this.profileSuccessData) {
@@ -204,7 +200,7 @@ export default {
         return this.profileSuccessData.specialties.find(
           (el) => el.id === this.profileSuccessData.user.speciality_id
         )?.name
-      } else return ''
+      } else return false
     },
     isWithWorkspaces() {
       if (
@@ -239,7 +235,9 @@ export default {
     try {
       this.getProfile()
       this.responseWorkspaces = await this.getWorkSpaces()
-    } catch {}
+    } catch {
+      location.reload()
+    }
   },
   methods: {
     ...mapActions('profile', ['getWorkSpaces', 'getProfile']),
