@@ -21,8 +21,15 @@
         </el-select>
 
         <div v-else class="main__logo">
-          <img src="@/assets/images/ov-logo.svg" alt="" />
-          <span class="main__left--title">Online Office</span>
+          <img
+            src="@/assets/images/icons/logo.svg"
+            alt=""
+            class="main__logo--logo"
+          />
+          <div class="main__logo--title">
+            <span class="main__logo--titleStart">ffi</span>
+            <span class="main__logo--titleEnd">swot</span>
+          </div>
         </div>
 
         <div
@@ -178,9 +185,19 @@ export default {
 
   &__logo {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
+    align-items: flex-end;
+    gap: 5px;
+    &--title {
+      display: flex;
+    }
+    &--titleStart {
+      font-size: 25px;
+      color: #4156f6;
+    }
+    &--titleEnd {
+      font-size: 25px;
+      color: #1ac1c9;
+    }
   }
 
   &__right {

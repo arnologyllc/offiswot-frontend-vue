@@ -88,7 +88,11 @@ const actions = {
       delete payload.cv
     }
     for (const i in payload) {
-      formData.append(i, payload[i])
+      if (payload[i] === null) {
+        formData.append(i, '')
+      } else{
+        formData.append(i,payload[i])
+      }
     }
     this.$api
       .post('update-profile', formData)

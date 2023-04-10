@@ -46,12 +46,7 @@
             </el-upload>
           </el-form-item>
         </el-col>
-        <el-col
-          :span="8"
-          :xs="{ span: 24 }"
-          :sm="{ span: 12 }"
-          :md="{ span: 8 }"
-        >
+        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
           <el-form-item prop="date_of_birth">
             <el-date-picker
               v-model="payload.date_of_birth"
@@ -74,12 +69,7 @@
             </el-radio-group>
           </el-form-item>
         </el-col>
-        <el-col
-          :span="8"
-          :xs="{ span: 24 }"
-          :sm="{ span: 12 }"
-          :md="{ span: 8 }"
-        >
+        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
           <el-form-item prop="languages">
             <el-select
               v-model="payload.languages"
@@ -139,12 +129,7 @@
         </el-col>
       </el-row>
       <el-row :gutter="70">
-        <el-col
-          :span="8"
-          :xs="{ span: 24 }"
-          :sm="{ span: 12 }"
-          :md="{ span: 8 }"
-        >
+        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
           <el-form-item prop="surname">
             <el-input
               v-model="payload.surname"
@@ -153,12 +138,7 @@
             ></el-input>
           </el-form-item>
         </el-col>
-        <el-col
-          :span="8"
-          :xs="{ span: 24 }"
-          :sm="{ span: 12 }"
-          :md="{ span: 8 }"
-        >
+        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
           <el-form-item prop="speciality_id">
             <el-select
               v-model="payload.speciality_id"
@@ -177,12 +157,7 @@
         </el-col>
       </el-row>
       <el-row :gutter="70">
-        <el-col
-          :span="8"
-          :xs="{ span: 24 }"
-          :sm="{ span: 12 }"
-          :md="{ span: 8 }"
-        >
+        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
           <el-form-item prop="lastname">
             <el-input
               v-model="payload.lastname"
@@ -191,33 +166,23 @@
             ></el-input>
           </el-form-item>
         </el-col>
-        <el-col
-          :span="8"
-          :xs="{ span: 24 }"
-          :sm="{ span: 12 }"
-          :md="{ span: 8 }"
-        >
+        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
           <el-form-item prop="timezone">
             <el-select
               v-model="payload.timezone"
-              multiple
               class="main__form--input select"
               placeholder="Timezone"
             >
-              <template v-for="timezone in timeZonesList">
-                <el-option :key="timezone.name" :value="timezone.name">{{
-                  'UTC' + timezone.value
-                }}</el-option>
-              </template>
+              <el-option
+                v-for="zone in timeZonesList"
+                :key="`time_${zone.value}`"
+                :value="zone.name"
+                >{{ 'UTC(' + zone.value + ')' }}</el-option
+              >
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col
-          :span="8"
-          :xs="{ span: 24 }"
-          :sm="{ span: 12 }"
-          :md="{ span: 8 }"
-        >
+        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
           <el-form-item prop="cv" class="main__form--cv-item" label="CV">
             <div class="main__form--upload__cv-box">
               <el-upload

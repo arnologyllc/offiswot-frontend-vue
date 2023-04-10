@@ -120,10 +120,13 @@
               <span>Create</span>
             </el-button>
             <div class="user-workspaces__container-text">
-              Thanks for joining Offiswot!<br />
-              Create a workspace for your team or company using our productivity
-              platform. Enjoy collaborating with each other easily and managing
-              your team members and the projects effectively.
+              <span>
+                Thanks for joining Offiswot!<br /><br />
+                Create a workspace for your team or company using our
+                productivity platform. Enjoy collaborating with each other
+                easily and managing your team members and the projects
+                effectively.
+              </span>
             </div>
           </div>
           <div
@@ -236,7 +239,7 @@ export default {
       this.getProfile()
       this.responseWorkspaces = await this.getWorkSpaces()
     } catch {
-      location.reload()
+      this.$router.push('/login')
     }
   },
   methods: {
@@ -260,6 +263,7 @@ export default {
     max-width: 1200px;
     margin: 0 auto;
     padding: 37px 0 82px 0;
+    width: 100%;
   }
 }
 .user-box {
@@ -354,8 +358,8 @@ export default {
     text-transform: uppercase;
   }
   &__container {
+    font-size: 16px;
     width: 100%;
-    min-height: 194px;
     margin-top: 11px;
     padding: 24px 31px 24px 29px;
     display: flex;
@@ -375,11 +379,15 @@ export default {
     line-height: 22px;
   }
   &__container-text {
+    display: flex;
+    justify-content: center;
+    align-content: center;
     font-size: 16px;
     color: #fff;
     font-weight: 600;
     line-height: 22px;
     text-align: justify;
+    width: 80%;
   }
   &__buttons {
     display: flex;
