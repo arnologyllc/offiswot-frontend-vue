@@ -110,8 +110,8 @@
           </div>
 
           <template slot="error">
-            <div v-if="errors.password.isShow" class="el-form-item__error">
-              <span>{{ errors.password.value }}</span>
+            <div v-if="!errors.password.isShow" class="el-form-item__error">
+              <span v-html="errors.password.value"></span>
             </div>
             <div></div>
           </template>
@@ -183,7 +183,9 @@ export default {
           },
           {
             min: 8,
-            message: 'Password length should me more than 8 chars',
+            message: `Password is improperly formatted.<br />
+                      Your password must be at least 8 characters long.
+                      `,
             trigger: 'blur',
           },
         ],

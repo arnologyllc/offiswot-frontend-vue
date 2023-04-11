@@ -90,7 +90,7 @@
           </el-input>
           <template slot="error">
             <div v-if="errors.username.isShow" class="el-form-item__error">
-              <span>{{ errors.username.value }}</span>
+              <span v-html="errors.username.value"></span>
             </div>
             <div></div>
           </template>
@@ -144,7 +144,7 @@
           </el-input>
           <template slot="error">
             <div v-if="errors.password.isShow" class="el-form-item__error">
-              <span>{{ errors.password.value }}</span>
+              <span v-html="errors.password.value"></span>
             </div>
             <div></div>
           </template>
@@ -204,7 +204,7 @@
               v-if="errors.password_confirmation.isShow"
               class="el-form-item__error"
             >
-              <span>{{ errors.password_confirmation.value }}</span>
+              <span v-html="errors.password_confirmation.value"></span>
             </div>
             <div></div>
           </template>
@@ -272,6 +272,18 @@ export default {
         callback()
       }
     }
+    const validateUsernameSymbols = (rule, value, callback) => {
+      const regex = /^[A-Za-z0-9_.]*$/g
+      if (!regex.test(value)) {
+        callback(
+          new Error(
+            `Username is improperly formatted.<br>
+            It can only contain letters, numbers, underscores and dots.<br>
+            It can't contain symbols or punctuation marks.`
+          )
+        )
+      }
+    }
     return {
       //  Request Body
       payload: {
@@ -288,7 +300,7 @@ export default {
         email: [
           {
             required: true,
-            message: 'Please enter Email address',
+            message: 'This field is required.',
             trigger: 'blur',
           },
           {
@@ -298,20 +310,37 @@ export default {
           },
         ],
         username: [
-          { required: true, message: 'Please enter username', trigger: 'blur' },
           {
-            min: 3,
-            max: 25,
-            message:
-              'Username must include minimum 3 and maximum 25 characters',
+            required: true,
+            message: 'This field is required.',
             trigger: 'blur',
           },
+          {
+            min: 3,
+            message: `Username is improperly formatted.<br />
+                      Your username must be at least 3 characters long.
+                      `,
+            trigger: 'blur',
+          },
+          {
+            max: 30,
+            message:
+              "Username is improperly formatted.<br />Your handle can't exceed 30 characters.",
+            trigger: 'blur',
+          },
+          { validator: validateUsernameSymbols, trigger: 'blur' },
         ],
         password: [
-          { required: true, message: 'Password is required', trigger: 'blur' },
+          {
+            required: true,
+            message: 'This field is required.',
+            trigger: 'blur',
+          },
           {
             min: 8,
-            message: 'Password length should me more than 8 chars',
+            message: `Password is improperly formatted.<br />
+                      Your password must be at least 8 characters long.
+                      `,
             trigger: 'blur',
           },
           { validator: validatePass, trigger: 'blur' },
@@ -320,12 +349,14 @@ export default {
         password_confirmation: [
           {
             required: true,
-            message: 'Please enter the password again',
+            message: 'This field is required.',
             trigger: 'blur',
           },
           {
             min: 8,
-            message: 'Password length should me more than 8 characters',
+            message: `Password is improperly formatted.<br />
+                      Your password must be at least 8 characters long.
+                      `,
             trigger: 'blur',
           },
           { validator: validatePass2, trigger: 'blur' },
@@ -596,7 +627,7 @@ export default {
     align-items: center;
     text-align: center;
     width: max-content;
-    max-width: 300px;
+    max-width: 430px;
     height: 45px;
     border-radius: 13px;
     background-color: white;
