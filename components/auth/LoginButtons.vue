@@ -8,7 +8,11 @@
           :loading="loginLoading"
         >
           <span class="submit-button__text">{{ loginTitle }}</span>
-          <img src="@/assets/images/icons/chevron-icon.svg" alt="arrow" />
+          <img
+            src="@/assets/images/icons/chevron-icon.svg"
+            alt="arrow"
+            class="arrow_position"
+          />
         </el-button>
       </div>
     </el-form-item>
@@ -59,6 +63,7 @@ export default {
 .submit-form-item {
   margin-bottom: 8px;
 }
+
 .google-sign-button {
   width: 100%;
   height: 48px;
@@ -106,5 +111,11 @@ export default {
     display: flex;
     justify-content: center;
   }
+}
+.arrow_position {
+  position: absolute;
+  right: 90px;
+}
+@media (max-width: 375px) {
 }
 </style>

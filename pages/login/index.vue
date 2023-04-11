@@ -104,7 +104,10 @@
             <el-checkbox v-model="payload.remember_me" class="remember-checkbox"
               >Remember me</el-checkbox
             >
-            <el-button type="text" @click="$router.push('/password/forgot')"
+            <el-button
+              type="text"
+              style="font-size: 14px"
+              @click="$router.push('/password/forgot')"
               >Forgot Password?</el-button
             >
           </div>
@@ -362,6 +365,9 @@ export default {
           color: $ov-primary;
         }
       }
+      .forgot-password {
+        font-size: 14px;
+      }
       .remember-checkbox {
         ::v-deep {
           .el-checkbox {
@@ -370,6 +376,7 @@ export default {
               height: 24px;
               border-radius: 6px;
               border-color: $ov-primary--light;
+              font-size: 14px;
               &:hover {
                 border-color: $ov-primary;
               }
