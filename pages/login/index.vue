@@ -254,6 +254,9 @@ export default {
     if (this.$route.query.email) {
       this.payload.email = this.$route.query.email
     }
+    if (this.$cookies.get('token')) {
+      this.$router.push('/')
+    }
   },
   methods: {
     ...mapActions('auth', ['loginUser']),
