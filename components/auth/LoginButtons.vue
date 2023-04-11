@@ -7,7 +7,9 @@
           native-type="submit"
           :loading="loginLoading"
         >
-          <span class="submit-button__text">{{ loginTitle }}</span>
+          <span class="submit-button__text">{{
+            !loginLoading ? loginTitle : ''
+          }}</span>
           <img
             src="@/assets/images/icons/chevron-icon.svg"
             alt="arrow"
@@ -86,6 +88,12 @@ export default {
     font-weight: 500;
   }
 }
+::v-deep .el-icon-loading {
+  position: absolute;
+  top: 16px;
+  left: 100px;
+}
+
 .submit-button {
   background: linear-gradient(90.32deg, #0cb1b9 0.28%, #4156f6 99.75%);
   color: white;

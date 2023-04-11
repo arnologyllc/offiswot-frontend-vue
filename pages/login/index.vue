@@ -106,14 +106,14 @@
             >
             <el-button
               type="text"
-              style="font-size: 14px"
+              style="font-size: 14px; font-weight: 400"
               @click="$router.push('/password/forgot')"
               >Forgot Password?</el-button
             >
           </div>
 
           <template slot="error">
-            <div v-if="!errors.password.isShow" class="el-form-item__error">
+            <div v-if="errors.password.isShow" class="el-form-item__error">
               <span v-html="errors.password.value"></span>
             </div>
             <div></div>
@@ -186,9 +186,11 @@ export default {
           },
           {
             min: 8,
-            message: `Password is improperly formatted.<br />
-                      Your password must be at least 8 characters long.
-                      `,
+            message: `Password is improperly formatted.<br /><br />
+                      <ul class="error_info">
+                        <li>Minimum 8 characters long.</li>
+                        <li>Cannot be weak, e.g., “abcd1234”.</li>
+                      </ul>`,
             trigger: 'blur',
           },
         ],
@@ -433,14 +435,14 @@ export default {
 
 @keyframes showPlaceholder {
   to {
-    top: -32px;
+    top: -34px;
     left: -263px;
   }
 }
 
 @keyframes showPasswordPlaceholder {
   to {
-    top: -32px;
+    top: -34px;
     left: -295px;
   }
 }
@@ -455,21 +457,34 @@ export default {
     position: absolute;
     font-family: 'Montserrat';
     font-size: 12px;
+    line-height: 20px;
     font-weight: 400;
     top: 0;
     left: 105%;
-    padding: 10px;
+    padding: 14px;
     color: #e60022;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    text-align: center;
-    width: max-content;
-    height: 45px;
+    width: 212px;
+    height: max-content;
+    min-height: 48px;
     border-radius: 13px;
     background-color: white;
     box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
+  }
+  .error_info {
+    color: #717a7f;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .error_info > li {
+    margin-left: 15px;
+  }
+
+  .error_info > li::marker {
+    font-size: 0.5em;
   }
   .el-form-item__error:after,
   .el-form-item__error:before {
@@ -477,7 +492,7 @@ export default {
     content: '';
     width: 0;
     height: 0;
-    top: 50%;
+    top: 25px;
   }
   .el-form-item__error:before {
     left: -8px;

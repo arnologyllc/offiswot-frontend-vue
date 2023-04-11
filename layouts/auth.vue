@@ -1,9 +1,12 @@
 <template>
   <div class="main-layout-aut__outer">
     <Header />
-    <div class="main-layout-auth">
+    <div
+      class="main-layout-auth"
+      :class="checkPage() === '/expired' ? '' : 'main-layout-auth__background'"
+    >
       <Nuxt />
-      <div class="go-back">
+      <div v-if="checkPage === '/expired'" class="go-back">
         <el-button type="text" @click="$router.go(-1)">
           <img
             src="@/assets/images/icons/chevron-dark-icon.svg"
@@ -27,22 +30,29 @@ export default {
     Header,
     Footer,
   },
+  methods: {
+    checkPage() {
+      console.log(this.$route.path)
+      return this.$route.path
+    },
+  },
 }
 </script>
 
 <style scoped lang="scss">
 .main-layout-auth {
   background: $ov-gray-bg;
-  background-image: url('@/assets/images/auth-background.svg');
   background-repeat: no-repeat;
   background-position: right;
   background-attachment: fixed;
   width: 100%;
   min-height: calc(100vh - 286px);
-  padding: 130px 0 150px 18%;
   overflow-y: auto;
   position: relative;
-
+  &__background {
+    background-image: url('@/assets/images/auth-background.svg');
+    padding: 130px 0 150px 18%;
+  }
   &__outer {
     display: flex;
     flex-direction: column;

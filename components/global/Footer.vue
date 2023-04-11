@@ -135,7 +135,7 @@ export default {
 @media (max-width: 990px) {
   .footer {
     &__content {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
     }
     &__rights {
       justify-content: unset;

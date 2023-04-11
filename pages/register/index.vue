@@ -59,6 +59,7 @@
             v-model="payload.username"
             class="main__form--box__input"
             placeholder="Username"
+            maxlength="30"
             @blur="validateField('username')"
           >
             <template slot="prefix">
@@ -260,28 +261,22 @@ export default {
         callback()
       }
     }
-    const validatePassSymbols = (rule, value, callback) => {
-      const regex = /^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[a-zA-Z0-9]*)$/
-      if (regex.test(value)) {
-        callback(
-          new Error(
-            'Password must include at least 1 lowercase, uppercase, 1 number and 1 special character'
-          )
-        )
-      } else {
-        callback()
-      }
-    }
     const validateUsernameSymbols = (rule, value, callback) => {
       const regex = /^[A-Za-z0-9_.]*$/g
       if (!regex.test(value)) {
         callback(
           new Error(
-            `Username is improperly formatted.<br>
-            It can only contain letters, numbers, underscores and dots.<br>
-            It can't contain symbols or punctuation marks.`
+            `<span>Username is improperly formatted.<br></span>
+            <ul class="error_info">
+              <li>Your handle can't exceed 30 characters. </li>
+              <li>It can only contain letters, numbers, underscores and dots. </li>
+              <li>It can't contain symbols or punctuation marks. </li>
+              <li>It needs to be unique.</li>
+            </ul>`
           )
         )
+      } else {
+        callback()
       }
     }
     return {
@@ -318,14 +313,19 @@ export default {
           {
             min: 3,
             message: `Username is improperly formatted.<br />
-                      Your username must be at least 3 characters long.
+                      <span class="error_info">Your username must be at least 3 characters long.</span>
                       `,
             trigger: 'blur',
           },
           {
             max: 30,
-            message:
-              "Username is improperly formatted.<br />Your handle can't exceed 30 characters.",
+            message: `Username is improperly formatted.<br /><br />
+                      <ul class="error_info">
+                        <li>Your handle can't exceed 30 characters.</li>
+                        <li>It can only contain letters, numbers, underscores and dots.</li>
+                        <li>It can't contain symbols or punctuation marks.</li>
+                        <li>It needs to be unique.</li>
+                      </ul>`,
             trigger: 'blur',
           },
           { validator: validateUsernameSymbols, trigger: 'blur' },
@@ -338,25 +338,19 @@ export default {
           },
           {
             min: 8,
-            message: `Password is improperly formatted.<br />
-                      Your password must be at least 8 characters long.
-                      `,
+            message: `Password is improperly formatted.<br /><br />
+                      <ul class="error_info">
+                        <li>Minimum 8 characters long.</li>
+                        <li>Cannot be weak, e.g., “abcd1234”.</li>
+                      </ul>`,
             trigger: 'blur',
           },
           { validator: validatePass, trigger: 'blur' },
-          { validator: validatePassSymbols, trigger: 'blur' },
         ],
         password_confirmation: [
           {
             required: true,
             message: 'This field is required.',
-            trigger: 'blur',
-          },
-          {
-            min: 8,
-            message: `Password is improperly formatted.<br />
-                      Your password must be at least 8 characters long.
-                      `,
             trigger: 'blur',
           },
           { validator: validatePass2, trigger: 'blur' },
@@ -580,28 +574,28 @@ export default {
 
 @keyframes showEmailPlaceholder {
   to {
-    top: -32px;
+    top: -34px;
     left: -343px;
   }
 }
 
 @keyframes showUsernamePlaceholder {
   to {
-    top: -32px;
+    top: -34px;
     left: -315px;
   }
 }
 
 @keyframes showPasswordPlaceholder {
   to {
-    top: -32px;
+    top: -34px;
     left: -295px;
   }
 }
 
 @keyframes showPasswordConfirmationPlaceholder {
   to {
-    top: -32px;
+    top: -34px;
     left: -243px;
   }
 }
@@ -616,22 +610,31 @@ export default {
     position: absolute;
     font-family: 'Montserrat';
     font-size: 12px;
+    line-height: 20px;
     font-weight: 400;
     top: 0;
     left: 105%;
-    padding: 10px;
+    padding: 14px;
     color: #e60022;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    text-align: center;
     width: max-content;
-    max-width: 430px;
-    height: 45px;
+    width: 212px;
+    height: max-content;
     border-radius: 13px;
     background-color: white;
     box-shadow: 0 0 10px gray;
+  }
+
+  .error_info {
+    color: #717a7f;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .error_info > li {
+    margin-left: 15px;
   }
   .el-form-item__error:after,
   .el-form-item__error:before {
@@ -639,7 +642,11 @@ export default {
     content: '';
     width: 0;
     height: 0;
-    top: 50%;
+    top: 25px;
+  }
+
+  .error_info > li::marker {
+    font-size: 0.5em;
   }
   .el-form-item__error:before {
     left: -8px;
