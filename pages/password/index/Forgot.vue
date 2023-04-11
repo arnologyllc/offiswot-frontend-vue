@@ -18,11 +18,35 @@
             v-model="payload.email"
             class="main__form--box__input"
             placeholder="E-mail"
+            @blur="validateField('email')"
           >
             <template slot="prefix">
               <img src="@/assets/images/icons/email-icon.svg" alt="user_icon" />
             </template>
+            <div
+              v-if="payload.email"
+              slot="suffix"
+              style="position: relative"
+              @click="focusElement('email')"
+            >
+              <span for="email" class="placeholder"> Email</span>
+            </div>
+            <template v-if="errors.email.value" slot="suffix">
+              <img
+                class="error_icon"
+                src="@/assets/images/icons/error.svg"
+                alt=""
+                @mouseover="showError('email')"
+                @mouseout="hideError('email')"
+              />
+            </template>
           </el-input>
+          <template slot="error">
+            <div v-if="errors.email.isShow" class="el-form-item__error">
+              <span>{{ errors.email.value }}</span>
+            </div>
+            <div></div>
+          </template>
         </el-form-item>
         <login-buttons
           login-title="Next"
@@ -69,7 +93,12 @@ export default {
           },
         ],
       },
-
+      errors: {
+        email: {
+          value: '',
+          isShow: false,
+        },
+      },
       isOpenEmailDialog: false,
     }
   },
@@ -122,6 +151,18 @@ export default {
           return false
         }
       })
+    },
+
+    validateField(fieldName) {
+      this.$refs.forgotForm.validateField(fieldName, (errorMessage) => {
+        this.errors[fieldName].value = errorMessage
+      })
+    },
+    showError(fieldName) {
+      this.errors[fieldName].isShow = true
+    },
+    hideError(fieldName) {
+      this.errors[fieldName].isShow = false
     },
   },
 }
@@ -198,11 +239,80 @@ export default {
     }
   }
 }
+
+.placeholder {
+  position: relative;
+  top: 0;
+  left: -750%;
+  animation: showPlaceholder 0.3s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes showPlaceholder {
+  to {
+    top: -80%;
+    left: -820%;
+  }
+}
 ::v-deep {
   .el-form-item.is-error {
     .el-input__inner {
-      border-color: red !important;
+      border-color: #e60022 !important;
     }
+  }
+  .el-form-item__error {
+    position: absolute;
+    font-family: 'Montserrat';
+    font-size: 12px;
+    font-weight: 400;
+    top: 0;
+    left: 105%;
+    padding: 10px;
+    color: #e60022;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: max-content;
+    height: 45px;
+    border-radius: 13px;
+    background-color: white;
+    box-shadow: 0 0 10px gray;
+  }
+  .el-form-item__error:after,
+  .el-form-item__error:before {
+    position: absolute;
+    content: '';
+    width: 0;
+    height: 0;
+    top: 50%;
+  }
+  .el-form-item__error:before {
+    left: -8px;
+    margin-top: -8px;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid #fff;
+  }
+  .el-form-item__error:after {
+    left: -7px;
+    margin-top: -7px;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-right: 7px solid #fff;
+  }
+  .error_icon {
+    position: absolute;
+    top: 12px;
+    right: 7px;
+  }
+
+  .el-input__suffix {
+    display: flex !important;
+  }
+  .el-input__suffix-inner {
+    display: flex !important;
   }
 }
 </style>

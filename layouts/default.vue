@@ -16,7 +16,7 @@ export default {
   name: 'DefaultLayout',
   components: {
     Footer,
-    Header
+    Header,
   },
   middleware: [auth],
 }

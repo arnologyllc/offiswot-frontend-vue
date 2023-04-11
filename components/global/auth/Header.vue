@@ -1,8 +1,15 @@
 <template>
   <nav class="main">
     <div class="main__left">
-      <img src="@/assets/images/ov-logo.svg" alt="" />
-      <span class="main__left--title">Online Office</span>
+      <img
+        src="@/assets/images/icons/logo.svg"
+        alt=""
+        class="main__left--logo"
+      />
+      <div class="main__left--title">
+        <span class="main__left--titleStart">ffi</span>
+        <span class="main__left--titleEnd">swot</span>
+      </div>
     </div>
     <div class="main__right">
       <el-button
@@ -47,11 +54,18 @@ export default {
 
   &__left {
     display: flex;
-    align-items: center;
-    gap: 0 13px;
-
+    align-items: flex-end;
+    gap: 5px;
     &--title {
-      font-size: 16px;
+      display: flex;
+    }
+    &--titleStart {
+      font-size: 25px;
+      color: #4156f6;
+    }
+    &--titleEnd {
+      font-size: 25px;
+      color: #1ac1c9;
     }
   }
   &__right {

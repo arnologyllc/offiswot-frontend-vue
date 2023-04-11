@@ -239,7 +239,7 @@ export default {
     &--channels-list {
       border-bottom: 1px solid white;
       padding-bottom: 44px;
-      margin-bottom: 22px;
+      margin-bottom: 27px;
     }
 
     &--channels {

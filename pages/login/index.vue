@@ -17,11 +17,21 @@
             v-model="payload.email"
             class="main__form--box__input"
             placeholder="Email or username"
+            @blur="validateField('email')"
           >
             <template slot="prefix">
               <img src="@/assets/images/icons/user-icon.svg" alt="user_icon" />
             </template>
 
+            <template v-if="errors.email.value" slot="suffix">
+              <img
+                class="error_icon"
+                src="@/assets/images/icons/error.svg"
+                alt=""
+                @mouseover="showError('email')"
+                @mouseout="hideError('email')"
+              />
+            </template>
             <div
               v-if="payload.email"
               slot="suffix"
@@ -31,6 +41,13 @@
               <span for="email" class="placeholder"> Email or username </span>
             </div>
           </el-input>
+
+          <template slot="error">
+            <div v-if="errors.email.isShow" class="el-form-item__error">
+              <span>{{ errors.email.value }}</span>
+            </div>
+            <div></div>
+          </template>
         </el-form-item>
         <el-form-item prop="password" class="password-form-item">
           <el-input
@@ -40,6 +57,7 @@
             :type="showPassword ? 'text' : 'password'"
             class="main__form--box__input"
             placeholder="Password"
+            @blur="validateField('password')"
           >
             <template slot="prefix">
               <img
@@ -60,6 +78,7 @@
             </div>
             <template slot="suffix">
               <img
+                :class="errors.password.value ? 'eye_icon' : ''"
                 :src="
                   require(`@/assets/images/icons/eye-${
                     showPassword ? 'close' : 'open'
@@ -69,15 +88,36 @@
                 @click="showPassword = !showPassword"
               />
             </template>
+
+            <template v-if="errors.password.value" slot="suffix">
+              <img
+                src="@/assets/images/icons/error.svg"
+                alt=""
+                class="error_icon"
+                @mouseover="showError('password')"
+                @mouseout="hideError('password')"
+              />
+            </template>
           </el-input>
+
           <div class="forgot-password">
             <el-checkbox v-model="payload.remember_me" class="remember-checkbox"
               >Remember me</el-checkbox
             >
-            <el-button type="text" @click="$router.push('/password/forgot')"
+            <el-button
+              type="text"
+              style="font-size: 14px; font-weight: 400"
+              @click="$router.push('/password/forgot')"
               >Forgot Password?</el-button
             >
           </div>
+
+          <template slot="error">
+            <div v-if="errors.password.isShow" class="el-form-item__error">
+              <span v-html="errors.password.value"></span>
+            </div>
+            <div></div>
+          </template>
         </el-form-item>
         <login-buttons
           :login-loading="loginLoading"
@@ -98,6 +138,7 @@
 import { mapGetters, mapActions } from 'vuex'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
 import ConfirmEmail from '@/components/shared/OvConfirmEmailModal.vue'
+
 export default {
   name: 'RegisterPage',
   components: {
@@ -117,21 +158,43 @@ export default {
       //  Show Password/Not Show Password
       showPassword: false,
 
+      errors: {
+        email: {
+          value: '',
+          isShow: false,
+        },
+        password: {
+          value: '',
+          isShow: false,
+        },
+      },
+
       //  Validation Rules
       rules: {
         email: [
-          { required: true, message: 'Email is required', trigger: 'blur' },
+          {
+            required: true,
+            message: 'This field is required.',
+            trigger: 'blur',
+          },
         ],
         password: [
-          { required: true, message: 'Password is required', trigger: 'blur' },
+          {
+            required: true,
+            message: 'This field is required.',
+            trigger: 'blur',
+          },
           {
             min: 8,
-            message: 'Password length should me more than 8 chars',
+            message: `Password is improperly formatted.<br /><br />
+                      <ul class="error_info">
+                        <li>Minimum 8 characters long.</li>
+                        <li>Cannot be weak, e.g., “abcd1234”.</li>
+                      </ul>`,
             trigger: 'blur',
           },
         ],
       },
-
       isOpenEmailDialog: false,
     }
   },
@@ -198,6 +261,9 @@ export default {
     if (this.$route.query.email) {
       this.payload.email = this.$route.query.email
     }
+    if (this.$cookies.get('token')) {
+      this.$router.push('/')
+    }
   },
   methods: {
     ...mapActions('auth', ['loginUser']),
@@ -213,6 +279,18 @@ export default {
     },
     focusElement(elem) {
       this.$refs[elem].focus()
+    },
+
+    validateField(fieldName) {
+      this.$refs.loginForm.validateField(fieldName, (errorMessage) => {
+        this.errors[fieldName].value = errorMessage
+      })
+    },
+    showError(fieldName) {
+      this.errors[fieldName].isShow = true
+    },
+    hideError(fieldName) {
+      this.errors[fieldName].isShow = false
     },
   },
 }
@@ -237,7 +315,7 @@ export default {
     &--subtitle {
       font-size: 14px;
       color: $ov-text--subtitle;
-      margin-bottom: 47px;
+      margin-bottom: 40px;
     }
 
     &--box {
@@ -289,6 +367,9 @@ export default {
           color: $ov-primary;
         }
       }
+      .forgot-password {
+        font-size: 14px;
+      }
       .remember-checkbox {
         ::v-deep {
           .el-checkbox {
@@ -297,6 +378,7 @@ export default {
               height: 24px;
               border-radius: 6px;
               border-color: $ov-primary--light;
+              font-size: 14px;
               &:hover {
                 border-color: $ov-primary;
               }
@@ -325,18 +407,17 @@ export default {
         }
       }
     }
-    .password-form-item {
-      ::v-deep .el-form-item__error {
-        top: 45%;
-      }
-    }
   }
 }
 
 .placeholder {
   position: relative;
   top: 0;
-  left: -150%;
+  width: 50px;
+  left: -220px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #717a7f;
   animation: showPlaceholder 0.3s;
   animation-fill-mode: forwards;
 }
@@ -344,37 +425,108 @@ export default {
 .password-placeholder {
   position: relative;
   top: 0;
-  left: -355%;
+  left: -250px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #717a7f;
   animation: showPasswordPlaceholder 0.3s;
   animation-fill-mode: forwards;
 }
 
 @keyframes showPlaceholder {
   to {
-    top: -90%;
-    left: -180%;
+    top: -34px;
+    left: -263px;
   }
 }
 
 @keyframes showPasswordPlaceholder {
   to {
-    top: -90%;
-    left: -410%;
+    top: -34px;
+    left: -295px;
   }
 }
 
 ::v-deep {
   .el-form-item.is-error {
     .el-input__inner {
-      border-color: red !important;
+      border-color: #e60022 !important;
     }
   }
+  .el-form-item__error {
+    position: absolute;
+    font-family: 'Montserrat';
+    font-size: 12px;
+    line-height: 20px;
+    font-weight: 400;
+    top: 0;
+    left: 105%;
+    padding: 14px;
+    color: #e60022;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 212px;
+    height: max-content;
+    min-height: 48px;
+    border-radius: 13px;
+    background-color: white;
+    box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
+  }
+  .error_info {
+    color: #717a7f;
+    font-style: italic;
+    font-weight: 400;
+  }
 
-  .el-form-item__content {
-    margin-bottom: 20px;
+  .error_info > li {
+    margin-left: 15px;
+  }
+
+  .error_info > li::marker {
+    font-size: 0.5em;
+  }
+  .el-form-item__error:after,
+  .el-form-item__error:before {
+    position: absolute;
+    content: '';
+    width: 0;
+    height: 0;
+    top: 25px;
+  }
+  .el-form-item__error:before {
+    left: -8px;
+    margin-top: -8px;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid #fff;
+  }
+  .el-form-item__error:after {
+    left: -7px;
+    margin-top: -7px;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-right: 7px solid #fff;
+  }
+  .error_icon {
+    position: absolute;
+    top: 12px;
+    right: 7px;
+  }
+
+  .eye_icon {
+    position: relative;
+    right: 32px;
+  }
+
+  .el-input__suffix {
+    display: flex !important;
   }
   .el-input__suffix-inner {
     display: flex !important;
+  }
+  .el-form-item {
+    margin-bottom: 27px;
   }
 }
 </style>

@@ -120,7 +120,8 @@ export default {
       &__image {
         cursor: pointer;
         & img:hover {
-          filter: invert(48%) sepia(9%) saturate(333%) hue-rotate(157deg) brightness(95%) contrast(88%);
+          filter: invert(48%) sepia(9%) saturate(333%) hue-rotate(157deg)
+            brightness(95%) contrast(88%);
         }
       }
     }
@@ -134,7 +135,7 @@ export default {
 @media (max-width: 990px) {
   .footer {
     &__content {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
     }
     &__rights {
       justify-content: unset;
@@ -149,7 +150,13 @@ export default {
 }
 @media (max-width: 768px) {
   .footer {
-    padding: 45px 30px 22px 96px;
+    padding: 30px;
+
+    &__content {
+      justify-content: center;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 40px 0;
+    }
     &__grid-item:last-child {
       padding-right: 40px;
     }

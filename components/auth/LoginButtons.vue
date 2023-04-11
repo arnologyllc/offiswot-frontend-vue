@@ -7,8 +7,14 @@
           native-type="submit"
           :loading="loginLoading"
         >
-          <span class="submit-button__text">{{ loginTitle }}</span>
-          <img src="@/assets/images/icons/chevron-icon.svg" alt="arrow" />
+          <span class="submit-button__text">{{
+            !loginLoading ? loginTitle : ''
+          }}</span>
+          <img
+            src="@/assets/images/icons/chevron-icon.svg"
+            alt="arrow"
+            :class="!loginLoading ? 'arrow_position' : ''"
+          />
         </el-button>
       </div>
     </el-form-item>
@@ -59,6 +65,7 @@ export default {
 .submit-form-item {
   margin-bottom: 8px;
 }
+
 .google-sign-button {
   width: 100%;
   height: 48px;
@@ -81,6 +88,12 @@ export default {
     font-weight: 500;
   }
 }
+::v-deep .el-icon-loading {
+  position: absolute;
+  top: 16px;
+  left: 100px;
+}
+
 .submit-button {
   background: linear-gradient(90.32deg, #0cb1b9 0.28%, #4156f6 99.75%);
   color: white;
@@ -106,5 +119,11 @@ export default {
     display: flex;
     justify-content: center;
   }
+}
+.arrow_position {
+  position: absolute;
+  right: 90px;
+}
+@media (max-width: 375px) {
 }
 </style>
