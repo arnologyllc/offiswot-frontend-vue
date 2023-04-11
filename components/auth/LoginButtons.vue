@@ -11,7 +11,7 @@
           <img
             src="@/assets/images/icons/chevron-icon.svg"
             alt="arrow"
-            class="arrow_position"
+            :class="!loginLoading ? 'arrow_position' : ''"
           />
         </el-button>
       </div>
