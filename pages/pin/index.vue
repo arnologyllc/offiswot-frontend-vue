@@ -51,6 +51,7 @@
                 class="error_icon"
                 @mouseover="showError('pin')"
                 @mouseout="hideError('pin')"
+                @click="showErrorClick('pin')"
               />
             </template>
           </el-input>
@@ -102,6 +103,7 @@
                 class="error_icon"
                 @mouseover="showError('pin_confirmation')"
                 @mouseout="hideError('pin_confirmation')"
+                @click="showErrorClick('pin_confirmation')"
               />
             </template>
           </el-input>
@@ -123,6 +125,20 @@
         >
           <span class="submit-button__text">Save</span>
         </el-button>
+        <error-massage
+          v-show="errors.pin.isShow && !isWeb()"
+          :error-text="errors.pin.value"
+          class="dialog"
+          @visible="errors.pin.isShow = false"
+        >
+        </error-massage>
+        <error-massage
+          v-show="errors.pin_confirmation.isShow && !isWeb()"
+          :error-text="errors.pin_confirmation.value"
+          class="dialog"
+          @visible="errors.pin_confirmation.isShow = false"
+        >
+        </error-massage>
       </el-form>
     </div>
   </div>
@@ -130,9 +146,13 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 
 export default {
   name: 'PINPage',
+  components: {
+    ErrorMassage,
+  },
   layout: 'default',
   data() {
     const validatePIN = (rule, value, callback) => {
@@ -172,6 +192,12 @@ export default {
           {
             required: true,
             message: 'This field is required.',
+            trigger: 'blur',
+          },
+          {
+            min: 4,
+            max: 6,
+            message: 'PIN must be between 4 and 6 digits',
             trigger: 'blur',
           },
         ],
@@ -251,13 +277,15 @@ export default {
     if (this.$route.query.email) {
       this.payload.email = this.$route.query.email
     }
+
+    window.addEventListener('resize', this.handleResize)
   },
   methods: {
     ...mapActions('profile', ['editProfile']),
     onSubmit() {
       this.editProfile(this.payload)
     },
-    focusElement(elem) {
+    ffocusElement(elem) {
       this.$refs[elem].focus()
     },
 
@@ -266,11 +294,27 @@ export default {
         this.errors[fieldName].value = errorMessage
       })
     },
-    showError(fieldName) {
+    showErrorClick(fieldName) {
       this.errors[fieldName].isShow = true
     },
+    showError(fieldName) {
+      if (this.isWeb()) {
+        this.errors[fieldName].isShow = true
+      }
+    },
     hideError(fieldName) {
-      this.errors[fieldName].isShow = false
+      if (this.isWeb()) {
+        this.errors[fieldName].isShow = false
+      }
+    },
+    handleResize() {
+      this.$forceUpdate()
+    },
+
+    isWeb() {
+      if (typeof window !== 'undefined') {
+        return window.innerWidth > 990
+      }
     },
   },
 }
@@ -517,5 +561,15 @@ export default {
     display: flex;
     justify-content: flex-end;
   }
+}
+.dialog {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.66);
 }
 </style>

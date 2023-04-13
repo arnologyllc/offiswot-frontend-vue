@@ -392,6 +392,7 @@ export default {
         this.errors.username.value = ''
         this.errors.username.status = null
       }
+      callback()
     }
     return {
       //  Request Body
