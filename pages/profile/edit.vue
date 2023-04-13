@@ -380,12 +380,10 @@ export default {
   },
   methods: {
     ...mapActions('profile', ['getProfile', 'editProfile']),
-    onSubmit() {
-      this.editProfile(this.payload)
-    },
     onAvatarUpload(e) {
       this.payload.avatar = e.raw
       this.avatarSrc = URL.createObjectURL(e.raw)
+      this.editProfile(this.payload)
     },
   },
 }

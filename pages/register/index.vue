@@ -42,12 +42,16 @@
                 alt=""
                 @mouseover="showError('email')"
                 @mouseout="hideError('email')"
+                @click="showErrorClick('email')"
               />
             </template>
           </el-input>
 
           <template slot="error">
-            <div v-if="errors.email.isShow" class="el-form-item__error">
+            <div
+              v-if="errors.email.isShow && isWeb()"
+              class="el-form-item__error"
+            >
               <span>{{ errors.email.value }}</span>
             </div>
             <div></div>
@@ -60,7 +64,7 @@
             class="main__form--box__input"
             placeholder="Username"
             maxlength="30"
-            @blur="validateField('username')"
+            @input="validateField('username')"
           >
             <template slot="prefix">
               <img src="@/assets/images/icons/user-icon.svg" alt="user_icon" />
@@ -80,17 +84,43 @@
               </span>
             </div>
             <template v-if="errors.username.value" slot="suffix">
-              <img
+              <div
                 class="error_icon"
-                src="@/assets/images/icons/error.svg"
-                alt=""
                 @mouseover="showError('username')"
                 @mouseout="hideError('username')"
-              />
+                @click="showErrorClick('username')"
+              >
+                <img
+                  v-if="errors.username.status === 'Medium' && payload.username"
+                  src="@/assets/images/icons/warning.svg"
+                  alt=""
+                />
+                <img
+                  v-else-if="errors.username.value"
+                  src="@/assets/images/icons/error.svg"
+                  alt=""
+                />
+              </div>
+            </template>
+            <template slot="suffix">
+              <div
+                v-if="
+                  errors.username.status === 'Medium' &&
+                  errors.username.isShow &&
+                  isWeb()
+                "
+                class="el-form-item__error strength warning"
+              >
+                <span v-html="errors.username.value"></span>
+              </div>
+              <div></div>
             </template>
           </el-input>
           <template slot="error">
-            <div v-if="errors.username.isShow" class="el-form-item__error">
+            <div
+              v-if="errors.username.isShow && isWeb()"
+              class="el-form-item__error"
+            >
               <span v-html="errors.username.value"></span>
             </div>
             <div></div>
@@ -126,7 +156,7 @@
                 :class="errors.password.value ? 'eye_icon' : ''"
                 :src="
                   require(`@/assets/images/icons/eye-${
-                    showPassword ? 'close' : 'open'
+                    !showPassword ? 'close' : 'open'
                   }-icon.svg`)
                 "
                 alt="eye_icon"
@@ -134,17 +164,44 @@
               />
             </template>
             <template v-if="errors.password.value" slot="suffix">
-              <img
-                src="@/assets/images/icons/error.svg"
-                alt=""
+              <div
                 class="error_icon"
                 @mouseover="showError('password')"
                 @mouseout="hideError('password')"
-              />
+                @click="showErrorClick('password')"
+              >
+                <img
+                  v-if="errors.password.status === 'Medium' && payload.password"
+                  src="@/assets/images/icons/warning.svg"
+                  alt=""
+                />
+                <img
+                  v-else-if="
+                    errors.password.status === 'Strong' && payload.password
+                  "
+                  src="@/assets/images/icons/good.svg"
+                  alt=""
+                />
+                <img v-else src="@/assets/images/icons/error.svg" alt="" />
+              </div>
+            </template>
+
+            <template slot="suffix">
+              <div
+                v-if="payload.password && errors.password.isShow && isWeb()"
+                :class="getColor()"
+                class="el-form-item__error strength"
+              >
+                <span v-html="errors.password.value"></span>
+              </div>
+              <div></div>
             </template>
           </el-input>
           <template slot="error">
-            <div v-if="errors.password.isShow" class="el-form-item__error">
+            <div
+              v-if="errors.password.isShow && isWeb()"
+              class="el-form-item__error"
+            >
               <span v-html="errors.password.value"></span>
             </div>
             <div></div>
@@ -183,7 +240,7 @@
                 :class="errors.password_confirmation.value ? 'eye_icon' : ''"
                 :src="
                   require(`@/assets/images/icons/eye-${
-                    showConfirmPassword ? 'close' : 'open'
+                    !showConfirmPassword ? 'close' : 'open'
                   }-icon.svg`)
                 "
                 alt="eye_icon"
@@ -197,12 +254,13 @@
                 class="error_icon"
                 @mouseover="showError('password_confirmation')"
                 @mouseout="hideError('password_confirmation')"
+                @click="showErrorClick('password_confirmation')"
               />
             </template>
           </el-input>
           <template slot="error">
             <div
-              v-if="errors.password_confirmation.isShow"
+              v-if="errors.password_confirmation.isShow && isWeb()"
               class="el-form-item__error"
             >
               <span v-html="errors.password_confirmation.value"></span>
@@ -225,6 +283,46 @@
       :model="isOpenEmailDialog"
       @close="isOpenEmailDialog = false"
     ></confirm-email>
+
+    <error-massage
+      v-show="errors.email.isShow && !isWeb()"
+      :error-text="errors.email.value"
+      class="dialog"
+      @visible="errors.email.isShow = false"
+    ></error-massage>
+
+    <error-massage
+      v-show="errors.username.isShow && !isWeb()"
+      :error-text="errors.username.value"
+      :text-color="
+        errors.username.status === 'Medium' && payload.username
+          ? 'warning'
+          : 'weak'
+      "
+      class="dialog"
+      @visible="errors.username.isShow = false"
+    ></error-massage>
+
+    <error-massage
+      v-show="errors.password.isShow && !isWeb()"
+      :error-text="errors.password.value"
+      class="dialog"
+      :text-color="
+        errors.password.status === 'Medium' && payload.password
+          ? 'warning'
+          : errors.password.status === 'Strong' && payload.password
+          ? 'done'
+          : 'weak'
+      "
+      @visible="errors.password.isShow = false"
+    ></error-massage>
+
+    <error-massage
+      v-show="errors.password_confirmation.isShow && !isWeb()"
+      :error-text="errors.password_confirmation.value"
+      class="dialog"
+      @visible="errors.password_confirmation.isShow = false"
+    ></error-massage>
   </div>
 </template>
 
@@ -232,25 +330,31 @@
 import { mapGetters, mapActions } from 'vuex'
 import ConfirmEmail from '@/components/shared/OvConfirmEmailModal.vue'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
+import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 
 export default {
   name: 'LoginPage',
   components: {
     ConfirmEmail,
     LoginButtons,
+    ErrorMassage,
   },
   layout: 'auth',
   data() {
     //  Custom Validations
     const validatePass = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('Please input the password'))
-      } else {
-        if (this.payload.password_confirmation !== '') {
-          this.$refs.registerForm.validateField('password_confirmation')
-        }
-        callback()
+      const strength = this.updatePasswordStrength(value)
+      if (strength === 'Weak') {
+        this.errors.password.status = 'Weak'
+        callback(new Error('Password strength: <b>Weak</b>'))
+      } else if (strength === 'Medium') {
+        this.errors.password.status = 'Medium'
+        this.errors.password.value = 'Password strength: <b>Medium</b>'
+      } else if (strength === 'Strong') {
+        this.errors.password.status = 'Strong'
+        this.errors.password.value = 'Password strength: <b>Strong</b>'
       }
+      callback()
     }
     const validatePass2 = (rule, value, callback) => {
       if (value === '') {
@@ -278,6 +382,17 @@ export default {
       } else {
         callback()
       }
+    }
+
+    const validateUsernameSymbolsCount = (rule, value, callback) => {
+      if (value.length === 30) {
+        this.errors.username.value = "Your handle can't exceed 30 characters."
+        this.errors.username.status = 'Medium'
+      } else {
+        this.errors.username.value = ''
+        this.errors.username.status = null
+      }
+      callback()
     }
     return {
       //  Request Body
@@ -317,32 +432,14 @@ export default {
                       `,
             trigger: 'blur',
           },
-          {
-            max: 30,
-            message: `Username is improperly formatted.<br /><br />
-                      <ul class="error_info">
-                        <li>Your handle can't exceed 30 characters.</li>
-                        <li>It can only contain letters, numbers, underscores and dots.</li>
-                        <li>It can't contain symbols or punctuation marks.</li>
-                        <li>It needs to be unique.</li>
-                      </ul>`,
-            trigger: 'blur',
-          },
+
           { validator: validateUsernameSymbols, trigger: 'blur' },
+          { validator: validateUsernameSymbolsCount, trigger: 'input' },
         ],
         password: [
           {
             required: true,
             message: 'This field is required.',
-            trigger: 'blur',
-          },
-          {
-            min: 8,
-            message: `Password is improperly formatted.<br /><br />
-                      <ul class="error_info">
-                        <li>Minimum 8 characters long.</li>
-                        <li>Cannot be weak, e.g., “abcd1234”.</li>
-                      </ul>`,
             trigger: 'blur',
           },
           { validator: validatePass, trigger: 'blur' },
@@ -364,10 +461,12 @@ export default {
         },
         username: {
           value: '',
+          status: null,
           isShow: false,
         },
         password: {
           value: '',
+          status: null,
           isShow: false,
         },
         password_confirmation: {
@@ -438,6 +537,8 @@ export default {
     if (this.$cookies.get('token')) {
       this.$router.push('/')
     }
+
+    window.addEventListener('resize', this.handleResize)
   },
   methods: {
     ...mapActions('auth', ['registerUser']),
@@ -460,11 +561,45 @@ export default {
         this.errors[fieldName].value = errorMessage
       })
     },
-    showError(fieldName) {
+    showErrorClick(fieldName) {
       this.errors[fieldName].isShow = true
     },
+    showError(fieldName) {
+      if (this.isWeb()) {
+        this.errors[fieldName].isShow = true
+      }
+    },
     hideError(fieldName) {
-      this.errors[fieldName].isShow = false
+      if (this.isWeb()) {
+        this.errors[fieldName].isShow = false
+      }
+    },
+    handleResize() {
+      this.$forceUpdate()
+    },
+
+    isWeb() {
+      if (typeof window !== 'undefined') {
+        return window.innerWidth > 990
+      }
+    },
+    updatePasswordStrength(password) {
+      const mediumRegex = /^(?=.*?[a-z])(?=.*?[0-9]).{8,}$/
+      const strongRegex =
+        /^(?=.*?[a-z])((?=.*?[A-Z]))(?=.*?[0-9])(?=.*?[#?!@$%^&*-.]).{12,}$/
+      if (strongRegex.test(password)) {
+        return 'Strong'
+      } else if (mediumRegex.test(password)) {
+        return 'Medium'
+      }
+      return 'Weak'
+    },
+    getColor() {
+      return this.errors.password.status === 'Medium'
+        ? 'warning'
+        : this.errors.password.status === 'Strong'
+        ? 'done'
+        : ''
     },
   },
 }
@@ -544,6 +679,88 @@ export default {
   }
 }
 
+@media (min-width: 375px) {
+  @keyframes showEmailPlaceholder {
+    to {
+      top: -34px;
+      left: -343px;
+    }
+  }
+  @keyframes showUsernamePlaceholder {
+    to {
+      top: -34px;
+      left: -315px;
+    }
+  }
+  @keyframes showPasswordPlaceholder {
+    to {
+      top: -34px;
+      left: -295px;
+    }
+  }
+  @keyframes showPasswordConfirmationPlaceholder {
+    to {
+      top: -34px;
+      left: -243px;
+    }
+  }
+  .placeholder {
+    &__email {
+      left: -300px;
+    }
+    &__username {
+      left: -270px;
+    }
+    &__password {
+      left: -250px;
+    }
+    &__passwordConfirmation {
+      left: -200px;
+    }
+  }
+}
+
+@media (max-width: 375px) {
+  @keyframes showEmailPlaceholder {
+    to {
+      top: -34px;
+      left: -240px;
+    }
+  }
+  @keyframes showUsernamePlaceholder {
+    to {
+      top: -34px;
+      left: -212px;
+    }
+  }
+  @keyframes showPasswordPlaceholder {
+    to {
+      top: -34px;
+      left: -192px;
+    }
+  }
+  @keyframes showPasswordConfirmationPlaceholder {
+    to {
+      top: -34px;
+      left: -139px;
+    }
+  }
+  .placeholder {
+    &__email {
+      left: -197px;
+    }
+    &__username {
+      left: -167px;
+    }
+    &__password {
+      left: -147px;
+    }
+    &__passwordConfirmation {
+      left: -96px;
+    }
+  }
+}
+
 .placeholder {
   position: relative;
   top: 0;
@@ -551,52 +768,20 @@ export default {
   font-weight: 400;
   color: #717a7f;
   &__email {
-    left: -300px;
     animation: showEmailPlaceholder 0.3s;
     animation-fill-mode: forwards;
   }
   &__username {
-    left: -270px;
     animation: showUsernamePlaceholder 0.3s;
     animation-fill-mode: forwards;
   }
   &__password {
-    left: -250px;
     animation: showPasswordPlaceholder 0.3s;
     animation-fill-mode: forwards;
   }
   &__passwordConfirmation {
-    left: -200px;
     animation: showPasswordConfirmationPlaceholder 0.3s;
     animation-fill-mode: forwards;
-  }
-}
-
-@keyframes showEmailPlaceholder {
-  to {
-    top: -34px;
-    left: -343px;
-  }
-}
-
-@keyframes showUsernamePlaceholder {
-  to {
-    top: -34px;
-    left: -315px;
-  }
-}
-
-@keyframes showPasswordPlaceholder {
-  to {
-    top: -34px;
-    left: -295px;
-  }
-}
-
-@keyframes showPasswordConfirmationPlaceholder {
-  to {
-    top: -34px;
-    left: -243px;
   }
 }
 
@@ -620,13 +805,26 @@ export default {
     flex-direction: column;
     justify-content: center;
     width: max-content;
-    width: 212px;
+    max-width: 212px;
     height: max-content;
     border-radius: 13px;
     background-color: white;
     box-shadow: 0 0 10px gray;
   }
 
+  .strength {
+    left: 127%;
+  }
+  .done {
+    color: #34b53a;
+  }
+
+  .warning {
+    color: #ffa26b;
+  }
+  .weak {
+    color: #e60022;
+  }
   .error_info {
     color: #717a7f;
     font-style: italic;
@@ -686,5 +884,16 @@ export default {
   font-size: 14px;
   text-align: center;
   margin-bottom: 25px;
+}
+
+.dialog {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.66);
 }
 </style>

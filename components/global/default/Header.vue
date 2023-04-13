@@ -73,6 +73,7 @@
           class="main__actions"
         ></el-button>
         <el-button
+          v-if="!$route.path.includes('/pin')"
           type="text"
           icon="el-icon-setting"
           class="main__actions"
