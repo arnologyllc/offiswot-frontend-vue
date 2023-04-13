@@ -86,12 +86,17 @@
         <div class="dialog__pin-icon">
           <img src="@/assets/images/icons/delete.svg" alt="delete-profile" />
         </div>
-        <el-form class="dialog__form">
+        <el-form
+          class="dialog__form"
+          :rules="rules"
+          :model="payload"
+          @submit.native.prevent="onSubmit"
+        >
           <h4>Please Enter your PIN.</h4>
-          <el-form-item prop="pass">
+          <el-form-item prop="pin">
             <el-input
-              ref="pass"
-              v-model="payload.pass"
+              ref="pin"
+              v-model="payload.pin"
               class="dialog__form--box__input"
               placeholder="PIN"
               :type="showPassword ? 'text' : 'password'"
@@ -114,7 +119,7 @@
             type="danger"
             class="dialog__pin-button btn"
             plain
-            @click="agreeModal"
+            native-type="submit"
             >I AGREE</el-button
           >
         </el-form>
@@ -140,6 +145,8 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
+
 export default {
   name: 'ModalDelete',
   props: {
@@ -157,12 +164,53 @@ export default {
         checked2: false,
       },
       payload: {
-        pass: null,
+        pin: null,
+      },
+      rules: {
+        pin: [
+          {
+            required: true,
+            message: 'This field is required.',
+            trigger: 'blur',
+          },
+        ],
       },
       showPassword: false,
     }
   },
+  computed: {
+    ...mapGetters('profile', ['deleteProfileData', 'deleteFailureData']),
+  },
+  watch: {
+    deleteFailureData(v) {
+      for (const i in v) {
+        if (typeof v[i] !== 'string') {
+          for (const j in v[i]) {
+            this.$notify.error({
+              title: 'Error',
+              dangerouslyUseHTMLString: true,
+              message: `${i}: ${v[i][j]}`,
+            })
+          }
+        } else {
+          this.$notify.error({
+            title: 'Error',
+            message: v[i],
+          })
+        }
+      }
+    },
+    deleteProfileData(v) {
+      if (v) {
+        this.$message.success('Success!')
+      }
+    },
+  },
   methods: {
+    ...mapActions('profile', ['deleteProfile']),
+    onSubmit() {
+      this.deleteProfile(this.payload)
+    },
     agreeModal() {
       this.modalStep += 1
     },

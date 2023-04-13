@@ -162,7 +162,7 @@ export default {
     }
   }
 }
-@media (max-width: 425px) {
+@media (max-width: 450px) {
   .footer {
     padding-left: 71px;
     padding-right: 0px;

@@ -68,9 +68,18 @@
             </div>
           </div>
         </div>
-        <el-button type="text" class="change-picture">
-          Change picture
-        </el-button>
+        <el-upload
+          v-model="payload.avatar"
+          :show-file-list="false"
+          class="main__form--upload"
+          action="#"
+          accept="image/*"
+          :on-change="onAvatarUpload"
+        >
+          <el-button type="text" class="change-picture"
+            >Change picture</el-button
+          >
+        </el-upload>
         <div class="user-workspaces">
           <div class="user-workspaces__header">
             <div class="user-workspaces__title">your workspaces</div>
@@ -115,18 +124,13 @@
           >
             <el-button
               class="user-workspaces__create-btn"
+              style="position: absolute"
               @click="createWorkSpace"
             >
               <span>Create</span>
             </el-button>
             <div class="user-workspaces__container-text">
-              <span>
-                Thanks for joining Offiswot!<br /><br />
-                Create a workspace for your team or company using our
-                productivity platform. Enjoy collaborating with each other
-                easily and managing your team members and the projects
-                effectively.
-              </span>
+              <span v-html="formattedText()"> </span>
             </div>
           </div>
           <div
@@ -149,6 +153,12 @@ export default {
   data() {
     return {
       responseWorkspaces: null,
+      text: '',
+      payload: {
+        avatar: null,
+      },
+      avatar: null,
+      avatarSrc: null,
     }
   },
   head() {
@@ -162,6 +172,7 @@ export default {
       'profileSuccessData',
       'profileFailureData',
     ]),
+
     avatarURL() {
       if (this.profileSuccessData) {
         if (this.profileSuccessData.user.avatar) {
@@ -242,13 +253,40 @@ export default {
       this.$router.push('/login')
     }
   },
+
+  mounted() {
+    window.addEventListener('resize', this.handleResize)
+  },
+
   methods: {
-    ...mapActions('profile', ['getWorkSpaces', 'getProfile']),
+    ...mapActions('profile', ['getWorkSpaces', 'getProfile', 'editProfile']),
     createWorkSpace() {
       this.$router.push('/create-workspace')
     },
     openWorkspace(id) {
       this.$router.push(`/workspace/staff/${id}`)
+    },
+    handleResize() {
+      this.$forceUpdate()
+    },
+    formattedText() {
+      if (window.innerWidth > 861) {
+        return `Thanks for joining Offiswot!<br /><br />
+            Create a workspace for your team or company using our productivity platform.<br/>Enjoy collaborating with each other easily and managing yourteam members and the projects effectively.`
+      } else if (window.innerWidth <= 861 && window.innerWidth > 567) {
+        return `Thanks for joining Offiswot!<br /><br />
+            Create a workspace for your team or company using our productivity platform. Enjoy collaborating with each other easily and managing yourteam members and the projects effectively.`
+      } else {
+        return `Thanks for<br /> joining Offiswot!<br /><br />
+            Create a workspace for your team or company using our productivity platform. Enjoy collaborating with each other easily and managing yourteam members and the projects effectively.`
+      }
+    },
+
+    onAvatarUpload(e) {
+      this.payload.avatar = e.raw
+      this.avatarSrc = URL.createObjectURL(e.raw)
+      this.editProfile(this.payload)
+      this.getProfile()
     },
   },
 }
@@ -341,6 +379,7 @@ export default {
   font-weight: 400;
 }
 .user-workspaces {
+  position: relative;
   padding: 30px 74px 0 74px;
   border-top: 1px solid $ov-border;
   &__header {
@@ -359,7 +398,6 @@ export default {
   }
   &__container {
     font-size: 16px;
-    width: 100%;
     margin-top: 11px;
     padding: 24px 31px 24px 29px;
     display: flex;
@@ -379,21 +417,20 @@ export default {
     line-height: 22px;
   }
   &__container-text {
-    display: flex;
-    justify-content: center;
-    align-content: center;
+    width: 100%;
     font-size: 16px;
     color: #fff;
     font-weight: 600;
     line-height: 22px;
     text-align: justify;
-    width: 80%;
   }
   &__buttons {
     display: flex;
     align-items: center;
   }
   &__create-btn {
+    top: 82px;
+    right: 103px;
     min-width: 137px;
     height: 40px;
     border-radius: 6px;
@@ -473,6 +510,32 @@ export default {
     }
     &__container {
       display: block;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .user-workspaces {
+    &__create-btn {
+      right: 92px;
+    }
+  }
+}
+
+@media (max-width: 475px) {
+  .user-workspaces {
+    &__create-btn {
+      top: 65px;
+      right: 85px;
+    }
+  }
+}
+
+@media (max-width: 425px) {
+  .user-workspaces {
+    &__create-btn {
+      top: 65px;
+      right: 50px;
     }
   }
 }

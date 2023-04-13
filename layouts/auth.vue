@@ -32,7 +32,6 @@ export default {
   },
   methods: {
     checkPage() {
-      console.log(this.$route.path)
       return this.$route.path
     },
   },
@@ -111,7 +110,7 @@ export default {
     padding: 0 44px 119px 44px;
     ::v-deep {
       .main {
-        width: 100% !important;
+        width: 287px !important;
         .form-item__label {
           background: $ov-gray-bg;
         }

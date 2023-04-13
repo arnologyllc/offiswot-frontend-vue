@@ -4,7 +4,9 @@ const state = () => ({
   profileLoading: true,
   isLoadingSubmit: false,
   editProfileData: null,
-  editFailureData: null
+  editFailureData: null,
+  deleteProfileData: null,
+  deleteFailureData: null,
 })
 
 const getters = {
@@ -14,7 +16,10 @@ const getters = {
 
   isLoadingSubmit: (state) => state.isLoadingSubmit,
   editProfileData: (state) => state.editProfileData,
-  editFailureData: (state) => state.editFailureData
+  editFailureData: (state) => state.editFailureData,
+
+  deleteProfileData: (state) => state.deleteProfileData,
+  deleteFailureData: (state) => state.deleteFailureData,
 }
 
 const mutations = {
@@ -41,7 +46,15 @@ const mutations = {
     state.editFailureData = null
     state.editFailureData = data
     state.isLoadingSubmit = false
-  }
+  },
+
+  DELETE_PROFILE_SUCCESS: (state, data) => {
+    state.deleteProfileData = data
+  },
+  DELETE_PROFILE_FAILURE: (state, data) => {
+    state.deleteFailureData = null
+    state.deleteFailureData = data
+  },
 }
 
 const actions = {
@@ -72,12 +85,12 @@ const actions = {
   },
   editProfile({ commit }, payload) {
     if (payload.phone_number) {
-    payload.phone_number = payload.phone_number
-      .toString()
-      .replaceAll('(', '')
-      .replaceAll(')', '')
-      .replaceAll(' ', '')
-      .replaceAll('-', '')
+      payload.phone_number = payload.phone_number
+        .toString()
+        .replaceAll('(', '')
+        .replaceAll(')', '')
+        .replaceAll(' ', '')
+        .replaceAll('-', '')
     }
     commit('EDIT_PROFILE_PROCESS', true)
     const formData = new FormData()
@@ -90,8 +103,8 @@ const actions = {
     for (const i in payload) {
       if (payload[i] === null) {
         formData.append(i, '')
-      } else{
-        formData.append(i,payload[i])
+      } else {
+        formData.append(i, payload[i])
       }
     }
     this.$api
@@ -108,12 +121,31 @@ const actions = {
         }
         commit('EDIT_PROFILE_FAILURE', JSON.parse(e.response.data))
       })
-  }
+  },
+
+  deleteProfile({ commit }, payload) {
+    if (payload.pin) {
+      this.$api
+        .delete('delete-profile', { data: payload })
+        .then(({ data }) => {
+          commit('DELETE_PROFILE_SUCCESS', data)
+        })
+        .catch((e) => {
+          try {
+            JSON.parse(e.response.data)
+          } catch {
+            commit('DELETE_PROFILE_FAILURE', e.response.data)
+            return
+          }
+          commit('DELETE_PROFILE_FAILURE', JSON.parse(e.response.data))
+        })
+    }
+  },
 }
 export default {
   namespaced: true,
   state,
   getters,
   actions,
-  mutations
+  mutations,
 }

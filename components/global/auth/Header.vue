@@ -94,7 +94,7 @@ export default {
     padding: 0 50px;
   }
 }
-@media (max-width: 425px) {
+@media (max-width: 450px) {
   .main {
     padding: 0 24px;
 

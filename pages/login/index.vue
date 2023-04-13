@@ -30,6 +30,7 @@
                 alt=""
                 @mouseover="showError('email')"
                 @mouseout="hideError('email')"
+                @click="showErrorClick('email')"
               />
             </template>
             <div
@@ -43,7 +44,10 @@
           </el-input>
 
           <template slot="error">
-            <div v-if="errors.email.isShow" class="el-form-item__error">
+            <div
+              v-if="errors.email.isShow && isWeb()"
+              class="el-form-item__error"
+            >
               <span>{{ errors.email.value }}</span>
             </div>
             <div></div>
@@ -96,6 +100,7 @@
                 class="error_icon"
                 @mouseover="showError('password')"
                 @mouseout="hideError('password')"
+                @click="showErrorClick('password')"
               />
             </template>
           </el-input>
@@ -113,7 +118,10 @@
           </div>
 
           <template slot="error">
-            <div v-if="errors.password.isShow" class="el-form-item__error">
+            <div
+              v-if="errors.password.isShow && isWeb()"
+              class="el-form-item__error"
+            >
               <span v-html="errors.password.value"></span>
             </div>
             <div></div>
@@ -131,6 +139,19 @@
       :model="isOpenEmailDialog"
       @close="isOpenEmailDialog = false"
     ></confirm-email>
+
+    <error-massage
+      v-show="errors.email.isShow && !isWeb()"
+      :error-text="errors.email.value"
+      class="dialog"
+      @visible="errors.email.isShow = false"
+    ></error-massage>
+    <error-massage
+      v-show="errors.password.isShow && !isWeb()"
+      :error-text="errors.password.value"
+      class="dialog"
+      @visible="errors.password.isShow = false"
+    ></error-massage>
   </div>
 </template>
 
@@ -138,12 +159,14 @@
 import { mapGetters, mapActions } from 'vuex'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
 import ConfirmEmail from '@/components/shared/OvConfirmEmailModal.vue'
+import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 
 export default {
   name: 'RegisterPage',
   components: {
     LoginButtons,
     ConfirmEmail,
+    ErrorMassage,
   },
   layout: 'auth',
   data() {
@@ -220,8 +243,8 @@ export default {
               : Math.round(v.expires_in / 60 / 24),
           },
         })
-        if (v.user.name) {
-          this.$router.push('/')
+        if (v.user.is_first_login) {
+          this.$router.push('/pin')
         } else {
           this.$router.push('/profile')
         }
@@ -264,6 +287,8 @@ export default {
     if (this.$cookies.get('token')) {
       this.$router.push('/')
     }
+
+    window.addEventListener('resize', this.handleResize)
   },
   methods: {
     ...mapActions('auth', ['loginUser']),
@@ -286,11 +311,25 @@ export default {
         this.errors[fieldName].value = errorMessage
       })
     },
-    showError(fieldName) {
+    showErrorClick(fieldName) {
       this.errors[fieldName].isShow = true
     },
+    showError(fieldName) {
+      if (this.isWeb()) {
+        this.errors[fieldName].isShow = true
+      }
+    },
     hideError(fieldName) {
-      this.errors[fieldName].isShow = false
+      if (this.isWeb()) {
+        this.errors[fieldName].isShow = false
+      }
+    },
+    handleResize() {
+      this.$forceUpdate()
+    },
+
+    isWeb() {
+      return window.innerWidth > 990
     },
   },
 }
@@ -379,6 +418,7 @@ export default {
               border-radius: 6px;
               border-color: $ov-primary--light;
               font-size: 14px;
+              z-index: auto;
               &:hover {
                 border-color: $ov-primary;
               }
@@ -414,7 +454,6 @@ export default {
   position: relative;
   top: 0;
   width: 50px;
-  left: -220px;
   font-size: 12px;
   font-weight: 400;
   color: #717a7f;
@@ -425,7 +464,6 @@ export default {
 .password-placeholder {
   position: relative;
   top: 0;
-  left: -250px;
   font-size: 12px;
   font-weight: 400;
   color: #717a7f;
@@ -433,17 +471,51 @@ export default {
   animation-fill-mode: forwards;
 }
 
-@keyframes showPlaceholder {
-  to {
-    top: -34px;
-    left: -263px;
+@media (min-width: 375px) {
+  @keyframes showPlaceholder {
+    to {
+      top: -34px;
+      left: -263px;
+    }
+  }
+
+  @keyframes showPasswordPlaceholder {
+    to {
+      top: -34px;
+      left: -295px;
+    }
+  }
+
+  .placeholder {
+    left: -220px;
+  }
+
+  .password-placeholder {
+    left: -250px;
   }
 }
 
-@keyframes showPasswordPlaceholder {
-  to {
-    top: -34px;
-    left: -295px;
+@media (max-width: 375px) {
+  @keyframes showPlaceholder {
+    to {
+      top: -34px;
+      left: -142px;
+    }
+  }
+
+  @keyframes showPasswordPlaceholder {
+    to {
+      top: -34px;
+      left: -175px;
+    }
+  }
+
+  .placeholder {
+    left: -100px;
+  }
+
+  .password-placeholder {
+    left: -130px;
   }
 }
 
@@ -466,7 +538,8 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    width: 212px;
+    width: max-content;
+    max-width: 212px;
     height: max-content;
     min-height: 48px;
     border-radius: 13px;
@@ -528,5 +601,16 @@ export default {
   .el-form-item {
     margin-bottom: 27px;
   }
+}
+
+.dialog {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.66);
 }
 </style>

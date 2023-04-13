@@ -4,8 +4,8 @@
     :title="modalStep > 2 ? null : 'Deactivate account'"
     width="30%"
     align-center
-    @close="closeModal"
     class="dialog"
+    @close="closeModal"
   >
     <template #footer>
       <span v-if="modalStep === 0">
@@ -49,7 +49,7 @@
         <div class="dialog__pin-icon">
           <img src="@/assets/images/icons/delete.svg" alt="delete-profile" />
         </div>
-        <el-form class="dialog__form">
+        <el-form class="dialog__form" :rules="rules">
           <h4>Please Enter your PIN.</h4>
           <el-form-item prop="pass">
             <el-input
