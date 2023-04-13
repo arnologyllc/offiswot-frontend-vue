@@ -64,7 +64,7 @@
             class="main__form--box__input"
             placeholder="Username"
             maxlength="30"
-            @blur="validateField('username')"
+            @input="validateField('username')"
           >
             <template slot="prefix">
               <img src="@/assets/images/icons/user-icon.svg" alt="user_icon" />
