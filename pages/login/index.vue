@@ -85,7 +85,7 @@
                 :class="errors.password.value ? 'eye_icon' : ''"
                 :src="
                   require(`@/assets/images/icons/eye-${
-                    showPassword ? 'close' : 'open'
+                    !showPassword ? 'close' : 'open'
                   }-icon.svg`)
                 "
                 alt="eye_icon"
@@ -205,15 +205,6 @@ export default {
           {
             required: true,
             message: 'This field is required.',
-            trigger: 'blur',
-          },
-          {
-            min: 8,
-            message: `Password is improperly formatted.<br /><br />
-                      <ul class="error_info">
-                        <li>Minimum 8 characters long.</li>
-                        <li>Cannot be weak, e.g., “abcd1234”.</li>
-                      </ul>`,
             trigger: 'blur',
           },
         ],
@@ -592,6 +583,9 @@ export default {
     right: 32px;
   }
 
+  .weak {
+    color: #e60022;
+  }
   .el-input__suffix {
     display: flex !important;
   }

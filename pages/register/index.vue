@@ -84,14 +84,36 @@
               </span>
             </div>
             <template v-if="errors.username.value" slot="suffix">
-              <img
+              <div
                 class="error_icon"
-                src="@/assets/images/icons/error.svg"
-                alt=""
                 @mouseover="showError('username')"
                 @mouseout="hideError('username')"
                 @click="showErrorClick('username')"
-              />
+              >
+                <img
+                  v-if="errors.username.status === 'Medium' && payload.username"
+                  src="@/assets/images/icons/warning.svg"
+                  alt=""
+                />
+                <img
+                  v-else-if="errors.username.value"
+                  src="@/assets/images/icons/error.svg"
+                  alt=""
+                />
+              </div>
+            </template>
+            <template slot="suffix">
+              <div
+                v-if="
+                  errors.username.status === 'Medium' &&
+                  errors.username.isShow &&
+                  isWeb()
+                "
+                class="el-form-item__error strength warning"
+              >
+                <span v-html="errors.username.value"></span>
+              </div>
+              <div></div>
             </template>
           </el-input>
           <template slot="error">
@@ -134,7 +156,7 @@
                 :class="errors.password.value ? 'eye_icon' : ''"
                 :src="
                   require(`@/assets/images/icons/eye-${
-                    showPassword ? 'close' : 'open'
+                    !showPassword ? 'close' : 'open'
                   }-icon.svg`)
                 "
                 alt="eye_icon"
@@ -149,12 +171,14 @@
                 @click="showErrorClick('password')"
               >
                 <img
-                  v-if="errors.password.status === 'Medium'"
+                  v-if="errors.password.status === 'Medium' && payload.password"
                   src="@/assets/images/icons/warning.svg"
                   alt=""
                 />
                 <img
-                  v-else-if="errors.password.status === 'Strong'"
+                  v-else-if="
+                    errors.password.status === 'Strong' && payload.password
+                  "
                   src="@/assets/images/icons/good.svg"
                   alt=""
                 />
@@ -164,7 +188,7 @@
 
             <template slot="suffix">
               <div
-                v-if="errors.password.isShow && isWeb()"
+                v-if="payload.password && errors.password.isShow && isWeb()"
                 :class="getColor()"
                 class="el-form-item__error strength"
               >
@@ -216,7 +240,7 @@
                 :class="errors.password_confirmation.value ? 'eye_icon' : ''"
                 :src="
                   require(`@/assets/images/icons/eye-${
-                    showConfirmPassword ? 'close' : 'open'
+                    !showConfirmPassword ? 'close' : 'open'
                   }-icon.svg`)
                 "
                 alt="eye_icon"
@@ -270,6 +294,11 @@
     <error-massage
       v-show="errors.username.isShow && !isWeb()"
       :error-text="errors.username.value"
+      :text-color="
+        errors.username.status === 'Medium' && payload.username
+          ? 'warning'
+          : 'weak'
+      "
       class="dialog"
       @visible="errors.username.isShow = false"
     ></error-massage>
@@ -279,11 +308,11 @@
       :error-text="errors.password.value"
       class="dialog"
       :text-color="
-        errors.password.status === 'Medium'
-          ? '#FFA26B'
-          : errors.password.status === 'Strong'
-          ? '#34B53A'
-          : '#e60022'
+        errors.password.status === 'Medium' && payload.password
+          ? 'warning'
+          : errors.password.status === 'Strong' && payload.password
+          ? 'done'
+          : 'weak'
       "
       @visible="errors.password.isShow = false"
     ></error-massage>
@@ -321,7 +350,7 @@ export default {
       } else if (strength === 'Medium') {
         this.errors.password.status = 'Medium'
         this.errors.password.value = 'Password strength: <b>Medium</b>'
-      } else {
+      } else if (strength === 'Strong') {
         this.errors.password.status = 'Strong'
         this.errors.password.value = 'Password strength: <b>Strong</b>'
       }
@@ -352,6 +381,16 @@ export default {
         )
       } else {
         callback()
+      }
+    }
+
+    const validateUsernameSymbolsCount = (rule, value, callback) => {
+      if (value.length === 30) {
+        this.errors.username.value = "Your handle can't exceed 30 characters."
+        this.errors.username.status = 'Medium'
+      } else {
+        this.errors.username.value = ''
+        this.errors.username.status = null
       }
     }
     return {
@@ -392,18 +431,9 @@ export default {
                       `,
             trigger: 'blur',
           },
-          {
-            max: 30,
-            message: `Username is improperly formatted.<br /><br />
-                      <ul class="error_info">
-                        <li>Your handle can't exceed 30 characters.</li>
-                        <li>It can only contain letters, numbers, underscores and dots.</li>
-                        <li>It can't contain symbols or punctuation marks.</li>
-                        <li>It needs to be unique.</li>
-                      </ul>`,
-            trigger: 'blur',
-          },
+
           { validator: validateUsernameSymbols, trigger: 'blur' },
+          { validator: validateUsernameSymbolsCount, trigger: 'input' },
         ],
         password: [
           {
@@ -430,6 +460,7 @@ export default {
         },
         username: {
           value: '',
+          status: null,
           isShow: false,
         },
         password: {
@@ -790,7 +821,9 @@ export default {
   .warning {
     color: #ffa26b;
   }
-
+  .weak {
+    color: #e60022;
+  }
   .error_info {
     color: #717a7f;
     font-style: italic;

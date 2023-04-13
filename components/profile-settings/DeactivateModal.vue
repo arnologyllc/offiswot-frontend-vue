@@ -63,7 +63,7 @@
                 <img
                   :src="
                     require(`@/assets/images/icons/eye-${
-                      showPassword ? 'close' : 'open'
+                      !showPassword ? 'close' : 'open'
                     }-icon.svg`)
                   "
                   alt="eye_icon"

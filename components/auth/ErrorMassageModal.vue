@@ -1,8 +1,8 @@
 <template>
   <el-dialog
     :visible.sync="visible"
+    :class="textColor"
     width="200px"
-    align-center
     class="dialog"
     :show-close="false"
     :show-header="false"
@@ -10,7 +10,7 @@
   >
     <template #footer>
       <div class="dialog-text">
-        <span :style="{ color: textColor }" v-html="errorText"></span>
+        <span v-html="errorText"></span>
       </div>
       <img
         class="close_btn"
@@ -35,7 +35,7 @@ export default {
     },
     textColor: {
       type: String,
-      default: '#e60022',
+      default: 'weak',
     },
   },
   data() {
@@ -58,12 +58,10 @@ export default {
   display: flex;
   flex-direction: column;
   width: max-content !important;
-  max-width: 184px;
   font-size: 12px;
   height: max-content;
-  padding: 12px 25px;
+  padding: 12px 16px;
   border-radius: 13px;
-  text-align: center;
   background: #ffffff;
   margin-top: 220px !important;
   border: 1px solid #4f4cec;
@@ -71,14 +69,24 @@ export default {
     display: none;
   }
   &__footer {
-    text-align: center;
-    width: 100%;
+    text-align: left;
+    width: max-content;
     padding: 0;
     margin: 0;
   }
   .error_info {
     display: block;
     margin-top: 15px;
+  }
+  @media (max-width: 420px) {
+    .el-dialog__footer {
+      max-width: 200px !important;
+    }
+  }
+  @media (min-width: 420px) {
+    .el-dialog__footer {
+      max-width: 406px !important;
+    }
   }
 }
 
