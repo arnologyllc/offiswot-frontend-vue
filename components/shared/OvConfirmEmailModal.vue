@@ -14,10 +14,13 @@
     </div>
     <span class="title"
       >We have emailed you a verification link on your registered email. Please
-      click on th link sent for verifying your email.</span
+      click on the link sent for verifying your email.</span
     >
     <span slot="footer" class="dialog-footer">
-      <a href="" class="dialog-footer__action" @click.prevent="resendEmail(email)"
+      <a
+        href=""
+        class="dialog-footer__action"
+        @click.prevent="resendEmail(email)"
         >Resend Verification Email</a
       >
     </span>
@@ -75,7 +78,7 @@ export default {
     })
   },
   methods: {
-    ...mapActions("auth", ["resendEmail"])
+    ...mapActions('auth', ['resendEmail']),
   },
 }
 </script>

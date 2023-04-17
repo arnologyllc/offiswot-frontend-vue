@@ -238,6 +238,7 @@ import { mapGetters, mapActions } from 'vuex'
 import VuePhoneNumberInput from 'vue-phone-number-input'
 import 'vue-phone-number-input/dist/vue-phone-number-input.css'
 import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
+import { checkPin } from '~/middleware/helpers'
 
 export default {
   name: 'EditProfile',
@@ -376,6 +377,7 @@ export default {
     },
   },
   created() {
+    checkPin(this.$cookies, this.$router)
     this.getProfile()
   },
   methods: {
@@ -383,6 +385,9 @@ export default {
     onAvatarUpload(e) {
       this.payload.avatar = e.raw
       this.avatarSrc = URL.createObjectURL(e.raw)
+      this.editProfile(this.payload)
+    },
+    onSubmit() {
       this.editProfile(this.payload)
     },
   },

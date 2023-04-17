@@ -5,6 +5,8 @@ const state = () => ({
   isLoadingSubmit: false,
   editProfileData: null,
   editFailureData: null,
+  setPinData: null,
+  setPinFailureData: null,
   deleteProfileData: null,
   deleteFailureData: null,
 })
@@ -17,6 +19,9 @@ const getters = {
   isLoadingSubmit: (state) => state.isLoadingSubmit,
   editProfileData: (state) => state.editProfileData,
   editFailureData: (state) => state.editFailureData,
+
+  setPinData: (state) => state.setPinData,
+  setPinFailureData: (state) => state.setPinFailureData,
 
   deleteProfileData: (state) => state.deleteProfileData,
   deleteFailureData: (state) => state.deleteFailureData,
@@ -45,6 +50,19 @@ const mutations = {
   EDIT_PROFILE_FAILURE: (state, data) => {
     state.editFailureData = null
     state.editFailureData = data
+    state.isLoadingSubmit = false
+  },
+
+  SET_PIN_PROCESS: (state, data) => {
+    state.isLoadingSubmit = data
+  },
+  SET_PIN_SUCCESS: (state, data) => {
+    state.setPinData = data
+    state.isLoadingSubmit = false
+  },
+  SET_PIN_FAILURE: (state, data) => {
+    state.setPinFailureData = null
+    state.setPinFailureData = data
     state.isLoadingSubmit = false
   },
 
@@ -120,6 +138,28 @@ const actions = {
           return
         }
         commit('EDIT_PROFILE_FAILURE', JSON.parse(e.response.data))
+      })
+  },
+
+  setPin({ commit }, payload) {
+    commit('SET_PIN_PROCESS', true)
+    const formData = new FormData()
+    for (const i in payload) {
+      formData.append(i, String(payload[i]))
+    }
+    this.$api
+      .post('create-pin', formData)
+      .then(({ data }) => {
+        commit('SET_PIN_SUCCESS', data)
+      })
+      .catch((e) => {
+        try {
+          JSON.parse(e.response.data)
+        } catch {
+          commit('SET_PIN_FAILURE', e.response.data)
+          return
+        }
+        commit('SET_PIN_FAILURE', JSON.parse(e.response.data))
       })
   },
 

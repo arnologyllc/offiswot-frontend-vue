@@ -11,6 +11,16 @@
         :rules="rules"
         @submit.native.prevent="onSubmit"
       >
+        <div
+          v-if="errors.global.value"
+          class="el-form-item__global-error-container"
+        >
+          <div class="el-form-item__global-error">
+            <img src="@/assets/images/icons/error.svg" alt="" />
+            <span>{{ errors.global.value }}</span>
+          </div>
+          <span class="clear-error" @click="clearError">X</span>
+        </div>
         <el-form-item prop="email" class="form-item">
           <el-input
             ref="email"
@@ -133,7 +143,7 @@
             class="main__form--box__input"
             placeholder="Password"
             :type="showPassword ? 'text' : 'password'"
-            @blur="validateField('password')"
+            @input="validateField('password')"
           >
             <template slot="prefix">
               <img
@@ -348,13 +358,14 @@ export default {
         this.errors.password.status = 'Weak'
         callback(new Error('Password strength: <b>Weak</b>'))
       } else if (strength === 'Medium') {
+        callback()
         this.errors.password.status = 'Medium'
         this.errors.password.value = 'Password strength: <b>Medium</b>'
       } else if (strength === 'Strong') {
+        callback()
         this.errors.password.status = 'Strong'
         this.errors.password.value = 'Password strength: <b>Strong</b>'
       }
-      callback()
     }
     const validatePass2 = (rule, value, callback) => {
       if (value === '') {
@@ -434,7 +445,7 @@ export default {
           },
 
           { validator: validateUsernameSymbols, trigger: 'blur' },
-          { validator: validateUsernameSymbolsCount, trigger: 'input' },
+          { validator: validateUsernameSymbolsCount, trigger: 'blur' },
         ],
         password: [
           {
@@ -442,7 +453,7 @@ export default {
             message: 'This field is required.',
             trigger: 'blur',
           },
-          { validator: validatePass, trigger: 'blur' },
+          { validator: validatePass, trigger: 'input' },
         ],
         password_confirmation: [
           {
@@ -473,6 +484,9 @@ export default {
           value: '',
           isShow: false,
         },
+        global: {
+          value: null,
+        },
       },
       isOpenEmailDialog: false,
     }
@@ -499,7 +513,7 @@ export default {
       deep: true,
       handler(v) {
         if (v === 'Account exists, please login.') {
-          this.$router.push(`/login?email=${this.payload.email}`)
+          this.errors.global.value = v
         }
         if (v === 'Email already exists but is not verified.') {
           this.isOpenEmailDialog = true
@@ -508,24 +522,14 @@ export default {
           for (const i in v) {
             if (typeof v[i] !== 'string') {
               for (const j in v[i]) {
-                this.$notify.error({
-                  title: 'Error',
-                  dangerouslyUseHTMLString: true,
-                  message: `${i}: ${v[i][j]}`,
-                })
+                this.errors.global.value = v[i][j]
               }
             } else {
-              this.$notify.error({
-                title: 'Error',
-                message: v[i],
-              })
+              this.errors.global.value = v[i]
             }
           }
         } else {
-          this.$notify.error({
-            title: 'Error',
-            message: v,
-          })
+          this.errors.global.value = v
         }
       },
     },
@@ -600,6 +604,9 @@ export default {
         : this.errors.password.status === 'Strong'
         ? 'done'
         : ''
+    },
+    clearError() {
+      this.errors.global.value = ''
     },
   },
 }
@@ -865,6 +872,36 @@ export default {
   }
   .el-input__suffix-inner {
     display: flex !important;
+  }
+  .el-form-item__global-error-container {
+    width: 100%;
+    border-color: #e60022;
+    background: #fbe4e8;
+    box-shadow: 0px 7px 64px rgb(0 0 0 / 7%);
+    border-radius: 6px;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 20px;
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 12px;
+    align-items: center;
+    color: #e60022;
+    gap: 16px;
+    margin-bottom: 27px;
+  }
+  .el-form-item__global-error {
+    font-family: 'Montserrat';
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .clear-error {
+    cursor: pointer;
   }
 }
 

@@ -11,6 +11,16 @@
         :rules="rules"
         @submit.native.prevent="onSubmit"
       >
+        <div
+          v-if="errors.global.value"
+          class="el-form-item__global-error-container"
+        >
+          <div class="el-form-item__global-error">
+            <img src="@/assets/images/icons/error.svg" alt="" />
+            <span>{{ errors.global.value }}</span>
+          </div>
+          <span class="clear-error" @click="clearError">X</span>
+        </div>
         <el-form-item prop="email">
           <el-input
             ref="email"
@@ -190,6 +200,9 @@ export default {
           value: '',
           isShow: false,
         },
+        global: {
+          value: '',
+        },
       },
 
       //  Validation Rules
@@ -227,44 +240,38 @@ export default {
   watch: {
     loginSuccessData(v) {
       if (v) {
-        this.$cookies.set('token', v.access_token, {
-          options: {
-            expires: this.payload.remember_me
-              ? 9999
-              : Math.round(v.expires_in / 60 / 24),
-          },
-        })
-        if (v.user.is_first_login) {
+        const expirationDate = this.payload.remember_me
+          ? new Date(Date.now() + 86400000).toISOString() // 1 day
+          : new Date(Date.now() + 3600000).toISOString() // 1 hour
+        this.$cookies.set('token', v.access_token, expirationDate)
+        if (v.is_first_login) {
           this.$router.push('/pin')
+          this.$cookies.set('first_login', v.is_first_login)
         } else {
-          this.$router.push('/profile')
+          this.$router.push('/')
         }
       }
     },
     loginErrorData: {
       deep: true,
       handler(v) {
-        if (v === 'Please Verify Email' || v.error === 'Please Verify Email') {
+        if (
+          v === 'Please visit your email to verify your account.' ||
+          v.error === 'Please visit your email to verify your account.'
+        ) {
           this.isOpenEmailDialog = true
         }
-        if (v === 'Email Or username not found') {
-          this.$router.push(`/register?email=${this.payload.email}`)
+        if (v === 'Incorrect username or password.') {
+          this.errors.global.value = v
         }
         if (typeof v !== 'string') {
           for (const i in v) {
             if (typeof v[i] !== 'string') {
               for (const j in v[i]) {
-                this.$notify.error({
-                  title: 'Error',
-                  dangerouslyUseHTMLString: true,
-                  message: `${i}: ${v[i][j]}`,
-                })
+                this.errors.global.value = v[i][j]
               }
             } else {
-              this.$notify.error({
-                title: 'Error',
-                message: v[i],
-              })
+              this.errors.global.value = v[i]
             }
           }
         }
@@ -278,7 +285,6 @@ export default {
     if (this.$cookies.get('token')) {
       this.$router.push('/')
     }
-
     window.addEventListener('resize', this.handleResize)
   },
   methods: {
@@ -321,6 +327,9 @@ export default {
 
     isWeb() {
       return window.innerWidth > 990
+    },
+    clearError() {
+      this.errors.global.value = ''
     },
   },
 }
@@ -594,6 +603,36 @@ export default {
   }
   .el-form-item {
     margin-bottom: 27px;
+  }
+  .el-form-item__global-error-container {
+    width: 100%;
+    border-color: #e60022;
+    background: #fbe4e8;
+    box-shadow: 0px 7px 64px rgb(0 0 0 / 7%);
+    border-radius: 6px;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 20px;
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 12px;
+    align-items: center;
+    color: #e60022;
+    gap: 16px;
+    margin-bottom: 27px;
+  }
+  .el-form-item__global-error {
+    font-family: 'Montserrat';
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .clear-error {
+    cursor: pointer;
   }
 }
 

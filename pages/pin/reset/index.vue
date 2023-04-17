@@ -1,12 +1,12 @@
 <template>
   <div class="main">
     <div class="main__form">
-      <div class="main__form--title">Set PIN</div>
+      <div class="main__form--title">Reset PIN</div>
       <div class="main__form--subtitle">
-        Fill in the fields to set your PIN.
+        Enter a new PIN below to change your PIN.
       </div>
       <el-form
-        ref="pinForm"
+        ref="resetForm"
         class="main__form--box"
         hide-required-asterisk
         :model="payload"
@@ -130,7 +130,9 @@
           native-type="submit"
           :loading="isLoadingSubmit"
         >
-          <span class="submit-button__text">Save</span>
+          <span class="submit-button__text">{{
+            isLoadingSubmit ? '' : 'Save'
+          }}</span>
         </el-button>
         <error-massage
           v-show="errors.pin.isShow && !isWeb()"
@@ -154,15 +156,14 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
-import { checkPin } from '~/middleware/helpers'
-
 export default {
-  name: 'PINPage',
+  name: 'PINReset',
   components: {
     ErrorMassage,
   },
   layout: 'default',
   data() {
+    //  Custom Validations
     const validatePIN = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('Please input the PIN again'))
@@ -177,6 +178,7 @@ export default {
       payload: {
         pin: null,
         pin_confirmation: null,
+        pinToken: null,
       },
 
       //  Show Password/Not Show Password
@@ -225,54 +227,74 @@ export default {
   },
   head() {
     return {
-      title: 'setPIN',
+      title: 'Reset PIN',
     }
   },
   computed: {
     ...mapGetters('pin', [
+      'changePinData',
+      'changePinFailureData',
       'isLoadingSubmit',
-      'setPinData',
-      'setPinFailureData',
     ]),
   },
+
   watch: {
-    setPinFailureData(v) {
-      for (const i in v) {
-        if (typeof v[i] !== 'string') {
-          for (const j in v[i]) {
-            this.errors.global.value = v[i][j]
-          }
-        } else {
-          this.errors.global.value = v[i]
-        }
-      }
-    },
-    setPinData(v) {
+    changePinData(v) {
       if (v) {
-        this.$message.success('Success!')
-        this.$cookies.remove('first_login')
+        this.payload.pin = null
+        this.payload.pin_confirmation = null
+        this.$notify.success({
+          title: 'Success',
+          message: v.data,
+        })
         this.$router.push('/')
       }
     },
+
+    changePinFailureData(v) {
+      for (const i in v) {
+        if (typeof v[i] !== 'string') {
+          for (const j in v[i]) {
+            this.$notify.error({
+              title: 'Error',
+              dangerouslyUseHTMLString: true,
+              message: `${i}: ${v[i][j]}`,
+            })
+          }
+        } else {
+          this.$notify.error({
+            title: 'Error',
+            message: v[i],
+          })
+        }
+      }
+    },
   },
+
   mounted() {
-    checkPin(this.$cookies, this.$router)
-    if (this.$route.query.email) {
-      this.payload.email = this.$route.query.email
-    }
+    this.payload.email = this.$route.query.email
+    this.payload.pinToken = this.$route.query.token
     window.addEventListener('resize', this.handleResize)
   },
+
   methods: {
-    ...mapActions('pin', ['setPin']),
+    ...mapActions('pin', ['changePin']),
     onSubmit() {
-      this.setPin(this.payload)
+      this.$refs.resetForm.validate((valid) => {
+        if (valid) {
+          this.changePin(this.payload)
+        } else {
+          this.$message.error('Wrong!')
+          return false
+        }
+      })
     },
     focusElement(elem) {
       this.$refs[elem].focus()
     },
 
     validateField(fieldName) {
-      this.$refs.pinForm.validateField(fieldName, (errorMessage) => {
+      this.$refs.resetForm.validateField(fieldName, (errorMessage) => {
         this.errors[fieldName].value = errorMessage
       })
     },
@@ -308,7 +330,7 @@ export default {
   display: flex;
   position: relative;
   height: 100%;
-  padding: 100px 0 150px 18%;
+  padding: 100px 0 150px 170px;
   width: 100%;
 
   &__form {
@@ -317,13 +339,13 @@ export default {
       font-size: 20px;
       font-weight: 600;
       color: $ov-text--title;
-      margin-bottom: 4px;
+      margin-bottom: 10px;
     }
 
     &--subtitle {
       font-size: 14px;
       color: $ov-text--subtitle;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
     }
 
     &--box {

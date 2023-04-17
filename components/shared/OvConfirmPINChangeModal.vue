@@ -2,6 +2,7 @@
   <el-dialog
     :visible.sync="dialogVisible"
     :width="dialogWidth"
+    :append-to-body="appendToBody"
     show-close
     top="30vh"
     @close="$emit('close')"
@@ -13,15 +14,15 @@
       <div class="title__text">Check your email</div>
     </div>
     <span class="title"
-      >In order to reset your password check your email and follow the
+      >In order to reset your PIN check your email and follow the
       instructions.</span
     >
     <span slot="footer" class="dialog-footer">
       <a
         href=""
         class="dialog-footer__action"
-        @click.prevent="forgotPassword({ email: email })"
-        >Resend Verification Email</a
+        @click.prevent="forgotPin({ email: email })"
+        >Resend Email</a
       >
     </span>
   </el-dialog>
@@ -30,12 +31,16 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 export default {
-  name: 'OvConfirmPasswordChangeModal',
+  name: 'OvConfirmPINChangeModal',
   props: {
     model: Boolean,
     email: {
       type: String,
       default: '',
+    },
+    appendToBody: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -45,7 +50,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('auth', ['resendSuccessData', 'resendFailureData']),
+    ...mapGetters('pin', ['changePinData', 'changePinFailureData']),
   },
   watch: {
     model() {
@@ -56,10 +61,10 @@ export default {
         this.$emit('close')
       }
     },
-    resendSuccessData(v) {
+    changePinData(v) {
       this.$message.success(v)
     },
-    resendFailureData(v) {
+    changePinFailureData(v) {
       this.$notify.error({
         title: 'Error',
         dangerouslyUseHTMLString: true,
@@ -78,7 +83,7 @@ export default {
     })
   },
   methods: {
-    ...mapActions('auth', ['forgotPassword']),
+    ...mapActions('pin', ['forgotPin']),
   },
 }
 </script>
@@ -100,6 +105,7 @@ export default {
       color: $ov-text--title;
     }
     &__header {
+      border-bottom-width: 0;
       display: grid;
       justify-content: center;
       padding-top: 40px;

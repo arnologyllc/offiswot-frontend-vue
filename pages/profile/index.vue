@@ -148,6 +148,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import defaultAvatar from '@/assets/images/icons/default-user-icon.jpg'
+import { checkPin } from '~/middleware/helpers'
 export default {
   name: 'ProfilePage',
   data() {
@@ -247,6 +248,7 @@ export default {
   },
   async created() {
     try {
+      checkPin(this.$cookies, this.$router)
       this.getProfile()
       this.responseWorkspaces = await this.getWorkSpaces()
     } catch {
@@ -507,6 +509,8 @@ export default {
       float: right;
       margin-bottom: 20px;
       margin-left: 8px;
+      top: 65px;
+      right: 50px;
     }
     &__container {
       display: block;
@@ -527,15 +531,6 @@ export default {
     &__create-btn {
       top: 65px;
       right: 85px;
-    }
-  }
-}
-
-@media (max-width: 425px) {
-  .user-workspaces {
-    &__create-btn {
-      top: 65px;
-      right: 50px;
     }
   }
 }

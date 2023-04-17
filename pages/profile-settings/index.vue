@@ -30,7 +30,10 @@
                   />
                 </div>
               </div>
-              <div class="account__body-block">
+              <div
+                class="account__body-block"
+                @click="$router.push('/profile-settings/update-pin')"
+              >
                 <div>
                   <div class="reset">Reset PIN</div>
                   <div class="reset_text">You can change your PIN here.</div>
@@ -78,6 +81,7 @@
 <script>
 import DeactivateModal from '@/components/profile-settings/DeactivateModal.vue'
 import DeleteModal from '@/components/profile-settings/DeleteModal.vue'
+import { checkPin } from '~/middleware/helpers'
 
 export default {
   name: 'ProfileSettings',
@@ -90,6 +94,9 @@ export default {
       showModal: false,
       dialogVisible: false,
     }
+  },
+  created() {
+    checkPin(this.$cookies, this.$router)
   },
 }
 </script>

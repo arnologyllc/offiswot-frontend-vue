@@ -59,6 +59,8 @@
 </template>
 
 <script>
+import { checkPin } from '~/middleware/helpers'
+
 export default {
   name: 'WorkspaceMain',
   middleware: [
@@ -204,6 +206,9 @@ export default {
     collapseChannels() {
       return this.channelsList.slice(0, this.showChannelsCount)
     },
+  },
+  created() {
+    checkPin(this.$cookies, this.$router)
   },
 }
 </script>

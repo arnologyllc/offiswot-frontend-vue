@@ -99,6 +99,8 @@
   </div>
 </template>
 <script>
+import { checkPin } from '~/middleware/helpers'
+
 export default {
   name: 'ResetPassword',
 
@@ -135,6 +137,7 @@ export default {
         callback()
       }
     }
+
     return {
       //  Request Body
       payload: {
@@ -199,6 +202,9 @@ export default {
 
       isOpenEmailDialog: false,
     }
+  },
+  created() {
+    checkPin(this.$cookies, this.$router)
   },
 }
 </script>
