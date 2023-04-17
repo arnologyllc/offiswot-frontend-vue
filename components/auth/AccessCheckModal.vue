@@ -9,9 +9,11 @@
     top="30vh"
     @close="$emit('close')"
   >
-    <div slot="title">
-      <h3>Access check</h3>
-    </div>
+    <template slot="title">
+      <div class="access-header">
+        <h3>Access check</h3>
+      </div>
+    </template>
 
     <div class="title__image">
       <img src="@/assets/images/icons/access-check.svg" alt="" />
@@ -326,7 +328,7 @@ export default {
     &__header {
       display: grid;
       justify-content: center;
-      border-bottom: 1px solid #bbbcbd;
+
       width: 100%;
       font-family: 'Montserrat';
       font-style: normal;
@@ -432,5 +434,10 @@ export default {
   .pin_placeholder {
     left: -210px;
   }
+}
+.access-header {
+  width: 450px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #bbbcbd;
 }
 </style>

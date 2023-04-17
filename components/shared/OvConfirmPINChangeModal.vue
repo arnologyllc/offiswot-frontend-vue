@@ -105,6 +105,7 @@ export default {
       color: $ov-text--title;
     }
     &__header {
+      border-bottom-width: 0;
       display: grid;
       justify-content: center;
       padding-top: 40px;
