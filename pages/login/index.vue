@@ -244,7 +244,6 @@ export default {
           ? new Date(Date.now() + 86400000).toISOString() // 1 day
           : new Date(Date.now() + 3600000).toISOString() // 1 hour
         this.$cookies.set('token', v.access_token, expirationDate)
-        this.$cookies.config(expirationDate)
         if (v.is_first_login) {
           this.$router.push('/pin')
           this.$cookies.set('first_login', v.is_first_login)

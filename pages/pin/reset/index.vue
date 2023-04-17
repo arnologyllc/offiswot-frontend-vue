@@ -130,7 +130,9 @@
           native-type="submit"
           :loading="isLoadingSubmit"
         >
-          <span class="submit-button__text">Save</span>
+          <span class="submit-button__text">{{
+            isLoadingSubmit ? '' : 'Save'
+          }}</span>
         </el-button>
         <error-massage
           v-show="errors.pin.isShow && !isWeb()"
