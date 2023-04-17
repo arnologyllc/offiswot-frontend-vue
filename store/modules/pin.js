@@ -12,6 +12,9 @@ const state = () => ({
 
   changePinData: null,
   changePinFailureData: null,
+
+  checkPinData: null,
+  checkPinFailureData: null,
 })
 
 const getters = {
@@ -28,6 +31,9 @@ const getters = {
 
   changePinData: (state) => state.changePinData,
   changePinFailureData: (state) => state.changePinFailureData,
+
+  checkPinData: (state) => state.checkPinData,
+  checkPinFailureData: (state) => state.checkPinFailureData,
 }
 
 const mutations = {
@@ -80,6 +86,19 @@ const mutations = {
   CHANGE_PIN_FAILURE: (state, data) => {
     state.changePinFailureData = null
     state.changePinFailureData = data
+    state.isLoadingSubmit = false
+  },
+
+  CHECK_PIN_PROCESS: (state, data) => {
+    state.isLoadingSubmit = data
+  },
+  CHECK_PIN_SUCCESS: (state, data) => {
+    state.checkPinData = data
+    state.isLoadingSubmit = false
+  },
+  CHECK_PIN_FAILURE: (state, data) => {
+    state.checkPinFailureData = null
+    state.checkPinFailureData = data
     state.isLoadingSubmit = false
   },
 }
@@ -174,6 +193,28 @@ const actions = {
       })
       .finally(() => {
         commit('CHANGE_PIN_PROCESS', false)
+      })
+  },
+
+  checkPin({ commit }, payload) {
+    commit('CHECK_PIN_PROCESS', true)
+    this.$api
+      .$post('/change-pin', { pin: payload.pin })
+      .then((data) => {
+        commit('CHECK_PIN_SUCCESS', data)
+      })
+      .catch((e) => {
+        try {
+          JSON.parse(e.response.data)
+        } catch {
+          commit('CHECK_PIN_FAILURE', e.response.data)
+          commit('CHECK_PIN_PROCESS', false)
+          return
+        }
+        commit('CHECK_PIN_FAILURE', JSON.parse(e.response.data))
+      })
+      .finally(() => {
+        commit('CHECK_PIN_PROCESS', false)
       })
   },
 }

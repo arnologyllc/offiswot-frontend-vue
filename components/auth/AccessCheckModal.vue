@@ -1,79 +1,111 @@
 <template>
   <el-dialog
-    :title="modalStep > 2 ? null : 'Delete account'"
-    width="30%"
-    align-center
-    @close="closeModal"
+    :visible.sync="dialogVisible"
+    :width="dialogWidth"
+    :height="dialogHeight"
+    :close-on-click-modal="false"
+    text-align="center"
+    :show-close="false"
+    top="30vh"
+    @close="$emit('close')"
   >
-    <template #footer>
-      <span v-if="modalStep === 0">
-        <div class="content">
-          <div class="content__icon">
-            <img src="@/assets/images/icons/delete.svg" alt="delete-profile" />
-          </div>
-          <div class="content__question question">
-            <div>Are you sure you want to</div>
-            <div class="warning">permanently delete</div>
-            <div>your account?</div>
-          </div>
-          <div class="content__body">
-            <div class="content__body-title">
-              This can not be undone. By deleting this account you agree that:
-            </div>
-            <div class="content__body-subtitle">
-              <img src="@/assets/images/icons/active.svg" alt="active" />
-              <p>
-                No one will be able to use this username ever, including
-                yourself.
-              </p>
-            </div>
-            <div class="content__body-subtitle">
-              <img src="@/assets/images/icons/active.svg" alt="active" />
-              <p>
-                All of your workspaces will be permanently deleted, including
-                chats, files and other data.
-              </p>
-            </div>
-            <div class="content__body-subtitle">
-              <img src="@/assets/images/icons/active.svg" alt="active" />
-              <p>
-                You will be removed from the workspaces that you have been
-                member of. It will be unrecoverable.
-              </p>
-            </div>
-          </div>
-          <el-button
-            type="danger"
-            class="btn content__button"
-            plain
-            @click="agreeModal"
-            >I AGREE</el-button
+    <div slot="title">
+      <h3>Access check</h3>
+    </div>
+
+    <div class="title__image">
+      <img src="@/assets/images/icons/access-check.svg" alt="" />
+    </div>
+    <span class="title__text">
+      Please enter your PIN in order to access account management section.
+    </span>
+    <el-form
+      ref="pinForm"
+      class="main__form--box"
+      hide-required-asterisk
+      :model="payload"
+      :rules="rules"
+      @submit.native.prevent="onSubmit"
+    >
+      <div v-if="errors.global.value" class="el-form-item__global-error">
+        <img src="@/assets/images/icons/error.svg" alt="" />
+        <span>{{ errors.global.value }}</span>
+      </div>
+      <el-form-item prop="pin" class="password-form-item">
+        <el-input
+          id="pin"
+          ref="pin"
+          v-model="payload.pin"
+          :type="showPIN ? 'text' : 'password'"
+          class="main__form--box__input"
+          placeholder="Enter PIN"
+          @blur="validateField('pin')"
+        >
+          <div
+            v-if="payload.pin"
+            slot="suffix"
+            style="position: relative"
+            @click="focusElement('pin')"
           >
-        </div>
-      </span>
-    </template>
+            <span for="pin" class="pin_placeholder"> Enter PIN </span>
+          </div>
+          <template slot="suffix">
+            <img
+              :src="
+                require(`@/assets/images/icons/eye-${
+                  showPIN ? 'close' : 'open'
+                }-icon.svg`)
+              "
+              alt="eye_icon"
+              @click="showPIN = !showPIN"
+            />
+          </template>
+        </el-input>
+      </el-form-item>
+      <div class="forgot-password">
+        <el-button
+          type="text"
+          style="font-size: 14px; font-weight: 400"
+          @click="onForgot"
+          >Forgot PIN?</el-button
+        >
+      </div>
+      <el-button
+        class="submit-button"
+        native-type="submit"
+        :loading="isLoadingSubmit"
+      >
+        <span class="submit-button__text">{{
+          isLoadingSubmit ? '' : 'NEXT'
+        }}</span>
+      </el-button>
+    </el-form>
+
+    <ConfirmModal
+      :email="payload.email"
+      :model="isOpenEmailDialog"
+      :append-to-body="true"
+      @close="isOpenEmailDialog = false"
+    ></ConfirmModal>
   </el-dialog>
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
-
+import { mapGetters, mapActions } from 'vuex'
+import ConfirmModal from '@/components/shared/OvConfirmPINChangeModal.vue'
 export default {
-  name: 'ModalDelete',
+  name: 'OvAccessCheckModal',
+  components: {
+    ConfirmModal,
+  },
   props: {
-    dialogVisible: {
-      type: Boolean,
-      required: false,
-    },
+    model: Boolean,
   },
   data() {
     return {
-      visible: false,
-      modalStep: 0,
-      checkbox: {
-        checked1: false,
-        checked2: false,
-      },
+      dialogVisible: true,
+      dialogWidth: '450px',
+      dialogHeight: '400px',
       payload: {
         pin: null,
       },
@@ -84,235 +116,321 @@ export default {
             message: 'This field is required.',
             trigger: 'blur',
           },
+          {
+            min: 4,
+            max: 6,
+            message: 'PIN must be between 4 and 6 digits',
+            trigger: 'blur',
+          },
         ],
       },
-      showPassword: false,
+      errors: {
+        pin: {
+          value: '',
+          isShow: false,
+        },
+        global: {
+          value: null,
+        },
+      },
+      showPIN: false,
+      isOpenEmailDialog: false,
     }
   },
   computed: {
-    ...mapGetters('profile', ['deleteProfileData', 'deleteFailureData']),
+    ...mapGetters('pin', [
+      'checkPinData',
+      'checkPinFailureData',
+      'isLoadingSubmit',
+      'forgotFailureData',
+    ]),
   },
   watch: {
-    deleteFailureData(v) {
+    model() {
+      this.dialogVisible = this.model
+    },
+    dialogVisible() {
+      if (!this.dialogVisible) {
+        this.$emit('close')
+      }
+    },
+    checkPinData(v) {
+      this.$message.success(v)
+      this.$emit('close')
+    },
+    checkPinFailureData(v) {
+      this.errors.global.value = v
+    },
+    forgotPinFailureData(v) {
       for (const i in v) {
         if (typeof v[i] !== 'string') {
           for (const j in v[i]) {
-            this.$notify.error({
-              title: 'Error',
-              dangerouslyUseHTMLString: true,
-              message: `${i}: ${v[i][j]}`,
-            })
+            this.errors.global.value = v[i][j]
           }
         } else {
-          this.$notify.error({
-            title: 'Error',
-            message: v[i],
-          })
+          this.errors.global.value = v[i]
         }
       }
     },
-    deleteProfileData(v) {
+    forgotPinData(v) {
       if (v) {
-        this.$message.success('Success!')
+        this.isOpenEmailDialog = true
       }
     },
   },
+  mounted() {
+    if (document.documentElement.clientWidth <= 425) {
+      this.dialogWidth = '315px'
+    }
+    window.addEventListener('resize', (e) => {
+      if (e.target.innerWidth <= 425) {
+        this.dialogWidth = '315px'
+      } else this.dialogWidth = '450px'
+    })
+  },
   methods: {
-    ...mapActions('profile', ['deleteProfile']),
+    ...mapActions('pin', ['checkPin', 'forgotPin']),
     onSubmit() {
-      this.deleteProfile(this.payload)
+      this.checkPin(this.payload)
     },
-    agreeModal() {
-      this.modalStep += 1
+
+    focusElement(elem) {
+      this.$refs[elem].focus()
     },
-    closeModal() {
-      this.$emit('visible', this.visible)
-      setTimeout(() => {
-        this.modalStep = 0
-      }, 200)
+
+    onForgot() {
+      this.isOpenEmailDialog = true
+      this.forgotPin()
+    },
+    hideError(fieldName) {
+      if (this.isWeb()) {
+        this.errors[fieldName].isShow = false
+      }
+    },
+    validateField(fieldName) {
+      this.$refs.pinForm.validateField(fieldName, (errorMessage) => {
+        this.errors[fieldName].value = errorMessage
+      })
     },
   },
 }
 </script>
 
-<style lang="scss" scoped>
-.content {
-  &__icon {
+<style scoped lang="scss">
+.main {
+  width: 100%;
+  display: flex;
+  position: relative;
+  height: 100%;
+  padding: 100px 0 150px 18%;
+
+  &__form {
+    &--title {
+      font-size: 20px;
+      font-weight: 600;
+      color: $ov-text--title;
+      margin-bottom: 4px;
+    }
+
+    &--subtitle {
+      font-size: 14px;
+      color: $ov-text--subtitle;
+      margin-bottom: 40px;
+    }
+
+    &--box {
+      width: 320px;
+      &__input {
+        box-shadow: 0px 7px 64px rgba(0, 0, 0, 0.07);
+        ::v-deep {
+          .el-input__inner {
+            height: 48px;
+            padding: 0 15px;
+            border-radius: 6px;
+            border-color: $ov-border--light;
+
+            &:focus,
+            &:hover {
+              border-color: $ov-primary;
+            }
+            &::placeholder {
+              color: $ov-placeholder;
+            }
+          }
+          .el-input__prefix,
+          .el-input__suffix {
+            display: grid;
+            align-items: center;
+          }
+
+          .el-input__prefix {
+            padding-left: 8px;
+          }
+          .el-input__suffix {
+            padding-right: 8px;
+            cursor: pointer;
+            &-inner {
+              display: grid;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+.forgot-password {
+  text-align: left;
+  color: #6979f8;
+  text-decoration: underline;
+  ::v-deep .el-button {
+    font-size: 12px;
+    font-weight: 500;
+    &:hover {
+      color: $ov-primary;
+    }
+    &--text {
+      padding: 0;
+      margin-bottom: 40px;
+    }
+  }
+}
+.forgot-password {
+  font-size: 14px;
+}
+::v-deep {
+  .el-form-item {
+    margin-bottom: 15px;
+  }
+  .el-dialog {
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    &__close {
+      color: black !important;
+    }
+    &__footer {
+      display: flex;
+      justify-content: center;
+    }
+    &__body {
+      padding: 15px 35px 30px 35px;
+      color: $ov-text--title;
+      word-break: normal;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    &__header {
+      display: grid;
+      justify-content: center;
+      border-bottom: 1px solid #bbbcbd;
+      width: 100%;
+      font-family: 'Montserrat';
+      font-style: normal;
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 24px;
+
+      color: #0d1c2e;
+    }
+  }
+}
+.dialog-footer {
+  &__action {
+    color: $ov-text--title;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+.title {
+  text-align: center;
+  display: flex;
+  word-break: break-word;
+
+  &__image {
     display: flex;
     justify-content: center;
-    margin-top: 15px;
+    margin-top: 33px;
+    margin-bottom: 42px;
   }
-  &__body {
-    width: 100%;
-    max-width: 348px;
+  &__text {
+    display: block;
+    padding: 0 60px;
     font-family: 'Montserrat';
     font-style: normal;
     font-weight: 500;
     font-size: 14px;
-    line-height: 17px;
-    margin: 25px auto;
-    color: #6d7075;
+    line-height: 20px;
+    margin-bottom: 16px;
     text-align: center;
-    &-title {
-      margin-bottom: 26px;
-      font-family: 'Montserrat';
-      font-style: normal;
-      font-weight: 500;
-      font-size: 14px;
-      line-height: 17px;
-      color: #6d7075;
-    }
-    &-subtitle {
-      width: 100%;
-      max-width: 348px;
-      display: flex;
-      flex-direction: row;
-      gap: 20px;
-      align-items: top;
-      margin: 12px auto;
-      font-family: Montserrat;
-      font-size: 12px;
-      font-weight: 500;
-      line-height: 15px;
-      letter-spacing: 0px;
-      text-align: left;
-      color: #b4b4b4 span {
-        color: #929eff;
-        text-decoration: underline;
-        cursor: pointer;
-      }
-    }
-    &-checkboxes {
-      margin-bottom: 145px;
-      .el-checkbox {
-        display: flex;
-        flex-direction: row;
-        white-space: normal;
-        text-align: left;
-        margin-bottom: 20px;
-        &__inner {
-          width: 26px;
-          height: 26px;
-        }
 
-        &__label {
-          font-family: 'Montserrat';
-          font-style: normal !important;
-          font-weight: 500 !important;
-          font-size: 14px !important;
-          line-height: 17px !important;
-          color: #6d7075 !important;
-        }
-      }
-    }
-  }
-  &__button {
-    margin: 40px auto !important;
+    color: #0d1c2e;
   }
 }
 
-.btn {
-  width: 50%;
-  padding: 8px 0;
-  margin: 0px auto;
-  font-family: 'Montserrat';
-  font-style: normal;
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 22px;
-  border: 1px solid #ff4a66;
-  background: #ffffff;
-  text-align: center;
+.submit-button {
+  background: $ov-primary;
+  color: white;
   text-transform: uppercase;
+  width: 220px;
+  height: 48px;
+  padding: 0;
+  padding-right: 8px;
   border-radius: 6px;
-  color: #ff4a66;
-}
-
-.question {
-  width: 333px;
-  margin: 0 auto;
-  font-family: 'Montserrat';
-  font-style: normal;
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 28px;
-  justify-content: center;
-  color: #0d1c2e;
-  .warning {
-    color: #ff4a66;
-  }
-}
-
-.dialog__pin {
-  &-icon {
-    margin-top: 15px;
+  ::v-deep span {
     display: flex;
+    align-items: center;
     justify-content: center;
   }
-  ::v-deep {
-    .el-input__suffix {
-      top: 5px !important;
-      right: 10px;
-    }
-  }
-
-  .el-form {
+  &__text {
     width: 100%;
-    max-width: 333px;
-    margin: 22px auto;
-    h4 {
-      margin-bottom: 28px;
-      font-family: 'Montserrat';
-      font-style: normal;
-      font-weight: 500;
-      font-size: 18px;
-      line-height: 28px;
-      text-align: center;
-      color: #0d1c2e;
-    }
-    .el-form-item {
-      margin-bottom: 32px;
-    }
-
-    h5 {
-      font-family: 'Montserrat';
-      font-style: normal;
-      font-weight: 500;
-      font-size: 14px;
-      line-height: 17px;
-      margin-bottom: 15px;
-      text-align: center;
-      color: #6d7075;
-    }
+    display: flex;
+    font-size: 17px;
+    font-weight: 700;
+    justify-content: center !important;
+  }
+  &__box {
+    display: flex;
+    justify-content: flex-end;
   }
 }
 
-.dialog {
-  position: fixed;
+.pin_placeholder {
+  position: relative;
   top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  background-color: #000000da;
-  ::v-deep .el-dialog__header {
-    border-bottom: 1px solid #bbbcbd;
-    margin-bottom: 22px;
+  width: 50px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #717a7f;
+  animation: showPINPlaceholder 0.3s;
+  animation-fill-mode: forwards;
+}
+@media (min-width: 375px) {
+  @keyframes showPINPlaceholder {
+    to {
+      top: -34px;
+      left: -330px;
+    }
   }
-  ::v-deep .el-dialog__footer {
-    text-align: center;
+
+  .pin_placeholder {
+    left: -310px;
   }
-  ::v-deep .el-dialog {
-    display: flex;
-    flex-direction: column;
-    width: 453px !important;
-    margin: auto;
-    border-radius: 20px;
-    text-align: center;
-    background: #ffffff;
-    border: 1px solid #4f4cec;
-    border-radius: 20px;
+}
+
+@media (max-width: 407px) {
+  @keyframes showPINPlaceholder {
+    to {
+      top: -34px;
+      left: -241px;
+    }
+  }
+
+  .pin_placeholder {
+    left: -210px;
   }
 }
 </style>

@@ -2,6 +2,7 @@
   <el-dialog
     :visible.sync="dialogVisible"
     :width="dialogWidth"
+    :append-to-body="appendToBody"
     show-close
     top="30vh"
     @close="$emit('close')"
@@ -36,6 +37,10 @@ export default {
     email: {
       type: String,
       default: '',
+    },
+    appendToBody: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
