@@ -13,8 +13,8 @@
       <div class="title__text">Check your email</div>
     </div>
     <span class="title"
-      >We have emailed you a verification link on your registered email. Please
-      click on th link sent for change your password.</span
+      >In order to reset your password check your email and follow the
+      instructions.</span
     >
     <span slot="footer" class="dialog-footer">
       <a
