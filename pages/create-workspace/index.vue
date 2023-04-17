@@ -60,6 +60,7 @@
 import { mapGetters, mapActions } from 'vuex'
 
 import showError from '@/mixins/errorToast.js'
+import { checkPin } from '@/middleware/helpers'
 
 export default {
   name: 'CreateWorkSpaceStep1',
@@ -113,6 +114,9 @@ export default {
         this.showError(v)
       },
     },
+  },
+  created() {
+    checkPin(this.$cookies, this.$router)
   },
   async mounted() {
     await this.getIndustries()

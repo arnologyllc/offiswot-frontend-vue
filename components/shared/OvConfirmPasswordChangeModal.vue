@@ -20,7 +20,7 @@
       <a
         href=""
         class="dialog-footer__action"
-        @click.prevent="resendEmail(email)"
+        @click.prevent="forgotPassword({ email: email })"
         >Resend Verification Email</a
       >
     </span>
@@ -78,7 +78,7 @@ export default {
     })
   },
   methods: {
-    ...mapActions('auth', ['resendEmail']),
+    ...mapActions('auth', ['forgotPassword']),
   },
 }
 </script>

@@ -152,6 +152,7 @@ export default {
     },
     onLogout() {
       this.$cookies.remove('token')
+      this.$cookies.remove('first_login')
       this.$api.post('logout')
       this.$router.push('/login')
     },

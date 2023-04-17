@@ -51,6 +51,8 @@
 </template>
 
 <script>
+import { checkPin } from '~/middleware/helpers'
+
 export default {
   name: 'IndexPage',
   layout: 'default',
@@ -58,6 +60,9 @@ export default {
     return {
       title: 'Home',
     }
+  },
+  created() {
+    checkPin(this.$cookies, this.$router)
   },
 }
 </script>

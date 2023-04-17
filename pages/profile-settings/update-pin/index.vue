@@ -1,10 +1,18 @@
 <template>
   <div class="main">
     <div class="main__form">
-      <div class="main__form--title">Set PIN</div>
-      <div class="main__form--subtitle">
-        Fill in the fields to set your PIN.
+      <div class="main__form--title">
+        <img
+          src="@/assets/images/icons/chevron-left.svg"
+          alt="chevron-left"
+          @click="$router.go(-1)"
+        />
+        <span>Reset PIN</span>
       </div>
+      <div class="main__form--subtitle">
+        Fill in the fields to change your PIN.
+      </div>
+
       <el-form
         ref="pinForm"
         class="main__form--box"
@@ -13,10 +21,69 @@
         :rules="rules"
         @submit.native.prevent="onSubmit"
       >
-        <div v-if="errors.global.value" class="el-form-item__global-error">
-          <img src="@/assets/images/icons/error.svg" alt="" />
-          <span>{{ errors.global.value }}</span>
+        <div
+          v-if="errors.global.value"
+          class="el-form-item__global-error-container"
+        >
+          <div class="el-form-item__global-error">
+            <img src="@/assets/images/icons/error.svg" alt="" />
+            <span>{{ errors.global.value }}</span>
+          </div>
+          <span class="clear-error" @click="clearError">X</span>
         </div>
+        <el-form-item prop="previous" class="password-form-item">
+          <el-input
+            id="previous"
+            ref="previous"
+            v-model="payload.previous"
+            :type="showPrevious ? 'text' : 'password'"
+            class="main__form--box__input"
+            placeholder="Old PIN"
+            @blur="validateField('previous')"
+          >
+            <div
+              v-if="payload.previous"
+              slot="suffix"
+              style="position: relative"
+              @click="focusElement('previous')"
+            >
+              <span for="previous" class="previous_placeholder"> Old PIN </span>
+            </div>
+            <template slot="suffix">
+              <img
+                :class="errors.previous.value ? 'eye_icon' : ''"
+                :src="
+                  require(`@/assets/images/icons/eye-${
+                    showPrevious ? 'close' : 'open'
+                  }-icon.svg`)
+                "
+                alt="eye_icon"
+                @click="showPrevious = !showPrevious"
+              />
+            </template>
+
+            <template v-if="errors.previous.value" slot="suffix">
+              <img
+                src="@/assets/images/icons/error.svg"
+                alt=""
+                class="error_icon"
+                @mouseover="showError('previous')"
+                @mouseout="hideError('previous')"
+                @click="showErrorClick('previous')"
+              />
+            </template>
+          </el-input>
+
+          <template slot="error">
+            <div
+              v-if="errors.previous.isShow && isWeb()"
+              class="el-form-item__error"
+            >
+              <span v-html="errors.previous.value"></span>
+            </div>
+            <div></div>
+          </template>
+        </el-form-item>
         <el-form-item prop="pin" class="password-form-item">
           <el-input
             id="pin"
@@ -24,7 +91,7 @@
             v-model="payload.pin"
             :type="showPIN ? 'text' : 'password'"
             class="main__form--box__input"
-            placeholder="Enter PIN"
+            placeholder="New PIN"
             @blur="validateField('pin')"
           >
             <div
@@ -33,7 +100,7 @@
               style="position: relative"
               @click="focusElement('pin')"
             >
-              <span for="pin" class="pin_placeholder"> PIN </span>
+              <span for="pin" class="pin_placeholder"> New PIN </span>
             </div>
             <template slot="suffix">
               <img
@@ -87,7 +154,7 @@
               @click="focusElement('pin_confirmation')"
             >
               <span for="password" class="repeat-placeholder">
-                PIN Confirmation
+                Repeat PIN
               </span>
             </div>
             <template slot="suffix">
@@ -125,6 +192,14 @@
             <div></div>
           </template>
         </el-form-item>
+        <div class="forgot-password">
+          <el-button
+            type="text"
+            style="font-size: 14px; font-weight: 400"
+            @click="onForgot"
+            >Forgot PIN?</el-button
+          >
+        </div>
         <el-button
           class="submit-button"
           native-type="submit"
@@ -132,6 +207,13 @@
         >
           <span class="submit-button__text">Save</span>
         </el-button>
+        <error-massage
+          v-show="errors.previous.isShow && !isWeb()"
+          :error-text="errors.previous.value"
+          class="dialog"
+          @visible="errors.previous.isShow = false"
+        >
+        </error-massage>
         <error-massage
           v-show="errors.pin.isShow && !isWeb()"
           :error-text="errors.pin.value"
@@ -148,6 +230,11 @@
         </error-massage>
       </el-form>
     </div>
+    <ConfirmModal
+      :email="payload.email"
+      :model="isOpenEmailDialog"
+      @close="isOpenEmailDialog = false"
+    ></ConfirmModal>
   </div>
 </template>
 
@@ -155,11 +242,13 @@
 import { mapGetters, mapActions } from 'vuex'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import { checkPin } from '~/middleware/helpers'
+import ConfirmModal from '@/components/shared/OvConfirmPINChangeModal.vue'
 
 export default {
   name: 'PINPage',
   components: {
     ErrorMassage,
+    ConfirmModal,
   },
   layout: 'default',
   data() {
@@ -175,15 +264,21 @@ export default {
     return {
       //  Request Body
       payload: {
+        previous: null,
         pin: null,
         pin_confirmation: null,
       },
 
       //  Show Password/Not Show Password
+      showPrevious: false,
       showPIN: false,
       showPINConfirmation: false,
 
       errors: {
+        previous: {
+          value: '',
+          isShow: false,
+        },
         pin: {
           value: '',
           isShow: false,
@@ -199,6 +294,13 @@ export default {
 
       //  Validation Rules
       rules: {
+        previous: [
+          {
+            required: true,
+            message: 'This field is required.',
+            trigger: 'blur',
+          },
+        ],
         pin: [
           {
             required: true,
@@ -221,22 +323,24 @@ export default {
           { validator: validatePIN, trigger: 'blur' },
         ],
       },
+      isOpenEmailDialog: false,
     }
   },
   head() {
     return {
-      title: 'setPIN',
+      title: 'resetPIN',
     }
   },
   computed: {
     ...mapGetters('pin', [
       'isLoadingSubmit',
-      'setPinData',
-      'setPinFailureData',
+      'resetPinData',
+      'resetPinFailureData',
+      'forgotFailureData',
     ]),
   },
   watch: {
-    setPinFailureData(v) {
+    resetPinFailureData(v) {
       for (const i in v) {
         if (typeof v[i] !== 'string') {
           for (const j in v[i]) {
@@ -247,11 +351,26 @@ export default {
         }
       }
     },
-    setPinData(v) {
+    resetPinData(v) {
       if (v) {
         this.$message.success('Success!')
-        this.$cookies.remove('first_login')
         this.$router.push('/')
+      }
+    },
+    forgotPinFailureData(v) {
+      for (const i in v) {
+        if (typeof v[i] !== 'string') {
+          for (const j in v[i]) {
+            this.errors.global.value = v[i][j]
+          }
+        } else {
+          this.errors.global.value = v[i]
+        }
+      }
+    },
+    forgotPinData(v) {
+      if (v) {
+        this.isOpenEmailDialog = true
       }
     },
   },
@@ -263,9 +382,13 @@ export default {
     window.addEventListener('resize', this.handleResize)
   },
   methods: {
-    ...mapActions('pin', ['setPin']),
+    ...mapActions('pin', ['resetPin', 'forgotPin']),
     onSubmit() {
-      this.setPin(this.payload)
+      this.resetPin(this.payload)
+    },
+    onForgot() {
+      this.isOpenEmailDialog = true
+      this.forgotPin()
     },
     focusElement(elem) {
       this.$refs[elem].focus()
@@ -298,6 +421,9 @@ export default {
         return window.innerWidth > 990
       }
     },
+    clearError() {
+      this.errors.global.value = ''
+    },
   },
 }
 </script>
@@ -308,22 +434,28 @@ export default {
   display: flex;
   position: relative;
   height: 100%;
-  padding: 100px 0 150px 18%;
+  padding: 100px 0 150px 170px;
   width: 100%;
 
   &__form {
     width: 390px;
     &--title {
-      font-size: 20px;
+      font-style: normal;
       font-weight: 600;
-      color: $ov-text--title;
-      margin-bottom: 4px;
+      font-size: 24px;
+      line-height: 29px;
+      margin-bottom: 17px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      gap: 16px;
+      color: #0d1c2e;
     }
 
     &--subtitle {
       font-size: 14px;
       color: $ov-text--subtitle;
-      margin-bottom: 40px;
+      margin-bottom: 70px;
     }
 
     &--box {
@@ -363,9 +495,66 @@ export default {
         }
       }
     }
+    .forgot-password {
+      margin-top: 24px;
+      display: flex;
+      color: #6979f8;
+      justify-content: space-between;
+      text-decoration: underline;
+      ::v-deep .el-button {
+        font-size: 12px;
+        font-weight: 500;
+        &:hover {
+          color: $ov-primary;
+        }
+      }
+    }
+    .forgot-password {
+      font-size: 14px;
+    }
+  }
+  .el-form-item__global-error-container {
+    width: 100%;
+    border-color: #e60022;
+    background: #fbe4e8;
+    box-shadow: 0px 7px 64px rgb(0 0 0 / 7%);
+    border-radius: 6px;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 20px;
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 12px;
+    align-items: center;
+    color: #e60022;
+    gap: 16px;
+    margin-bottom: 27px;
+  }
+  .el-form-item__global-error {
+    font-family: 'Montserrat';
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .clear-error {
+    cursor: pointer;
   }
 }
 
+.previous_placeholder {
+  position: relative;
+  top: 0;
+  width: 50px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #717a7f;
+  animation: showPreviousPlaceholder 0.3s;
+  animation-fill-mode: forwards;
+}
 .pin_placeholder {
   position: relative;
   top: 0;
@@ -387,51 +576,74 @@ export default {
   animation-fill-mode: forwards;
 }
 
-@media (min-width: 375px) {
+@media (min-width: 407px) {
+  ::v-deep .main {
+    justify-content: flex-start;
+    &__form {
+      padding-left: 65px;
+      border-left: 1px solid #d0c9d6;
+    }
+  }
+  @keyframes showPreviousPlaceholder {
+    to {
+      top: -34px;
+      left: -240px;
+    }
+  }
   @keyframes showPINPlaceholder {
     to {
       top: -34px;
-      left: -330px;
+      left: -235px;
     }
   }
 
   @keyframes showRepeatPlaceholder {
     to {
       top: -34px;
-      left: -249px;
+      left: -218px;
     }
   }
-
+  .previous_placeholder {
+    left: -230px;
+  }
   .pin_placeholder {
-    left: -310px;
+    left: -225px;
   }
 
   .repeat-placeholder {
-    left: -220px;
+    left: -210px;
   }
 }
 
 @media (max-width: 407px) {
+  @keyframes showPreviousPlaceholder {
+    to {
+      top: -34px;
+      left: -215px;
+    }
+  }
   @keyframes showPINPlaceholder {
     to {
       top: -34px;
-      left: -241px;
+      left: -210px;
     }
   }
 
   @keyframes showRepeatPlaceholder {
     to {
       top: -34px;
-      left: -157px;
+      left: -194px;
     }
   }
-
+  .previous_placeholder {
+    left: -200px;
+  }
   .pin_placeholder {
-    left: -210px;
+    left: -195px;
   }
 
   .repeat-placeholder {
-    left: -130px;
+    left: -180px;
   }
 }
 
@@ -519,25 +731,6 @@ export default {
   .el-form-item {
     margin-bottom: 27px;
   }
-  .el-form-item__global-error {
-    width: 100%;
-    border-color: #e60022;
-    background: #fbe4e8;
-    box-shadow: 0px 7px 64px rgb(0 0 0 / 7%);
-    border-radius: 6px;
-    font-family: 'Montserrat';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 20px;
-    display: flex;
-    justify-content: flex-start;
-    padding: 7px 12px;
-    align-items: center;
-    color: #e60022;
-    gap: 16px;
-    margin-bottom: 27px;
-  }
 }
 .submit-button {
   background: $ov-primary;
@@ -548,7 +741,7 @@ export default {
   padding: 0;
   padding-right: 8px;
   border-radius: 6px;
-  margin-top: 270px;
+  margin-top: 157px;
   ::v-deep span {
     display: flex;
     align-items: center;

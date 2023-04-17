@@ -13,15 +13,15 @@
       <div class="title__text">Check your email</div>
     </div>
     <span class="title"
-      >We have emailed you a verification link on your registered email. Please
-      click on the link sent for verifying your email.</span
+      >In order to reset your PIN check your email and follow the
+      instructions.</span
     >
     <span slot="footer" class="dialog-footer">
       <a
         href=""
         class="dialog-footer__action"
-        @click.prevent="resendEmail(email)"
-        >Resend Verification Email</a
+        @click.prevent="forgotPin({ email: email })"
+        >Resend Email</a
       >
     </span>
   </el-dialog>
@@ -30,7 +30,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 export default {
-  name: 'OvConfirmEmailModal',
+  name: 'OvConfirmPINChangeModal',
   props: {
     model: Boolean,
     email: {
@@ -45,7 +45,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('auth', ['resendSuccessData', 'resendFailureData']),
+    ...mapGetters('pin', ['changePinData', 'changePinFailureData']),
   },
   watch: {
     model() {
@@ -56,10 +56,10 @@ export default {
         this.$emit('close')
       }
     },
-    resendSuccessData(v) {
+    changePinData(v) {
       this.$message.success(v)
     },
-    resendFailureData(v) {
+    changePinFailureData(v) {
       this.$notify.error({
         title: 'Error',
         dangerouslyUseHTMLString: true,
@@ -78,7 +78,7 @@ export default {
     })
   },
   methods: {
-    ...mapActions('auth', ['resendEmail']),
+    ...mapActions('pin', ['forgotPin']),
   },
 }
 </script>
