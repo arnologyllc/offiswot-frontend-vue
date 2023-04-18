@@ -207,7 +207,7 @@ export default {
       return this.channelsList.slice(0, this.showChannelsCount)
     },
   },
-  created() {
+  mounted() {
     checkPin(this.$cookies, this.$router)
   },
 }

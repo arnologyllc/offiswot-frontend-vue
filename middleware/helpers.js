@@ -6,4 +6,11 @@ const checkPin = (cookies, router) => {
   }
 }
 
-export { checkPin }
+const checkAccess = (cookies) => {
+  if (cookies.get('pin')) {
+    return true
+  }
+  return false
+}
+
+export { checkPin, checkAccess }

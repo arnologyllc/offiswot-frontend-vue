@@ -61,12 +61,12 @@
         </div>
       </div>
       <div class="main__right">
-        <el-input
+        <!-- <el-input
           v-model="search"
           class="main__search-input"
           placeholder="Search"
           suffix-icon="el-icon-search"
-        ></el-input>
+        ></el-input> -->
         <el-button
           type="text"
           icon="el-icon-bell"
@@ -77,7 +77,7 @@
           type="text"
           icon="el-icon-setting"
           class="main__actions"
-          @click="$router.push('/profile')"
+          @click="$router.push('/')"
         ></el-button>
         <el-dropdown class="main__user-actions">
           <div class="main__user-actions--activator">
@@ -111,12 +111,14 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('profile', ['profileSuccessData']),
+    ...mapGetters('profile', ['profileSuccessData', 'editProfileData']),
     buttonText() {
       return this.$route.path === '/login' ? 'Sign up' : 'Sign in'
     },
     avatarUrl() {
-      if (this.profileSuccessData) {
+      if (this.editProfileData) {
+        return `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.editProfileData.user.avatar}`
+      } else if (this.profileSuccessData) {
         if (this.profileSuccessData.user.avatar) {
           return `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.profileSuccessData.user.avatar}`
         }
@@ -249,7 +251,6 @@ export default {
   &__button-group {
     ::v-deep {
       .el-button-group {
-        box-shadow: 0px 7px 64px rgba(0, 0, 0, 0.07);
         border-radius: 6px;
 
         .el-button {

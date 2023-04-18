@@ -51,10 +51,10 @@
         </div>
         <el-form class="dialog__form" :rules="rules">
           <h4>Please Enter your PIN.</h4>
-          <el-form-item prop="pass">
+          <el-form-item prop="pin">
             <el-input
-              ref="pass"
-              v-model="payload.pass"
+              ref="pin"
+              v-model="payload.pin"
               class="dialog__form--box__input"
               placeholder="PIN"
               :type="showPassword ? 'text' : 'password'"
@@ -87,8 +87,10 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
+
 export default {
-  name: 'DeleteSettings',
+  name: 'DeactivateSettings',
   props: {
     dialogVisible: {
       type: Boolean,
@@ -104,12 +106,56 @@ export default {
         checked2: false,
       },
       payload: {
-        pass: null,
+        pin: null,
+      },
+      rules: {
+        pin: [
+          {
+            required: true,
+            message: 'This field is required.',
+            trigger: 'blur',
+          },
+        ],
       },
       showPassword: false,
     }
   },
+  computed: {
+    ...mapGetters('profile', [
+      'deactivateProfileData',
+      'deactivateFailureData',
+    ]),
+  },
+  watch: {
+    deactivateFailureData(v) {
+      for (const i in v) {
+        if (typeof v[i] !== 'string') {
+          for (const j in v[i]) {
+            this.$notify.error({
+              title: 'Error',
+              dangerouslyUseHTMLString: true,
+              message: `${i}: ${v[i][j]}`,
+            })
+          }
+        } else {
+          this.$notify.error({
+            title: 'Error',
+            message: v[i],
+          })
+        }
+      }
+    },
+    deactivateProfileData(v) {
+      if (v) {
+        this.$message.success('Success!')
+      }
+    },
+  },
   methods: {
+    ...mapActions('profile', ['deactivateProfile']),
+    onSubmit() {
+      this.deactivateProfile(this.payload)
+    },
     agreeModal() {
       this.modalStep += 1
     },

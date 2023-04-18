@@ -115,11 +115,10 @@ export default {
       },
     },
   },
-  created() {
-    checkPin(this.$cookies, this.$router)
-  },
+  created() {},
   async mounted() {
     await this.getIndustries()
+    checkPin(this.$cookies, this.$router)
   },
   methods: {
     ...mapActions('workspace', ['getIndustries', 'createWorkspace']),
@@ -165,7 +164,6 @@ export default {
 
     &--input {
       width: 100%;
-      box-shadow: 0px 7px 64px rgba(0, 0, 0, 0.07);
       ::v-deep {
         .el-input__inner {
           height: 48px;

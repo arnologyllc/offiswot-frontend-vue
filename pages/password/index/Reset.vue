@@ -317,6 +317,9 @@ export default {
   mounted() {
     this.payload.pinToken = this.$route.query.token
     this.payload.email = this.$route.query.email
+    while (this.$cookies.get('token')) {
+      this.$cookies.remove('token')
+    }
     window.addEventListener('resize', this.handleResize)
   },
 
@@ -408,7 +411,6 @@ export default {
 
     &--box {
       &__input {
-        box-shadow: 0px 7px 64px rgba(0, 0, 0, 0.07);
         ::v-deep {
           .el-input__inner {
             height: 48px;

@@ -189,6 +189,52 @@ const actions = {
         commit('RESET_PROCESS', false)
       })
   },
+  resetPasswordWithSettings({ commit }, payload) {
+    const formData = new FormData()
+    for (const i in payload) {
+      formData.append(i, payload[i])
+    }
+    commit('RESET_PROCESS', true)
+    this.$api
+      .$post('/settings/reset-password', formData)
+      .then((data) => {
+        commit('RESET_SUCCESS', data)
+      })
+      .catch((e) => {
+        try {
+          JSON.parse(e.response.data)
+        } catch {
+          commit('RESET_FAILURE', e.response.data)
+          commit('RESET_PROCESS', false)
+          return
+        }
+        commit('RESET_FAILURE', JSON.parse(e.response.data))
+      })
+      .finally(() => {
+        commit('RESET_PROCESS', false)
+      })
+  },
+  forgotPasswordWithMail({ commit }, payload) {
+    commit('FORGOT_PROCESS', true)
+    this.$api
+      .$get('/settings/forget-password')
+      .then((data) => {
+        commit('FORGOT_SUCCESS', data)
+      })
+      .catch((e) => {
+        try {
+          JSON.parse(e.response.data)
+        } catch {
+          commit('FORGOT_FAILURE', e.response.data)
+          commit('FORGOT_FAILURE', false)
+          return
+        }
+        commit('FORGOT_FAILURE', JSON.parse(e.response.data))
+      })
+      .finally(() => {
+        commit('FORGOT_PROCESS', false)
+      })
+  },
 }
 export default {
   namespaced: true,

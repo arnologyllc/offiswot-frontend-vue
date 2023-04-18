@@ -45,11 +45,9 @@
                   />
                 </div>
               </div>
-              <div class="account__body-block">
+              <div class="account__body-block" @click="dialogVisible = true">
                 <div>
-                  <div class="deactivate" @click="dialogVisible = true">
-                    Deactivate my account
-                  </div>
+                  <div class="deactivate">Deactivate my account</div>
                   <div class="reset_text">
                     You can deactivate your account up to 3 months.
                   </div>
@@ -95,7 +93,7 @@ export default {
       dialogVisible: false,
     }
   },
-  created() {
+  mounted() {
     checkPin(this.$cookies, this.$router)
   },
 }
