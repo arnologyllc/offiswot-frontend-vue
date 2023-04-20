@@ -73,28 +73,43 @@
       class="dialog"
       @visible="showModal = false"
     ></delete-modal>
+    <check-modal
+      :model="isOpenPINDialog"
+      @close="isOpenPINDialog = false"
+    ></check-modal>
   </div>
 </template>
 
 <script>
 import DeactivateModal from '@/components/profile-settings/DeactivateModal.vue'
 import DeleteModal from '@/components/profile-settings/DeleteModal.vue'
-import { checkPin } from '~/middleware/helpers'
+import {
+  checkFirstLogin,
+  checkLoginToken,
+  checkSettingsToken,
+} from '~/middleware/helpers'
+import CheckModal from '@/components/auth/AccessCheckModal.vue'
 
 export default {
   name: 'ProfileSettings',
   components: {
     DeleteModal,
     DeactivateModal,
+    CheckModal,
   },
   data() {
     return {
       showModal: false,
       dialogVisible: false,
+      isOpenPINDialog: false,
     }
   },
   mounted() {
-    checkPin(this.$cookies, this.$router)
+    checkFirstLogin(this.$cookies, this.$router)
+    checkLoginToken(this.$cookies, this.$router)
+    if (!checkSettingsToken(this.$cookies)) {
+      this.isOpenPINDialog = true
+    }
   },
 }
 </script>

@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { checkAccess, checkPin } from '~/middleware/helpers'
+import { checkLoginToken, checkFirstLogin } from '~/middleware/helpers'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
 
 export default {
@@ -78,8 +78,10 @@ export default {
     }
   },
   mounted() {
-    checkPin(this.$cookies, this.$router)
-    this.isOpenPINDialog = !checkAccess(this.$cookies)
+    checkFirstLogin(this.$cookies, this.$router)
+    if (!checkLoginToken(this.$cookies, this.$router)) {
+      this.isOpenPINDialog = true
+    }
   },
 }
 </script>

@@ -142,15 +142,27 @@
         </div>
       </div>
     </div>
+    <check-modal
+      :model="isOpenPINDialog"
+      @close="isOpenPINDialog = false"
+    ></check-modal>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import defaultAvatar from '@/assets/images/icons/default-user-icon.jpg'
-import { checkAccess, checkPin } from '~/middleware/helpers'
+import {
+  checkFirstLogin,
+  checkLoginToken,
+  checkSettingsToken,
+} from '~/middleware/helpers'
+import CheckModal from '@/components/auth/AccessCheckModal.vue'
 export default {
   name: 'ProfilePage',
+  components: {
+    CheckModal,
+  },
   data() {
     return {
       responseWorkspaces: null,
@@ -160,6 +172,7 @@ export default {
       },
       avatar: null,
       avatarSrc: null,
+      isOpenPINDialog: false,
     }
   },
   head() {
@@ -255,7 +268,11 @@ export default {
   },
   async created() {
     try {
-      checkPin(this.$cookies, this.$router)
+      checkFirstLogin(this.$cookies, this.$router)
+      checkLoginToken(this.$cookies, this.$router)
+      if (!checkSettingsToken(this.$cookies)) {
+        this.isOpenPINDialog = true
+      }
 
       this.getProfile()
       this.responseWorkspaces = await this.getWorkSpaces()
@@ -263,12 +280,8 @@ export default {
       this.$router.push('/login')
     }
   },
-
   mounted() {
     window.addEventListener('resize', this.handleResize)
-    if (!checkAccess(this.$cookies)) {
-      this.$router.push('/')
-    }
   },
 
   methods: {

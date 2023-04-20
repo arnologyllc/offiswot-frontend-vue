@@ -1,6 +1,6 @@
 <template>
   <nav class="main">
-    <div v-if="profileSuccessData && workSpaces" class="main__inner">
+    <div v-if="profileSuccessData" class="main__inner">
       <div class="main__left">
         <el-select
           v-if="$route.path.includes('/workspace')"
@@ -141,12 +141,11 @@ export default {
       }
     },
   },
-  async created() {
+  created() {
     this.getProfile()
-    this.workSpaces = await this.getWorkSpaces()
   },
   methods: {
-    ...mapActions('profile', ['getWorkSpaces', 'getProfile']),
+    ...mapActions('profile', ['getProfile']),
     onRightButtonClick() {
       this.$route.path === '/login'
         ? this.$router.push('/register')
@@ -155,6 +154,7 @@ export default {
     onLogout() {
       this.$cookies.remove('token')
       this.$cookies.remove('first_login')
+      this.$cookies.remove('settings_pin_token')
       this.$api.post('logout')
       this.$router.push('/login')
     },

@@ -237,20 +237,30 @@
       :model="isOpenEmailDialog"
       @close="isOpenEmailDialog = false"
     ></ConfirmModal>
+    <check-modal
+      :model="isOpenPINDialog"
+      @close="isOpenPINDialog = false"
+    ></check-modal>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
-import { checkPin } from '~/middleware/helpers'
+import {
+  checkFirstLogin,
+  checkLoginToken,
+  checkSettingsToken,
+} from '~/middleware/helpers'
 import ConfirmModal from '@/components/shared/OvConfirmPINChangeModal.vue'
 
+import CheckModal from '@/components/auth/AccessCheckModal.vue'
 export default {
   name: 'PINPage',
   components: {
     ErrorMassage,
     ConfirmModal,
+    CheckModal,
   },
   layout: 'default',
   data() {
@@ -326,6 +336,7 @@ export default {
         ],
       },
       isOpenEmailDialog: false,
+      isOpenPINDialog: false,
     }
   },
   head() {
@@ -377,7 +388,11 @@ export default {
     },
   },
   mounted() {
-    checkPin(this.$cookies, this.$router)
+    checkFirstLogin(this.$cookies, this.$router)
+    checkLoginToken(this.$cookies, this.$router)
+    if (!checkSettingsToken(this.$cookies)) {
+      this.isOpenPINDialog = true
+    }
     if (this.$route.query.email) {
       this.payload.email = this.$route.query.email
     }
@@ -667,7 +682,8 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    width: 212px;
+    width: max-content;
+    max-width: 212px;
     height: max-content;
     min-height: 48px;
     border-radius: 13px;

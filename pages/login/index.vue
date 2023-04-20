@@ -292,7 +292,7 @@ export default {
         if (valid) {
           this.loginUser(this.payload)
         } else {
-          this.$message.error('Wrong!')
+          this.errors.global.value = 'Please fill empty areas'
           return false
         }
       })

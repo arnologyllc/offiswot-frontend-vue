@@ -147,7 +147,7 @@ export default {
         if (valid) {
           this.forgotPassword(this.payload)
         } else {
-          this.$message.error('Wrong!')
+          this.errors.global.value = 'Please fill empty areas'
           return false
         }
       })

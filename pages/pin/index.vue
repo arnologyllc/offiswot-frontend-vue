@@ -154,7 +154,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
-import { checkPin } from '~/middleware/helpers'
+import { checkFirstLogin } from '~/middleware/helpers'
 
 export default {
   name: 'PINPage',
@@ -256,7 +256,7 @@ export default {
     },
   },
   mounted() {
-    checkPin(this.$cookies, this.$router)
+    checkFirstLogin(this.$cookies, this.$router)
     if (this.$route.query.email) {
       this.payload.email = this.$route.query.email
     }

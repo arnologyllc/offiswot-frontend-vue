@@ -7,13 +7,9 @@
     @close="$emit('close')"
   >
     <div class="dialog__title">
-      {{
-        showSecondPage
-          ? 'Required information to join your workspace '
-          : 'Invite member'
-      }}
+      {{ !showSecondPage ? 'Workspace Rules' : 'Invite member' }}
     </div>
-    <div v-if="!showSecondPage" class="dialog__body">
+    <div v-if="showSecondPage" class="dialog__body">
       <div class="dialog__input--label">Enter email</div>
       <el-autocomplete
         v-model="userEmail"
@@ -37,18 +33,14 @@
         </div>
       </div>
       <div class="dialog__invite">
-        <el-button class="dialog__invite--btn" @click="goNextPage">
+        <el-button class="dialog__invite--btn" @click="handleAddMembers">
           INVITE
         </el-button>
-      </div>
-      <div class="dialog__invite" @click="goNextPage">
-        <el-button type="text" class="dialog__text-btn"> skip </el-button>
       </div>
     </div>
     <div v-else class="dialog__second-page">
       <div class="dialog__second-page--title">
-        What is the information your workspace members have to fill in before
-        joining to your workspace?
+        What info must your workspace members provide to join?
       </div>
       <div class="dialog__second-page--checkobox-container">
         <el-checkbox-group v-model="checkList">
@@ -67,7 +59,10 @@
         workspace in settings (click <a href="">here</a>).
       </div>
       <div class="dialog__second-page--submit-box">
-        <el-button class="dialog__invite--btn"> SUBMIT </el-button>
+        <el-button class="dialog__invite--btn"> NEXT </el-button>
+      </div>
+      <div class="dialog__invite" @click="goNextPage">
+        <el-button type="text" class="dialog__text-btn"> skip </el-button>
       </div>
     </div>
   </el-dialog>
@@ -129,7 +124,7 @@ export default {
   },
   computed: {
     dialogWidth() {
-      if (this.showSecondPage) {
+      if (!this.showSecondPage) {
         return '918px'
       } else return '432px'
     },
@@ -174,6 +169,9 @@ export default {
         (el) => el.value !== item.value
       )
       this.emails.push(item)
+    },
+    handleAddMembers() {
+      this.$emit('close')
     },
   },
 }

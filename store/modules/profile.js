@@ -110,10 +110,12 @@ const actions = {
         commit('GET_PROFILE_PROCESS', false)
       })
   },
+
   async getWorkSpaces() {
     const res = await this.$api.get('workspaces')
     return res.status === 200 ? res.data : JSON.parse(res.response.data)
   },
+
   editProfile({ commit }, payload) {
     if (payload.phone_number) {
       payload.phone_number = payload.phone_number

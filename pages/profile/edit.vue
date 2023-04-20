@@ -229,6 +229,10 @@
         </el-col>
       </el-row>
     </el-form>
+    <check-modal
+      :model="isOpenPINDialog"
+      @close="isOpenPINDialog = false"
+    ></check-modal>
   </div>
 </template>
 
@@ -238,12 +242,18 @@ import { mapGetters, mapActions } from 'vuex'
 import VuePhoneNumberInput from 'vue-phone-number-input'
 import 'vue-phone-number-input/dist/vue-phone-number-input.css'
 import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
-import { checkAccess, checkPin } from '~/middleware/helpers'
+import {
+  checkFirstLogin,
+  checkLoginToken,
+  checkSettingsToken,
+} from '~/middleware/helpers'
+import CheckModal from '@/components/auth/AccessCheckModal.vue'
 
 export default {
   name: 'EditProfile',
   components: {
     phone: VuePhoneNumberInput,
+    CheckModal,
   },
   data() {
     return {
@@ -299,6 +309,7 @@ export default {
         { value: '+12', name: 'Pacific/Auckland' },
       ],
       avatarSrc: null,
+      isOpenPINDialog: false,
     }
   },
   head() {
@@ -382,9 +393,10 @@ export default {
     this.getProfile()
   },
   mounted() {
-    checkPin(this.$cookies, this.$router)
-    if (!checkAccess(this.$cookies)) {
-      this.$router.push('/')
+    checkFirstLogin(this.$cookies, this.$router)
+    checkLoginToken(this.$cookies, this.$router)
+    if (!checkSettingsToken(this.$cookies)) {
+      this.isOpenPINDialog = true
     }
   },
   methods: {
