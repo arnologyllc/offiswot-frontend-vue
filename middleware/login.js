@@ -4,7 +4,7 @@ export default function ({ route, redirect, app }) {
       app.router.currentRoute.path === '/register' ||
       app.router.currentRoute.fullPath === '/login'
     ) {
-      return redirect('/profile')
+      return redirect('/')
     }
   }
 }

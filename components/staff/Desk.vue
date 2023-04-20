@@ -212,7 +212,12 @@
       </div>
     </div>
     <div v-else class="desk__edit-footer">
-      <el-button class="desk__edit-footer--invite" @click="isOpenInviteModal = true"> Invite Member </el-button>
+      <el-button
+        class="desk__edit-footer--invite"
+        @click="isOpenInviteModal = true"
+      >
+        Invite Member
+      </el-button>
       <draggable
         v-if="availableMembers.length"
         group="users"
@@ -268,23 +273,25 @@
         class="tutorial-box__bottom-line"
       />
     </div>
-    <OvInviteMemberModal :model="isOpenInviteModal" @close="isOpenInviteModal" />
+    <OvInviteMemberModal
+      :model="isOpenInviteModal"
+      @close="isOpenInviteModal"
+    />
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import draggable from 'vuedraggable'
-import OvInviteMemberModal from "@/components/shared/OvInviteMemberModal"
-
+import OvInviteMemberModal from '@/components/shared/OvInviteMemberModal'
 import AllTablesList from '@/data/tablesList.json'
 import AllUsersList from '@/data/usersList.json'
-
 
 export default {
   name: 'DeskComponent',
   components: {
     draggable,
-    OvInviteMemberModal
+    OvInviteMemberModal,
   },
   props: {
     dragOptions: {
@@ -337,6 +344,51 @@ export default {
       isOpenInviteModal: false,
     }
   },
+  computed: {
+    ...mapGetters('workspace', [
+      'isLoadingSubmit',
+      'getMembersSuccess',
+      'getMembersError',
+      'getSeatsSuccess',
+      'getSeatsError',
+      'setSeatsSuccess',
+      'setSeatsError',
+    ]),
+  },
+  watch: {
+    getMembersSuccess(v) {
+      if (v) {
+        console.log(v)
+      }
+    },
+    getMembersError(v) {
+      if (v) {
+        console.log(v)
+      }
+    },
+    getSeatsSuccess(v) {
+      if (v) {
+        console.log(v)
+      }
+    },
+    getSeatsError(v) {
+      if (v) {
+        console.log(v)
+      }
+    },
+    setSeatsSuccess(v) {
+      if (v) {
+        console.log(v)
+      }
+    },
+    setSeatsError(v) {
+      if (v) {
+        console.log(v)
+      }
+    },
+  },
+  created() {},
+
   mounted() {
     this.setAvailableMembers()
     this.setLastTableId()

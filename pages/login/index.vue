@@ -240,9 +240,7 @@ export default {
   watch: {
     loginSuccessData(v) {
       if (v) {
-        const expirationDate = this.payload.remember_me
-          ? new Date(Date.now() + 86400000).toISOString() // 1 day
-          : new Date(Date.now() + 3600000).toISOString() // 1 hour
+        const expirationDate = this.payload.remember_me ? 0 : '1h'
         this.$cookies.set('token', v.access_token, expirationDate)
         if (v.is_first_login) {
           this.$router.push('/pin')
@@ -294,7 +292,7 @@ export default {
         if (valid) {
           this.loginUser(this.payload)
         } else {
-          this.$message.error('Wrong!')
+          this.errors.global.value = 'Please fill empty areas'
           return false
         }
       })
@@ -359,7 +357,6 @@ export default {
 
     &--box {
       &__input {
-        box-shadow: 0px 7px 64px rgba(0, 0, 0, 0.07);
         ::v-deep {
           .el-input__inner {
             height: 48px;

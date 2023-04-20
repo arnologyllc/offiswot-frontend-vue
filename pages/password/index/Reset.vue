@@ -20,7 +20,7 @@
             class="main__form--box__input"
             placeholder="Password"
             :type="showPassword ? 'text' : 'password'"
-            @blur="validateField('password')"
+            @input="validateField('password')"
           >
             <template slot="prefix">
               <img
@@ -206,13 +206,14 @@ export default {
         this.errors.password.status = 'Weak'
         callback(new Error('Password strength: <b>Weak</b>'))
       } else if (strength === 'Medium') {
+        callback()
         this.errors.password.status = 'Medium'
         this.errors.password.value = 'Password strength: <b>Medium</b>'
       } else if (strength === 'Strong') {
+        callback()
         this.errors.password.status = 'Strong'
         this.errors.password.value = 'Password strength: <b>Strong</b>'
       }
-      callback()
     }
     const validatePass2 = (rule, value, callback) => {
       if (value === '') {
@@ -244,7 +245,7 @@ export default {
             message: 'This field is required.',
             trigger: 'blur',
           },
-          { validator: validatePass, trigger: 'blur' },
+          { validator: validatePass, trigger: 'input' },
         ],
         password_confirmation: [
           {
@@ -317,6 +318,9 @@ export default {
   mounted() {
     this.payload.pinToken = this.$route.query.token
     this.payload.email = this.$route.query.email
+    while (this.$cookies.get('token')) {
+      this.$cookies.remove('token')
+    }
     window.addEventListener('resize', this.handleResize)
   },
 
@@ -327,7 +331,7 @@ export default {
         if (valid) {
           this.resetPassword(this.payload)
         } else {
-          this.$message.error('Wrong!')
+          this.errors.global.value = 'Please fill empty areas'
           return false
         }
       })
@@ -408,7 +412,6 @@ export default {
 
     &--box {
       &__input {
-        box-shadow: 0px 7px 64px rgba(0, 0, 0, 0.07);
         ::v-deep {
           .el-input__inner {
             height: 48px;

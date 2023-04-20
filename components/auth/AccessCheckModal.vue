@@ -6,7 +6,7 @@
     :close-on-click-modal="false"
     text-align="center"
     :show-close="false"
-    top="30vh"
+    top="230px"
     @close="$emit('close')"
   >
     <template slot="title">
@@ -25,13 +25,20 @@
       ref="pinForm"
       class="main__form--box"
       hide-required-asterisk
+      :show-message="false"
       :model="payload"
       :rules="rules"
       @submit.native.prevent="onSubmit"
     >
-      <div v-if="errors.global.value" class="el-form-item__global-error">
-        <img src="@/assets/images/icons/error.svg" alt="" />
-        <span>{{ errors.global.value }}</span>
+      <div
+        v-if="errors.global.value"
+        class="el-form-item__global-error-container"
+      >
+        <div class="el-form-item__global-error">
+          <img src="@/assets/images/icons/error.svg" alt="" />
+          <span>{{ errors.global.value }}</span>
+        </div>
+        <span class="clear-error" @click="clearError">X</span>
       </div>
       <el-form-item prop="pin" class="password-form-item">
         <el-input
@@ -105,7 +112,7 @@ export default {
   },
   data() {
     return {
-      dialogVisible: true,
+      dialogVisible: false,
       dialogWidth: '450px',
       dialogHeight: '400px',
       payload: {
@@ -157,11 +164,23 @@ export default {
       }
     },
     checkPinData(v) {
-      this.$message.success(v)
+      if (!this.$cookies.get('login_pin_token'))
+        this.$cookies.set('login_pin_token', v.data.login_pin_token, '3m')
+      this.$cookies.set('settings_pin_token', v.data.settings_pin_token, 0)
+      this.dialogVisible = false
       this.$emit('close')
     },
     checkPinFailureData(v) {
-      this.errors.global.value = v
+      for (const i in v) {
+        if (typeof v[i] !== 'string') {
+          for (const j in v[i]) {
+            this.errors.global.value = v[i][j]
+          }
+        } else {
+          this.errors.global.value = v[i]
+        }
+      }
+      if (this.$router.history.current.path !== '/') this.$router.go(-1)
     },
     forgotPinFailureData(v) {
       for (const i in v) {
@@ -176,7 +195,7 @@ export default {
     },
     forgotPinData(v) {
       if (v) {
-        this.isOpenEmailDialog = true
+        this.isOpenPINDialog = true
       }
     },
   },
@@ -208,6 +227,10 @@ export default {
       if (this.isWeb()) {
         this.errors[fieldName].isShow = false
       }
+    },
+
+    clearError() {
+      this.errors.global.value = ''
     },
     validateField(fieldName) {
       this.$refs.pinForm.validateField(fieldName, (errorMessage) => {
@@ -243,7 +266,6 @@ export default {
     &--box {
       width: 320px;
       &__input {
-        box-shadow: 0px 7px 64px rgba(0, 0, 0, 0.07);
         ::v-deep {
           .el-input__inner {
             height: 48px;
@@ -270,9 +292,10 @@ export default {
           }
           .el-input__suffix {
             padding-right: 8px;
+            display: flex !important;
             cursor: pointer;
             &-inner {
-              display: grid;
+              display: flex !important;
             }
           }
         }
@@ -338,6 +361,36 @@ export default {
 
       color: #0d1c2e;
     }
+  }
+  .el-form-item__global-error-container {
+    width: 100%;
+    border-color: #e60022;
+    background: #fbe4e8;
+    box-shadow: 0px 7px 64px rgb(0 0 0 / 7%);
+    border-radius: 6px;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 20px;
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 12px;
+    align-items: center;
+    color: #e60022;
+    gap: 16px;
+    margin-bottom: 27px;
+  }
+  .el-form-item__global-error {
+    font-family: 'Montserrat';
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .clear-error {
+    cursor: pointer;
   }
 }
 .dialog-footer {
@@ -414,12 +467,12 @@ export default {
   @keyframes showPINPlaceholder {
     to {
       top: -34px;
-      left: -330px;
+      left: -224px;
     }
   }
 
   .pin_placeholder {
-    left: -310px;
+    left: -210px;
   }
 }
 

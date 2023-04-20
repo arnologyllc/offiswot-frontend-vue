@@ -45,11 +45,9 @@
                   />
                 </div>
               </div>
-              <div class="account__body-block">
+              <div class="account__body-block" @click="dialogVisible = true">
                 <div>
-                  <div class="deactivate" @click="dialogVisible = true">
-                    Deactivate my account
-                  </div>
+                  <div class="deactivate">Deactivate my account</div>
                   <div class="reset_text">
                     You can deactivate your account up to 3 months.
                   </div>
@@ -75,28 +73,43 @@
       class="dialog"
       @visible="showModal = false"
     ></delete-modal>
+    <check-modal
+      :model="isOpenPINDialog"
+      @close="isOpenPINDialog = false"
+    ></check-modal>
   </div>
 </template>
 
 <script>
 import DeactivateModal from '@/components/profile-settings/DeactivateModal.vue'
 import DeleteModal from '@/components/profile-settings/DeleteModal.vue'
-import { checkPin } from '~/middleware/helpers'
+import {
+  checkFirstLogin,
+  checkLoginToken,
+  checkSettingsToken,
+} from '~/middleware/helpers'
+import CheckModal from '@/components/auth/AccessCheckModal.vue'
 
 export default {
   name: 'ProfileSettings',
   components: {
     DeleteModal,
     DeactivateModal,
+    CheckModal,
   },
   data() {
     return {
       showModal: false,
       dialogVisible: false,
+      isOpenPINDialog: false,
     }
   },
-  created() {
-    checkPin(this.$cookies, this.$router)
+  mounted() {
+    checkFirstLogin(this.$cookies, this.$router)
+    checkLoginToken(this.$cookies, this.$router)
+    if (!checkSettingsToken(this.$cookies)) {
+      this.isOpenPINDialog = true
+    }
   },
 }
 </script>

@@ -9,6 +9,8 @@ const state = () => ({
   setPinFailureData: null,
   deleteProfileData: null,
   deleteFailureData: null,
+  deactivateProfileData: null,
+  deactivateFailureData: null,
 })
 
 const getters = {
@@ -25,6 +27,9 @@ const getters = {
 
   deleteProfileData: (state) => state.deleteProfileData,
   deleteFailureData: (state) => state.deleteFailureData,
+
+  deactivateProfileData: (state) => state.deactivateProfileData,
+  deactivateFailureData: (state) => state.deactivateFailureData,
 }
 
 const mutations = {
@@ -73,6 +78,14 @@ const mutations = {
     state.deleteFailureData = null
     state.deleteFailureData = data
   },
+
+  DEACTIVATE_PROFILE_SUCCESS: (state, data) => {
+    state.deactivateProfileData = data
+  },
+  DEACTIVATE_PROFILE_FAILURE: (state, data) => {
+    state.deactivateFailureData = null
+    state.deactivateFailureData = data
+  },
 }
 
 const actions = {
@@ -97,10 +110,12 @@ const actions = {
         commit('GET_PROFILE_PROCESS', false)
       })
   },
+
   async getWorkSpaces() {
     const res = await this.$api.get('workspaces')
     return res.status === 200 ? res.data : JSON.parse(res.response.data)
   },
+
   editProfile({ commit }, payload) {
     if (payload.phone_number) {
       payload.phone_number = payload.phone_number
@@ -167,6 +182,25 @@ const actions = {
     if (payload.pin) {
       this.$api
         .delete('delete-profile', { data: payload })
+        .then(({ data }) => {
+          commit('DELETE_PROFILE_SUCCESS', data)
+        })
+        .catch((e) => {
+          try {
+            JSON.parse(e.response.data)
+          } catch {
+            commit('DELETE_PROFILE_FAILURE', e.response.data)
+            return
+          }
+          commit('DELETE_PROFILE_FAILURE', JSON.parse(e.response.data))
+        })
+    }
+  },
+
+  deactivateProfile({ commit }, payload) {
+    if (payload.pin) {
+      this.$api
+        .post('deactivate-profile', { data: payload })
         .then(({ data }) => {
           commit('DELETE_PROFILE_SUCCESS', data)
         })

@@ -11,7 +11,7 @@
             class="user-box__avatar"
             width="119px"
             height="119px"
-            :src="avatarURL"
+            :src="avatarUrl"
             alt="user_avatar"
           />
           <div class="user-box__user-info">
@@ -74,7 +74,7 @@
           class="main__form--upload"
           action="#"
           accept="image/*"
-          :on-change="onAvatarUpload"
+          :on-success="onAvatarUpload"
         >
           <el-button type="text" class="change-picture"
             >Change picture</el-button
@@ -142,15 +142,27 @@
         </div>
       </div>
     </div>
+    <check-modal
+      :model="isOpenPINDialog"
+      @close="isOpenPINDialog = false"
+    ></check-modal>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import defaultAvatar from '@/assets/images/icons/default-user-icon.jpg'
-import { checkPin } from '~/middleware/helpers'
+import {
+  checkFirstLogin,
+  checkLoginToken,
+  checkSettingsToken,
+} from '~/middleware/helpers'
+import CheckModal from '@/components/auth/AccessCheckModal.vue'
 export default {
   name: 'ProfilePage',
+  components: {
+    CheckModal,
+  },
   data() {
     return {
       responseWorkspaces: null,
@@ -160,6 +172,7 @@ export default {
       },
       avatar: null,
       avatarSrc: null,
+      isOpenPINDialog: false,
     }
   },
   head() {
@@ -172,10 +185,12 @@ export default {
       'profileLoading',
       'profileSuccessData',
       'profileFailureData',
+      'editProfileData',
     ]),
-
-    avatarURL() {
-      if (this.profileSuccessData) {
+    avatarUrl() {
+      if (this.editProfileData) {
+        return `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.editProfileData.user.avatar}`
+      } else if (this.profileSuccessData) {
         if (this.profileSuccessData.user.avatar) {
           return `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.profileSuccessData.user.avatar}`
         }
@@ -245,17 +260,26 @@ export default {
         }
       }
     },
+    editProfileData(v) {
+      if (v) {
+        this.$message.success('Success!')
+      }
+    },
   },
   async created() {
     try {
-      checkPin(this.$cookies, this.$router)
+      checkFirstLogin(this.$cookies, this.$router)
+      checkLoginToken(this.$cookies, this.$router)
+      if (!checkSettingsToken(this.$cookies)) {
+        this.isOpenPINDialog = true
+      }
+
       this.getProfile()
       this.responseWorkspaces = await this.getWorkSpaces()
     } catch {
       this.$router.push('/login')
     }
   },
-
   mounted() {
     window.addEventListener('resize', this.handleResize)
   },
@@ -284,11 +308,10 @@ export default {
       }
     },
 
-    onAvatarUpload(e) {
-      this.payload.avatar = e.raw
-      this.avatarSrc = URL.createObjectURL(e.raw)
+    onAvatarUpload(e, file) {
+      this.payload.avatar = file.raw
+      this.avatarSrc = URL.createObjectURL(file.raw)
       this.editProfile(this.payload)
-      this.getProfile()
     },
   },
 }

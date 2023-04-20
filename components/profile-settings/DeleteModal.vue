@@ -230,6 +230,7 @@ export default {
     display: flex;
     justify-content: center;
     margin-top: 15px;
+    margin-bottom: 20px;
   }
   &__body {
     width: 100%;
@@ -241,7 +242,7 @@ export default {
     line-height: 17px;
     margin: 25px auto;
     color: #6d7075;
-    text-align: center;
+    text-align: left;
     &-title {
       margin-bottom: 26px;
       font-family: 'Montserrat';
@@ -259,17 +260,13 @@ export default {
       gap: 20px;
       align-items: top;
       margin: 12px auto;
-      font-family: Montserrat;
-      font-size: 12px;
+      font-family: 'Montserrat';
+      font-style: normal;
       font-weight: 500;
-      line-height: 15px;
-      letter-spacing: 0px;
-      text-align: left;
-      color: #b4b4b4 span {
-        color: #929eff;
-        text-decoration: underline;
-        cursor: pointer;
-      }
+      font-size: 14px;
+      line-height: 17px;
+
+      color: #6d7075;
     }
     &-checkboxes {
       margin-bottom: 145px;
@@ -402,6 +399,16 @@ export default {
     background: #ffffff;
     border: 1px solid #4f4cec;
     border-radius: 20px;
+    &__title {
+      font-family: 'Montserrat';
+      font-style: normal;
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 24px;
+      text-align: center;
+
+      color: #0d1c2e;
+    }
   }
 }
 </style>

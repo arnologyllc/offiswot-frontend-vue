@@ -46,13 +46,20 @@
             class="submit-button"
           >
             <span>
-              <span class="submit-button__text">Next</span>
+              <span class="submit-button__text">{{
+                isLoadingSubmit ? '' : 'Next'
+              }}</span>
               <img src="@/assets/images/icons/chevron-icon.svg" alt="arrow" />
             </span>
           </el-button>
         </div>
       </el-form-item>
     </el-form>
+
+    <check-modal
+      :model="isOpenPINDialog"
+      @close="isOpenPINDialog = false"
+    ></check-modal>
   </div>
 </template>
 
@@ -60,11 +67,22 @@
 import { mapGetters, mapActions } from 'vuex'
 
 import showError from '@/mixins/errorToast.js'
-import { checkPin } from '@/middleware/helpers'
+import {
+  checkFirstLogin,
+  checkLoginToken,
+  checkSettingsToken,
+} from '@/middleware/helpers'
+
+import CheckModal from '@/components/auth/AccessCheckModal.vue'
 
 export default {
   name: 'CreateWorkSpaceStep1',
+
+  components: {
+    CheckModal,
+  },
   mixins: [showError],
+
   data() {
     return {
       payload: {
@@ -78,6 +96,7 @@ export default {
           trigger: 'blur',
         },
       },
+      isOpenPINDialog: false,
     }
   },
   head() {
@@ -115,10 +134,12 @@ export default {
       },
     },
   },
-  created() {
-    checkPin(this.$cookies, this.$router)
-  },
   async mounted() {
+    checkFirstLogin(this.$cookies, this.$router)
+    checkLoginToken(this.$cookies, this.$router)
+    if (!checkSettingsToken(this.$cookies)) {
+      this.isOpenPINDialog = true
+    }
     await this.getIndustries()
   },
   methods: {
@@ -128,7 +149,7 @@ export default {
         if (valid) {
           this.createWorkspace(this.payload)
         } else {
-          this.$message.error('Wrong!')
+          this.errors.global.value = 'Please fill empty areas'
           return false
         }
       })
@@ -165,7 +186,6 @@ export default {
 
     &--input {
       width: 100%;
-      box-shadow: 0px 7px 64px rgba(0, 0, 0, 0.07);
       ::v-deep {
         .el-input__inner {
           height: 48px;

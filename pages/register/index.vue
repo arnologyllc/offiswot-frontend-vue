@@ -7,6 +7,7 @@
         ref="registerForm"
         class="main__form--box"
         hide-required-asterisk
+        autocomplate="off"
         :model="payload"
         :rules="rules"
         @submit.native.prevent="onSubmit"
@@ -74,7 +75,7 @@
             class="main__form--box__input"
             placeholder="Username"
             maxlength="30"
-            @input="validateField('username')"
+            @blur="validateField('username')"
           >
             <template slot="prefix">
               <img src="@/assets/images/icons/user-icon.svg" alt="user_icon" />
@@ -93,7 +94,10 @@
                 Username
               </span>
             </div>
-            <template v-if="errors.username.value" slot="suffix">
+            <template
+              v-if="errors.username.value || errors.username.status"
+              slot="suffix"
+            >
               <div
                 class="error_icon"
                 @mouseover="showError('username')"
@@ -396,14 +400,19 @@ export default {
     }
 
     const validateUsernameSymbolsCount = (rule, value, callback) => {
-      if (value.length === 30) {
+      if (value?.length === 30) {
         this.errors.username.value = "Your handle can't exceed 30 characters."
         this.errors.username.status = 'Medium'
-      } else {
+        callback()
+      } else if (value?.length > 0 && value?.length < 30) {
         this.errors.username.value = ''
         this.errors.username.status = null
+        callback()
+      } else {
+        this.errors.username.value = 'This field is required'
+        this.errors.username.status = null
+        callback(new Error(`This field is required`))
       }
-      callback()
     }
     return {
       //  Request Body
@@ -443,9 +452,8 @@ export default {
                       `,
             trigger: 'blur',
           },
-
           { validator: validateUsernameSymbols, trigger: 'blur' },
-          { validator: validateUsernameSymbolsCount, trigger: 'blur' },
+          { validator: validateUsernameSymbolsCount, trigger: 'change' },
         ],
         password: [
           {
@@ -551,7 +559,7 @@ export default {
         if (valid) {
           this.registerUser(this.payload)
         } else {
-          this.$message.error('Wrong!')
+          this.errors.global.value = 'Please fill empty areas'
           return false
         }
       })
@@ -562,7 +570,9 @@ export default {
 
     validateField(fieldName) {
       this.$refs.registerForm.validateField(fieldName, (errorMessage) => {
-        this.errors[fieldName].value = errorMessage
+        if (this.errors[fieldName].status !== 'Medium') {
+          this.errors[fieldName].value = errorMessage
+        }
       })
     },
     showErrorClick(fieldName) {
@@ -635,7 +645,6 @@ export default {
 
     &--box {
       &__input {
-        box-shadow: 0px 7px 64px rgba(0, 0, 0, 0.07);
         ::v-deep {
           .el-input__inner {
             height: 48px;

@@ -55,14 +55,26 @@
       </div>
     </el-menu>
     <NuxtChild />
+    <check-modal
+      :model="isOpenPINDialog"
+      @close="isOpenPINDialog = false"
+    ></check-modal>
   </div>
 </template>
 
 <script>
-import { checkPin } from '~/middleware/helpers'
+import {
+  checkFirstLogin,
+  checkLoginToken,
+  checkSettingsToken,
+} from '~/middleware/helpers'
+import CheckModal from '@/components/auth/AccessCheckModal.vue'
 
 export default {
   name: 'WorkspaceMain',
+  components: {
+    CheckModal,
+  },
   middleware: [
     function ({ redirect, route }) {
       if (!route.params.id) {
@@ -72,6 +84,7 @@ export default {
   ],
   data() {
     return {
+      isOpenPINDialog: false,
       showChannelsCount: 2,
       channelsList: [
         {
@@ -207,8 +220,12 @@ export default {
       return this.channelsList.slice(0, this.showChannelsCount)
     },
   },
-  created() {
-    checkPin(this.$cookies, this.$router)
+  mounted() {
+    checkFirstLogin(this.$cookies, this.$router)
+    checkLoginToken(this.$cookies, this.$router)
+    if (!checkSettingsToken(this.$cookies)) {
+      this.isOpenPINDialog = true
+    }
   },
 }
 </script>

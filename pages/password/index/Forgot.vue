@@ -147,7 +147,7 @@ export default {
         if (valid) {
           this.forgotPassword(this.payload)
         } else {
-          this.$message.error('Wrong!')
+          this.errors.global.value = 'Please fill empty areas'
           return false
         }
       })
@@ -191,7 +191,6 @@ export default {
 
     &--box {
       &__input {
-        box-shadow: 0px 7px 64px rgba(0, 0, 0, 0.07);
         ::v-deep {
           .el-input__inner {
             height: 48px;

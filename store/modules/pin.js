@@ -199,7 +199,7 @@ const actions = {
   checkPin({ commit }, payload) {
     commit('CHECK_PIN_PROCESS', true)
     this.$api
-      .$post('/change-pin', { pin: payload.pin })
+      .$post('/check-pin', { pin: payload.pin })
       .then((data) => {
         commit('CHECK_PIN_SUCCESS', data)
       })

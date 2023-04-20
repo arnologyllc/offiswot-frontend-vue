@@ -4,7 +4,10 @@
       <div>
         <div class="account__title">My account</div>
         <div class="account__body">
-          <el-button class="account__body--block">
+          <el-button
+            class="account__body--block"
+            @click="$router.push('/profile')"
+          >
             <div>
               <img src="@/assets/images/icons/profile.svg" alt="profile-icon" />
             </div>
@@ -47,22 +50,38 @@
         </div>
       </div>
     </div>
+    <check-modal
+      :model="isOpenPINDialog"
+      @close="isOpenPINDialog = false"
+    ></check-modal>
   </div>
 </template>
 
 <script>
-import { checkPin } from '~/middleware/helpers'
+import { checkLoginToken, checkFirstLogin } from '~/middleware/helpers'
+import CheckModal from '@/components/auth/AccessCheckModal.vue'
 
 export default {
   name: 'IndexPage',
+  components: {
+    CheckModal,
+  },
   layout: 'default',
+  data() {
+    return {
+      isOpenPINDialog: null,
+    }
+  },
   head() {
     return {
       title: 'Home',
     }
   },
-  created() {
-    checkPin(this.$cookies, this.$router)
+  mounted() {
+    checkFirstLogin(this.$cookies, this.$router)
+    if (!checkLoginToken(this.$cookies, this.$router)) {
+      this.isOpenPINDialog = true
+    }
   },
 }
 </script>
@@ -125,6 +144,36 @@ export default {
         color: #6d7075;
       }
     }
+  }
+  .el-form-item__global-error-container {
+    width: 100%;
+    border-color: #e60022;
+    background: #fbe4e8;
+    box-shadow: 0px 7px 64px rgb(0 0 0 / 7%);
+    border-radius: 6px;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 20px;
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 12px;
+    align-items: center;
+    color: #e60022;
+    gap: 16px;
+    margin-bottom: 27px;
+  }
+  .el-form-item__global-error {
+    font-family: 'Montserrat';
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .clear-error {
+    cursor: pointer;
   }
 }
 

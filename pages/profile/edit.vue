@@ -40,7 +40,7 @@
               class="main__form--upload"
               action="#"
               accept="image/*"
-              :on-change="onAvatarUpload"
+              :on-success="onAvatarUpload"
             >
               <el-button size="small" type="text">Upload picture</el-button>
             </el-upload>
@@ -229,6 +229,10 @@
         </el-col>
       </el-row>
     </el-form>
+    <check-modal
+      :model="isOpenPINDialog"
+      @close="isOpenPINDialog = false"
+    ></check-modal>
   </div>
 </template>
 
@@ -238,12 +242,18 @@ import { mapGetters, mapActions } from 'vuex'
 import VuePhoneNumberInput from 'vue-phone-number-input'
 import 'vue-phone-number-input/dist/vue-phone-number-input.css'
 import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
-import { checkPin } from '~/middleware/helpers'
+import {
+  checkFirstLogin,
+  checkLoginToken,
+  checkSettingsToken,
+} from '~/middleware/helpers'
+import CheckModal from '@/components/auth/AccessCheckModal.vue'
 
 export default {
   name: 'EditProfile',
   components: {
     phone: VuePhoneNumberInput,
+    CheckModal,
   },
   data() {
     return {
@@ -299,6 +309,7 @@ export default {
         { value: '+12', name: 'Pacific/Auckland' },
       ],
       avatarSrc: null,
+      isOpenPINDialog: false,
     }
   },
   head() {
@@ -317,7 +328,9 @@ export default {
     ]),
 
     avatarUrl() {
-      if (this.profileSuccessData) {
+      if (this.editProfileData) {
+        return `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.editProfileData.user.avatar}`
+      } else if (this.profileSuccessData) {
         if (this.profileSuccessData.user.avatar) {
           return `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.profileSuccessData.user.avatar}`
         }
@@ -377,14 +390,20 @@ export default {
     },
   },
   created() {
-    checkPin(this.$cookies, this.$router)
     this.getProfile()
+  },
+  mounted() {
+    checkFirstLogin(this.$cookies, this.$router)
+    checkLoginToken(this.$cookies, this.$router)
+    if (!checkSettingsToken(this.$cookies)) {
+      this.isOpenPINDialog = true
+    }
   },
   methods: {
     ...mapActions('profile', ['getProfile', 'editProfile']),
-    onAvatarUpload(e) {
-      this.payload.avatar = e.raw
-      this.avatarSrc = URL.createObjectURL(e.raw)
+    onAvatarUpload(e, file) {
+      this.payload.avatar = file.raw
+      this.avatarSrc = URL.createObjectURL(file.raw)
       this.editProfile(this.payload)
     },
     onSubmit() {
@@ -480,7 +499,6 @@ export default {
     &--input {
       width: 100%;
       position: relative;
-      box-shadow: 0px 7px 64px rgba(0, 0, 0, 0.07);
 
       &.date-picker {
         margin-bottom: 14px;
@@ -528,7 +546,6 @@ export default {
       }
     }
     &--phone-number {
-      box-shadow: 0px 7px 64px rgba(0, 0, 0, 0.07);
       ::v-deep {
         input {
           height: 48px;

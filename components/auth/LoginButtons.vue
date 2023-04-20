@@ -72,7 +72,6 @@ export default {
   padding: 0;
   border-color: $ov-border--light;
   border-radius: 6px;
-  box-shadow: 0px 7px 64px rgba(0, 0, 0, 0.07);
   &:focus,
   &:hover {
     background-color: white;
