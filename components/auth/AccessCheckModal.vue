@@ -151,7 +151,7 @@ export default {
       'checkPinData',
       'checkPinFailureData',
       'isLoadingSubmit',
-      'forgotFailureData',
+      'forgotPinFailureData',
     ]),
   },
   watch: {
@@ -166,6 +166,7 @@ export default {
     checkPinData(v) {
       if (!this.$cookies.get('login_pin_token'))
         this.$cookies.set('login_pin_token', v.data.login_pin_token, '3m')
+      this.$root.$emit('loginToken', this.$cookies.get('login_pin_token'))
       this.$cookies.set('settings_pin_token', v.data.settings_pin_token, 0)
       this.dialogVisible = false
       this.$emit('close')

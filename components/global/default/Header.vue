@@ -141,21 +141,28 @@ export default {
       }
     },
   },
-  created() {
-    this.getProfile()
+  async mounted() {
+    if (this.$cookies.get('login_pin_token')) {
+      this.getProfile()
+      this.workSpaces = await this.getWorkSpaces()
+    }
+    this.$root.$once('loginToken', async () => {
+      this.getProfile()
+      this.workSpaces = await this.getWorkSpaces()
+    })
   },
   methods: {
-    ...mapActions('profile', ['getProfile']),
+    ...mapActions('profile', ['getProfile', 'getWorkSpaces']),
     onRightButtonClick() {
       this.$route.path === '/login'
         ? this.$router.push('/register')
         : this.$router.push('/login')
     },
-    onLogout() {
+    async onLogout() {
+      await this.$api.post('logout')
       this.$cookies.remove('token')
       this.$cookies.remove('first_login')
       this.$cookies.remove('settings_pin_token')
-      this.$api.post('logout')
       this.$router.push('/login')
     },
   },

@@ -25,7 +25,7 @@
             :type="showPIN ? 'text' : 'password'"
             class="main__form--box__input"
             placeholder="Enter PIN"
-            @blur="validateField('pin')"
+            @change="validateField('pin')"
           >
             <div
               v-if="payload.pin"
@@ -164,11 +164,27 @@ export default {
   layout: 'default',
   data() {
     //  Custom Validations
-    const validatePIN = (rule, value, callback) => {
+    const validateRepeatPIN = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('Please input the PIN again'))
       } else if (value !== this.payload.pin) {
-        callback(new Error('PIN and confirm PIN do not match'))
+        callback(new Error('PIN and repeat PIN do not match.'))
+      } else {
+        callback()
+      }
+    }
+    const validatePIN = (rule, value, callback) => {
+      const regex = /^\d{4,6}$/
+      if (!regex.test(value)) {
+        callback(
+          new Error(
+            `<span>PIN is improperly formatted.<br></span>
+            <ul class="error_info">
+              <li>4-6 characters long.</li>
+              <li>Should include only numbers.</li>
+            </ul>`
+          )
+        )
       } else {
         callback()
       }
@@ -207,12 +223,7 @@ export default {
             message: 'This field is required.',
             trigger: 'blur',
           },
-          {
-            min: 4,
-            max: 6,
-            message: 'PIN must be between 4 and 6 digits',
-            trigger: 'blur',
-          },
+          { validator: validatePIN, trigger: 'change' },
         ],
         pin_confirmation: [
           {
@@ -220,7 +231,7 @@ export default {
             message: 'This field is required.',
             trigger: 'blur',
           },
-          { validator: validatePIN, trigger: 'blur' },
+          { validator: validateRepeatPIN, trigger: 'blur' },
         ],
       },
     }

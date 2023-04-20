@@ -578,7 +578,7 @@ export default {
     height: max-content;
     border-radius: 13px;
     background-color: white;
-    box-shadow: 0 0 10px gray;
+    box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
   }
 
   .strength {
