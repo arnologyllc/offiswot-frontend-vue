@@ -181,7 +181,10 @@ export default {
           this.errors.global.value = v[i]
         }
       }
-      if (this.$router.history.current.path !== '/') this.$router.go(-1)
+      if (this.$router.history.current.path !== '/')
+        setTimeout(() => {
+          this.$router.go(-1)
+        }, 1000)
     },
     forgotPinFailureData(v) {
       for (const i in v) {
@@ -213,7 +216,15 @@ export default {
   methods: {
     ...mapActions('pin', ['checkPin', 'forgotPin']),
     onSubmit() {
-      this.checkPin(this.payload)
+      this.$refs.pinForm.validate((valid) => {
+        if (valid) {
+          this.checkPin(this.payload)
+        } else if (this.payload.pin) {
+          this.errors.global.value = 'PIN must be between 4 and 6 digits'
+        } else {
+          this.errors.global.value = 'This field is required'
+        }
+      })
     },
 
     focusElement(elem) {
