@@ -7,36 +7,38 @@
     @close="$emit('close')"
   >
     <div class="dialog__title">
-      {{ !showSecondPage ? 'Workspace Rules' : 'Invite member' }}
+      {{ showSecondPage ? 'Workspace Rules' : 'Invite member' }}
     </div>
-    <div v-if="showSecondPage" class="dialog__body">
-      <div class="dialog__input--label">Enter email</div>
-      <el-autocomplete
-        v-model="userEmail"
-        popper-class="custom-style-popup"
-        class="dialog__input"
-        :fetch-suggestions="querySearch"
-        placeholder="Enter email"
-        prefix-icon="el-icon-search"
-        @select="handleSelect"
-      ></el-autocomplete>
-      <div class="dialog__chips-box">
-        <div
-          v-for="(item, index) in selectedEmails"
-          :key="`email_${index}`"
-          class="dialog__chip"
-        >
-          <div class="dialog__chip--text">{{ item.value }}</div>
-          <div class="dialog__chip--icon" @click="removeChip(item)">
-            <i class="el-icon-close"></i>
+    <div v-if="!showSecondPage" class="dialog__body">
+      <el-form ref="inviteForm" :rules="rules">
+        <div class="dialog__input--label">Enter email</div>
+        <el-autocomplete
+          v-model="userEmail"
+          popper-class="custom-style-popup"
+          class="dialog__input"
+          :fetch-suggestions="querySearch"
+          placeholder="Enter email"
+          prefix-icon="el-icon-search"
+          @select="handleSelect"
+        ></el-autocomplete>
+        <div class="dialog__chips-box">
+          <div
+            v-for="(item, index) in selectedEmails"
+            :key="`email_${index}`"
+            class="dialog__chip"
+          >
+            <div class="dialog__chip--text">{{ item.value }}</div>
+            <div class="dialog__chip--icon" @click="removeChip(item)">
+              <i class="el-icon-close"></i>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="dialog__invite">
-        <el-button class="dialog__invite--btn" @click="handleAddMembers">
-          INVITE
-        </el-button>
-      </div>
+        <div class="dialog__invite">
+          <el-button class="dialog__invite--btn" @click="goNextPage">
+            INVITE
+          </el-button>
+        </div>
+      </el-form>
     </div>
     <div v-else class="dialog__second-page">
       <div class="dialog__second-page--title">
@@ -59,10 +61,7 @@
         workspace in settings (click <a href="">here</a>).
       </div>
       <div class="dialog__second-page--submit-box">
-        <el-button class="dialog__invite--btn"> NEXT </el-button>
-      </div>
-      <div class="dialog__invite" @click="goNextPage">
-        <el-button type="text" class="dialog__text-btn"> skip </el-button>
+        <el-button class="dialog__invite--btn"> SUBMIT </el-button>
       </div>
     </div>
   </el-dialog>
@@ -87,16 +86,13 @@ export default {
           value: 'dsdf@gmail.com',
           link: 'https://github.com/vuejs/vue-router',
         },
-        { value: 'babel.mail.ru', link: 'https://github.com/babel/babel' },
+        { value: 'babel@mail.ru', link: 'https://github.com/babel/babel' },
       ],
       checkboxItems: [
         'Name',
         'Picture',
-        'Timezone',
         'Surname',
-        'Gender',
         'Languages',
-        'Last Name',
         'Phone number',
         'Years of experience',
         'Date of birth',
@@ -109,11 +105,8 @@ export default {
       checkList: [
         'Name',
         'Picture',
-        'Timezone',
         'Surname',
-        'Gender',
         'Languages',
-        'Last Name',
         'Phone number',
         'Years of experience',
         'Date of birth',
@@ -124,7 +117,7 @@ export default {
   },
   computed: {
     dialogWidth() {
-      if (!this.showSecondPage) {
+      if (this.showSecondPage) {
         return '918px'
       } else return '432px'
     },
@@ -169,9 +162,6 @@ export default {
         (el) => el.value !== item.value
       )
       this.emails.push(item)
-    },
-    handleAddMembers() {
-      this.$emit('close')
     },
   },
 }
@@ -334,6 +324,7 @@ export default {
       font-size: 14px;
       font-weight: 500;
       color: $ov-text--title;
+      text-align: center;
     }
     &--checkobox-container {
       padding-top: 43px;

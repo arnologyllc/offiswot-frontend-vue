@@ -277,7 +277,7 @@ export default {
     height: 45px;
     border-radius: 13px;
     background-color: white;
-    box-shadow: 0 0 10px gray;
+    box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
   }
   .el-form-item__error:after,
   .el-form-item__error:before {

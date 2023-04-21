@@ -12,6 +12,7 @@
 import auth from '@/middleware/auth'
 import Header from '@/components/global/default/Header'
 import Footer from '@/components/global/Footer'
+
 export default {
   name: 'DefaultLayout',
   components: {

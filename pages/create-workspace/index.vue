@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <el-form
-      ref="step1"
+      ref="createForm"
       class="main__form"
       hide-required-asterisk
       :rules="rules"
@@ -10,12 +10,48 @@
     >
       <div class="main__title">Create workspace</div>
       <div class="main__subtitle">Please fill the forms to register</div>
+      <div
+        v-if="errors.global.value"
+        class="el-form-item__global-error-container"
+      >
+        <div class="el-form-item__global-error">
+          <img src="@/assets/images/icons/error.svg" alt="" />
+          <span>{{ errors.global.value }}</span>
+        </div>
+        <span class="clear-error" @click="clearError">X</span>
+      </div>
       <el-form-item prop="name">
         <el-input
           v-model="payload.name"
           class="main__form--input"
           placeholder="Workspace name"
-        ></el-input>
+          @blur="validateField('name')"
+        >
+          <div
+            v-if="payload.name"
+            slot="suffix"
+            style="position: relative"
+            @click="focusElement('name')"
+          >
+            <span for="name" class="name_placeholder"> Workspace Name </span>
+          </div>
+          <template v-if="errors.name.value" slot="suffix">
+            <img
+              src="@/assets/images/icons/error.svg"
+              alt=""
+              class="error_icon"
+              @mouseover="showError('name')"
+              @mouseout="hideError('name')"
+              @click="showErrorClick('name')"
+            />
+          </template>
+        </el-input>
+        <template slot="error">
+          <div v-if="errors.name.isShow && isWeb()" class="el-form-item__error">
+            <span v-html="errors.name.value"></span>
+          </div>
+          <div></div>
+        </template>
       </el-form-item>
       <el-form-item prop="industry_id">
         <el-select
@@ -54,6 +90,13 @@
           </el-button>
         </div>
       </el-form-item>
+      <error-massage
+        v-show="errors.name.isShow && !isWeb()"
+        :error-text="errors.name.value"
+        class="dialog"
+        @visible="errors.name.isShow = false"
+      >
+      </error-massage>
     </el-form>
 
     <check-modal
@@ -74,12 +117,14 @@ import {
 } from '@/middleware/helpers'
 
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
+import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 
 export default {
   name: 'CreateWorkSpaceStep1',
 
   components: {
     CheckModal,
+    ErrorMassage,
   },
   mixins: [showError],
 
@@ -94,6 +139,15 @@ export default {
           required: true,
           message: 'Please input workspace name',
           trigger: 'blur',
+        },
+      },
+      errors: {
+        name: {
+          value: '',
+          isShow: false,
+        },
+        global: {
+          value: '',
         },
       },
       isOpenPINDialog: false,
@@ -124,13 +178,13 @@ export default {
     createWorkspaceError: {
       deep: true,
       handler(v) {
-        this.showError(v)
+        this.errors.global.value = v
       },
     },
     industriesError: {
       deep: true,
       handler(v) {
-        this.showError(v)
+        this.errors.global.value = v
       },
     },
   },
@@ -140,12 +194,13 @@ export default {
     if (!checkSettingsToken(this.$cookies)) {
       this.isOpenPINDialog = true
     }
+    window.addEventListener('resize', this.handleResize)
     await this.getIndustries()
   },
   methods: {
     ...mapActions('workspace', ['getIndustries', 'createWorkspace']),
     onSubmit() {
-      this.$refs.step1.validate((valid) => {
+      this.$refs.createForm.validate((valid) => {
         if (valid) {
           this.createWorkspace(this.payload)
         } else {
@@ -154,6 +209,40 @@ export default {
         }
       })
     },
+    focusElement(elem) {
+      this.$refs[elem].focus()
+    },
+
+    validateField(fieldName) {
+      this.$refs.createForm.validateField(fieldName, (errorMessage) => {
+        this.errors[fieldName].value = errorMessage
+      })
+    },
+    showErrorClick(fieldName) {
+      this.errors[fieldName].isShow = true
+    },
+    showError(fieldName) {
+      if (this.isWeb()) {
+        this.errors[fieldName].isShow = true
+      }
+    },
+    hideError(fieldName) {
+      if (this.isWeb()) {
+        this.errors[fieldName].isShow = false
+      }
+    },
+    handleResize() {
+      this.$forceUpdate()
+    },
+
+    isWeb() {
+      if (typeof window !== 'undefined') {
+        return window.innerWidth > 990
+      }
+    },
+    clearError() {
+      this.errors.global.value = ''
+    },
   },
 }
 </script>
@@ -161,8 +250,10 @@ export default {
 <style scoped lang="scss">
 .main {
   width: 100%;
-  min-height: calc(100vh - 366px);
-  padding: 74px 246px;
+  display: flex;
+  position: relative;
+  height: 100%;
+  padding: 100px 0 150px 170px;
 
   &__title {
     font-size: 20px;
@@ -180,12 +271,9 @@ export default {
     min-height: calc(100vh - 514px);
     display: flex;
     flex-direction: column;
-    width: 480px;
-    border-left: 1px solid #d0c9d6;
     padding: 21px 45px;
 
     &--input {
-      width: 100%;
       ::v-deep {
         .el-input__inner {
           height: 48px;
@@ -234,7 +322,6 @@ export default {
         width: 220px;
         height: 48px;
         padding: 0;
-        padding-right: 8px;
         border-radius: 6px;
         ::v-deep span {
           display: flex;
@@ -256,6 +343,37 @@ export default {
       margin-bottom: 0;
     }
   }
+
+  .el-form-item__global-error-container {
+    width: 100%;
+    border-color: #e60022;
+    background: #fbe4e8;
+    box-shadow: 0px 7px 64px rgb(0 0 0 / 7%);
+    border-radius: 6px;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 20px;
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 12px;
+    align-items: center;
+    color: #e60022;
+    gap: 16px;
+    margin-bottom: 27px;
+  }
+  .el-form-item__global-error {
+    font-family: 'Montserrat';
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .clear-error {
+    cursor: pointer;
+  }
   ::v-deep {
     .el-form-item.is-error {
       .el-input__inner {
@@ -265,6 +383,167 @@ export default {
     .el-form-item__error {
       z-index: 1000;
     }
+  }
+}
+
+.name_placeholder {
+  position: relative;
+  top: 0;
+  width: 50px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #717a7f;
+  animation: showNamePlaceholder 0.3s;
+  animation-fill-mode: forwards;
+}
+
+@media (min-width: 490px) {
+  ::v-deep .main {
+    justify-content: flex-start;
+    margin: 100px 0 150px 170px;
+    &__form {
+      padding-left: 65px;
+      border-left: 1px solid #d0c9d6;
+      width: 480px;
+      &--input {
+        width: 390px;
+      }
+      &--footer {
+        margin-top: 250px;
+      }
+    }
+  }
+  @keyframes showNamePlaceholder {
+    to {
+      top: -34px;
+      left: -270px;
+    }
+  }
+  .name_placeholder {
+    left: -255px;
+  }
+}
+
+@media (max-width: 490px) {
+  @keyframes showNamePlaceholder {
+    to {
+      top: -34px;
+      left: -180px;
+    }
+  }
+  .name_placeholder {
+    left: -165px;
+  }
+  .main {
+    margin: 100px auto 150px;
+    padding: 0;
+    width: 300px;
+    justify-content: center;
+    &__form {
+      border: none;
+      padding: 0 auto;
+      &--input {
+        width: 300px;
+      }
+      &--actions {
+        display: flex;
+        flex-direction: column-reverse;
+      }
+
+      &--footer {
+        margin-top: 80px;
+      }
+    }
+  }
+}
+
+::v-deep {
+  .el-form-item.is-error {
+    .el-input__inner {
+      border-color: #e60022 !important;
+    }
+  }
+  .el-form-item__error {
+    position: absolute;
+    font-family: 'Montserrat';
+    font-size: 12px;
+    line-height: 20px;
+    font-weight: 400;
+    top: 0;
+    left: 105%;
+    padding: 14px;
+    color: #e60022;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: max-content;
+    max-width: 212px;
+    height: max-content;
+    min-height: 48px;
+    border-radius: 13px;
+    background-color: white;
+    box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
+  }
+  .error_info {
+    color: #717a7f;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .error_info > li {
+    margin-left: 15px;
+  }
+
+  .error_info > li::marker {
+    font-size: 0.5em;
+  }
+  .el-form-item__error:after,
+  .el-form-item__error:before {
+    position: absolute;
+    content: '';
+    width: 0;
+    height: 0;
+    top: 25px;
+  }
+  .el-form-item__error:before {
+    left: -8px;
+    margin-top: -8px;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid #fff;
+  }
+  .el-form-item__error:after {
+    left: -7px;
+    margin-top: -7px;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-right: 7px solid #fff;
+  }
+  .error_icon {
+    position: absolute;
+    top: 12px;
+    right: 7px;
+  }
+
+  .weak {
+    color: #e60022;
+  }
+  .el-input__suffix {
+    display: flex !important;
+  }
+  .el-input__suffix-inner {
+    display: flex !important;
+  }
+  .el-form-item {
+    margin-bottom: 27px;
+  }
+}
+
+@media (max-width: 990px) {
+  .main {
+    margin: 100px auto 150px;
+    padding: 0;
+    justify-content: center;
   }
 }
 </style>

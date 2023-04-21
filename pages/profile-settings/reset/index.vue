@@ -295,10 +295,13 @@ export default {
   layout: 'default',
   data() {
     const validatePass = (rule, value, callback) => {
+      if (value.length === 0) {
+        callback(new Error('This field is required'))
+      }
       const strength = this.updatePasswordStrength(value)
       if (strength === 'Weak') {
-        this.errors.password.status = 'Weak'
         callback(new Error('Password strength: <b>Weak</b>'))
+        this.errors.password.status = 'Weak'
       } else if (strength === 'Medium') {
         callback()
         this.errors.password.status = 'Medium'
@@ -358,14 +361,7 @@ export default {
             trigger: 'blur',
           },
         ],
-        password: [
-          {
-            required: true,
-            message: 'This field is required.',
-            trigger: 'blur',
-          },
-          { validator: validatePass, trigger: 'input' },
-        ],
+        password: [{ validator: validatePass, trigger: 'input' }],
         password_confirmation: [
           {
             required: true,
@@ -481,13 +477,27 @@ export default {
     },
 
     updatePasswordStrength(password) {
-      const mediumRegex = /^(?=.*?[a-z])(?=.*?[0-9]).{8,}$/
+      const mediumRegex =
+        /^(?=.*[a-zA-Z])(?=.*[\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])[a-zA-Z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{8,}$/
       const strongRegex =
-        /^(?=.*?[a-z])((?=.*?[A-Z]))(?=.*?[0-9])(?=.*?[#?!@$%^&*-.]).{12,}$/
-      if (strongRegex.test(password)) {
-        return 'Strong'
-      } else if (mediumRegex.test(password)) {
-        return 'Medium'
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])[a-zA-Z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{12,}$/
+      const identicalRegex = /^(?:(.)(?!\1{3}))*$/
+      const words = ['password', 'admin', 'qwerty', 'asdfgh', 'xzcvb']
+
+      if (
+        identicalRegex.test(password) &&
+        (password.length > 15 ||
+          !words.some((elem) => password.toLowerCase().includes(elem)))
+      ) {
+        if (
+          strongRegex.test(password) &&
+          (password.length > 25 ||
+            !words.some((elem) => password.toLowerCase().includes(elem)))
+        ) {
+          return 'Strong'
+        } else if (mediumRegex.test(password)) {
+          return 'Medium'
+        }
       }
       return 'Weak'
     },
@@ -829,7 +839,6 @@ export default {
   width: 220px;
   height: 48px;
   padding: 0;
-  padding-right: 8px;
   border-radius: 6px;
   margin-top: 157px;
   ::v-deep span {

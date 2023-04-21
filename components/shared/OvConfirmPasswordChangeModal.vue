@@ -12,17 +12,27 @@
       </div>
       <div class="title__text">Check your email</div>
     </div>
-    <span class="title"
-      >In order to reset your password check your email and follow the
-      instructions.</span
-    >
+    <span class="title">
+      <span>
+        In order to reset your password check your email and follow the
+        instructions.
+      </span>
+    </span>
+    <span v-if="error" class="error">
+      {{ error }}
+    </span>
     <span slot="footer" class="dialog-footer">
+      <span v-if="timer && !error"
+        >0:{{ timer > 9 ? timer : `0${timer}` }}</span
+      >
       <a
+        v-if="!error && !timer"
         href=""
         class="dialog-footer__action"
         @click.prevent="forgotPassword({ email: email })"
-        >Resend Verification Email</a
+        >Resend Email</a
       >
+      <span v-if="error" class="later"> Please try again later. </span>
     </span>
   </el-dialog>
 </template>
@@ -42,10 +52,12 @@ export default {
     return {
       dialogVisible: false,
       dialogWidth: '560px',
+      timer: 59,
+      error: null,
     }
   },
   computed: {
-    ...mapGetters('auth', ['resendSuccessData', 'resendFailureData']),
+    ...mapGetters('auth', ['forgotSuccessData', 'forgotErrorData']),
   },
   watch: {
     model() {
@@ -56,15 +68,20 @@ export default {
         this.$emit('close')
       }
     },
-    resendSuccessData(v) {
+    forgotSuccessData(v) {
       this.$message.success(v)
+      this.timer = 59
+      const ID = setInterval(() => {
+        if (this.timer) this.timer--
+      }, 1000)
+      setTimeout(() => {
+        clearTimeout(ID)
+      }, 60000)
     },
-    resendFailureData(v) {
-      this.$notify.error({
-        title: 'Error',
-        dangerouslyUseHTMLString: true,
-        message: v,
-      })
+    forgotErrorData(v) {
+      if (!v) {
+        this.error = `You have exceeded the maximum number of reset password requests.`
+      }
     },
   },
   mounted() {
@@ -87,7 +104,7 @@ export default {
 ::v-deep {
   .el-dialog {
     border-radius: 20px;
-
+    font-weight: 500;
     &__close {
       color: black !important;
     }
@@ -96,7 +113,7 @@ export default {
       justify-content: center;
     }
     &__body {
-      padding: 15px 35px 30px 35px;
+      padding: 15px 35px 15px 35px;
       color: $ov-text--title;
     }
     &__header {
@@ -115,6 +132,7 @@ export default {
 }
 .title {
   text-align: center;
+  justify-content: center;
   display: flex;
   word-break: break-word;
 
@@ -128,5 +146,17 @@ export default {
     font-size: 18px;
     color: $ov-text--title;
   }
+}
+
+.error {
+  font-size: 13px;
+  color: #e60022;
+  margin-top: 15px;
+  word-wrap: break-word;
+  display: block;
+  text-align: center;
+}
+.later {
+  font-size: 13px;
 }
 </style>

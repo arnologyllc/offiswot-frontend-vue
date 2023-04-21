@@ -264,11 +264,27 @@ export default {
   },
   layout: 'default',
   data() {
-    const validatePIN = (rule, value, callback) => {
+    const validateRepeatPIN = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('Please input the PIN again'))
       } else if (value !== this.payload.pin) {
-        callback(new Error('PIN and confirm PIN do not match'))
+        callback(new Error('PIN and repeat PIN do not match.'))
+      } else {
+        callback()
+      }
+    }
+    const validatePIN = (rule, value, callback) => {
+      const regex = /^\d{4,6}$/
+      if (!regex.test(value)) {
+        callback(
+          new Error(
+            `<span>PIN is improperly formatted.<br></span>
+            <ul class="error_info">
+              <li>4-6 characters long.</li>
+              <li>Should include only numbers.</li>
+            </ul>`
+          )
+        )
       } else {
         callback()
       }
@@ -320,9 +336,7 @@ export default {
             trigger: 'blur',
           },
           {
-            min: 4,
-            max: 6,
-            message: 'PIN must be between 4 and 6 digits',
+            validator: validatePIN,
             trigger: 'blur',
           },
         ],
@@ -332,7 +346,7 @@ export default {
             message: 'This field is required.',
             trigger: 'blur',
           },
-          { validator: validatePIN, trigger: 'blur' },
+          { validator: validateRepeatPIN, trigger: 'blur' },
         ],
       },
       isOpenEmailDialog: false,
@@ -349,7 +363,7 @@ export default {
       'isLoadingSubmit',
       'resetPinData',
       'resetPinFailureData',
-      'forgotFailureData',
+      'forgotPinFailureData',
     ]),
   },
   watch: {
@@ -452,7 +466,6 @@ export default {
   position: relative;
   height: 100%;
   padding: 100px 0 150px 170px;
-  width: 100%;
 
   &__form {
     width: 390px;
@@ -756,7 +769,6 @@ export default {
   width: 220px;
   height: 48px;
   padding: 0;
-  padding-right: 8px;
   border-radius: 6px;
   margin-top: 157px;
   ::v-deep span {
