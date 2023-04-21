@@ -68,13 +68,15 @@ export default {
     },
     resendSuccessData(v) {
       this.$message.success(v)
-      this.timer = 59
-      const ID = setInterval(() => {
-        if (this.timer) this.timer--
-      }, 1000)
-      setTimeout(() => {
-        clearTimeout(ID)
-      }, 60000)
+      if (this.timer === 0) {
+        this.timer = 59
+        const ID = setInterval(() => {
+          if (this.timer) this.timer--
+        }, 1000)
+        setTimeout(() => {
+          clearInterval(ID)
+        }, 60000)
+      }
     },
     resendFailureData(v) {
       if (!v) {
@@ -91,11 +93,12 @@ export default {
         this.dialogWidth = '315px'
       } else this.dialogWidth = '560px'
     })
+    this.timer = 59
     const ID = setInterval(() => {
       if (this.timer) this.timer--
     }, 1000)
     setTimeout(() => {
-      clearTimeout(ID)
+      clearInterval(ID)
     }, 60000)
   },
   methods: {
