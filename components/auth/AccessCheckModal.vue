@@ -181,7 +181,10 @@ export default {
           this.errors.global.value = v[i]
         }
       }
-      if (this.$router.history.current.path !== '/') this.$router.go(-1)
+      if (this.$router.history.current.path !== '/')
+        setTimeout(() => {
+          this.$router.go(-1)
+        }, 2000)
     },
     forgotPinFailureData(v) {
       for (const i in v) {
