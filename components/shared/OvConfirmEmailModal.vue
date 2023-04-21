@@ -20,7 +20,9 @@
       {{ error }}
     </span>
     <span slot="footer" class="dialog-footer">
-      <span v-if="timer && !error">0:{{ timer }}</span>
+      <span v-if="timer && !error"
+        >0:{{ timer > 9 ? timer : `0${timer}` }}</span
+      >
       <a
         v-if="!error && !timer"
         href=""
@@ -48,7 +50,7 @@ export default {
     return {
       dialogVisible: false,
       dialogWidth: '560px',
-      timer: 0,
+      timer: 59,
       error: null,
     }
   },

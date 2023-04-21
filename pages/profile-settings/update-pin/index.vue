@@ -769,7 +769,6 @@ export default {
   width: 220px;
   height: 48px;
   padding: 0;
-  padding-right: 8px;
   border-radius: 6px;
   margin-top: 157px;
   ::v-deep span {

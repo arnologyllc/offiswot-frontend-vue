@@ -100,7 +100,6 @@ export default {
   width: 220px;
   height: 48px;
   padding: 0;
-  padding-right: 8px;
   border-radius: 6px;
   ::v-deep span {
     display: flex;
@@ -119,10 +118,17 @@ export default {
     justify-content: center;
   }
 }
-.arrow_position {
-  position: absolute;
-  right: 90px;
-}
 @media (max-width: 375px) {
+  .arrow_position {
+    position: absolute;
+    right: 35px;
+  }
+}
+
+@media (min-width: 375px) {
+  .arrow_position {
+    position: absolute;
+    right: 90px;
+  }
 }
 </style>
