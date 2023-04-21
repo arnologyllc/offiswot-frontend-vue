@@ -91,6 +91,12 @@ export default {
         this.dialogWidth = '315px'
       } else this.dialogWidth = '560px'
     })
+    const ID = setInterval(() => {
+      if (this.timer) this.timer--
+    }, 1000)
+    setTimeout(() => {
+      clearTimeout(ID)
+    }, 60000)
   },
   methods: {
     ...mapActions('auth', ['resendEmail']),
