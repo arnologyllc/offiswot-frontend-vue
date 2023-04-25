@@ -10,17 +10,42 @@
       {{ showSecondPage ? 'Workspace Rules' : 'Invite member' }}
     </div>
     <div v-if="!showSecondPage" class="dialog__body">
-      <el-form ref="inviteForm" :rules="rules">
+      <el-form ref="inviteForm">
         <div class="dialog__input--label">Enter email</div>
         <el-autocomplete
+          ref="email"
           v-model="userEmail"
           popper-class="custom-style-popup"
           class="dialog__input"
+          :class="error.value ? 'is-error' : ''"
           :fetch-suggestions="querySearch"
           placeholder="Enter email"
           prefix-icon="el-icon-search"
           @select="handleSelect"
-        ></el-autocomplete>
+          @input="validateEmail"
+        >
+          <template v-if="!error.value" #default="{ item }">
+            <span v-html="showingEmail(item.value, userEmail.length)"></span>
+            <span v-if="item.link" class="list_item_isMember">Member</span>
+          </template>
+
+          <template v-if="error.value" slot="suffix">
+            <img
+              src="@/assets/images/icons/error.svg"
+              alt=""
+              class="error_icon"
+              @mouseover="showError()"
+              @mouseout="hideError()"
+            />
+          </template>
+
+          <template slot="suffix">
+            <div v-if="error.isShow" class="el-form-item__error">
+              <span v-html="error.value"></span>
+            </div>
+            <div></div>
+          </template>
+        </el-autocomplete>
         <div class="dialog__chips-box">
           <div
             v-for="(item, index) in selectedEmails"
@@ -76,8 +101,15 @@ export default {
   data() {
     return {
       dialogVisible: false,
+      error: {
+        value: null,
+        isShow: null,
+      },
       emails: [
-        { value: 'aaa@email.ru', link: 'https://github.com/vuejs/vue' },
+        {
+          value: 'aaaaaaaaaaaaaaaaaaaaaa@email.ru',
+          link: 'https://github.com/vuejs/vue',
+        },
         { value: 'bbb@gmail.com', link: 'https://github.com/ElemeFE/element' },
         { value: 'cc@gmail.com', link: 'https://github.com/ElemeFE/cooking' },
         { value: 'ffff@mail.ru', link: 'https://github.com/ElemeFE/mint-ui' },
@@ -145,9 +177,10 @@ export default {
     },
     querySearch(queryString, cb) {
       const emails = this.emails
-      const results = queryString
-        ? emails.filter(this.createFilter(queryString))
-        : emails
+      const results =
+        queryString && !this.error.value
+          ? emails.filter(this.createFilter(queryString))
+          : []
       cb(results)
     },
     createFilter(queryString) {
@@ -162,6 +195,32 @@ export default {
         (el) => el.value !== item.value
       )
       this.emails.push(item)
+    },
+
+    validateEmail(value) {
+      const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/
+      if (value.includes('@') && !emailRegex.test(value)) {
+        this.error.value = 'Email is not valid.'
+      } else {
+        this.error.value = ''
+      }
+    },
+
+    showError() {
+      this.error.isShow = true
+    },
+    hideError() {
+      this.error.isShow = false
+    },
+
+    clearError() {
+      this.errors.global.value = ''
+    },
+
+    showingEmail(email, size) {
+      const part1 = email.slice(0, size)
+      const part2 = email.slice(size)
+      return `<span class="list_item_value">${part1}<span style="opacity: 0.3">${part2}</span></span>`
     },
   },
 }
@@ -273,7 +332,7 @@ export default {
     border-radius: 4px;
   }
   &__chip {
-    width: 116px;
+    width: 100%;
     height: 24px;
     border-radius: 4px;
     background-color: #e5e7fa;
@@ -349,6 +408,87 @@ export default {
       display: flex;
       justify-content: center;
     }
+  }
+}
+
+.list_item_isMember {
+  background: #e5e7fa;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 10px;
+  line-height: 22px;
+  text-align: center;
+  text-transform: uppercase;
+  color: #4156f6;
+  width: 75px;
+}
+
+.list_item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.clear-error {
+  cursor: pointer;
+}
+::v-deep {
+  .is-error {
+    .el-input__inner {
+      border-color: red !important;
+    }
+  }
+
+  .error_icon {
+    position: absolute;
+    top: 8px;
+    right: 0;
+  }
+  .el-form-item__error {
+    z-index: 1000;
+  }
+  .el-form-item__error {
+    position: absolute;
+    font-family: 'Montserrat';
+    font-size: 12px;
+    line-height: 20px;
+    font-weight: 400;
+    top: -4px;
+    left: 24px;
+    padding: 14px;
+    color: #e60022;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: max-content;
+    max-width: 212px;
+    height: max-content;
+    min-height: 48px;
+    border-radius: 13px;
+    background-color: white;
+    box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
+  }
+  .el-form-item__error:after,
+  .el-form-item__error:before {
+    position: absolute;
+    content: '';
+    width: 0;
+    height: 0;
+    top: 25px;
+  }
+  .el-form-item__error:before {
+    left: -8px;
+    margin-top: -8px;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid #fff;
+  }
+  .el-form-item__error:after {
+    left: -7px;
+    margin-top: -7px;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-right: 7px solid #fff;
   }
 }
 </style>

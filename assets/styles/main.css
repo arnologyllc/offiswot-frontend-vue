@@ -9,18 +9,18 @@
 
 /* width */
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  width: 6px;
+  height: 6px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-    background: #F5F7FB;
+  background: #f5f7fb;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #D0C9D6;
+  background: #d0c9d6;
   border-radius: 8px;
 }
 
@@ -36,13 +36,30 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type=number] {
+input[type='number'] {
   -moz-appearance: textfield;
 }
 
 .custom-style-popup {
   margin-top: 7px !important;
   border: 1px solid #cdc7d2;
+  border-top: 1px dashed #cdc7d2;
+  border-radius: 0;
+  top: 440px !important;
+}
+
+.custom-style-popup li {
+  padding: 0 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.custom-style-popup li > span:first-child {
+  width: 195px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .popper__arrow {

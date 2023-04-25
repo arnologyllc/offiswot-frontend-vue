@@ -323,11 +323,14 @@ export default {
         height: 48px;
         padding: 0;
         border-radius: 6px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
         ::v-deep span {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          width: 100%;
         }
         &__text {
           width: 100%;
@@ -335,6 +338,10 @@ export default {
           font-size: 17px;
           font-weight: 700;
           justify-content: center !important;
+        }
+        img {
+          position: absolute;
+          right: 0px;
         }
       }
     }
@@ -470,7 +477,7 @@ export default {
     line-height: 20px;
     font-weight: 400;
     top: 0;
-    left: 105%;
+    left: 110%;
     padding: 14px;
     color: #e60022;
     display: flex;
@@ -545,5 +552,16 @@ export default {
     padding: 0;
     justify-content: center;
   }
+}
+
+.dialog {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.66);
 }
 </style>

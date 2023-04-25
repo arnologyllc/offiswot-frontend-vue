@@ -102,6 +102,8 @@ export default {
   padding: 0;
   border-radius: 6px;
   ::v-deep span {
+    margin: 0;
+    width: 220px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -121,14 +123,14 @@ export default {
 @media (max-width: 375px) {
   .arrow_position {
     position: absolute;
-    right: 35px;
+    right: 32px;
   }
 }
 
 @media (min-width: 375px) {
   .arrow_position {
     position: absolute;
-    right: 90px;
+    right: 84px;
   }
 }
 </style>
