@@ -1,0 +1,1 @@
+import{av as o,e as i,B as e,x as n}from"./entry.dabfc507.js";const f=o((s,a)=>{const t=i();if(e.get("token")){if(t.path==="/register"||t.fullPath==="/login")return n("/")}else e.get("settings_pin_token")&&e.remove("settings_pin_token")});export{f as default};
