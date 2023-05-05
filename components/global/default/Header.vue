@@ -1,21 +1,20 @@
 <template>
   <nav class="main">
-    <div v-if="profileSuccessData" class="main__inner">
+    <div class="main__inner">
       <div class="main__left">
         <el-select
           v-if="$route.path.includes('/workspace')"
           v-model="selectedWorkspaceId"
           class="main__workspaces"
           placeholder="Workspace"
-          :disabled="!$route.path.includes('/workspace')"
         >
           <el-option
-            v-for="(item, index) in workSpaces.myWorkspaces"
+            v-for="(item, index) in workSpaces?.myWorkspaces"
             :key="`workspace_${index}`"
             :value="item.id"
             :label="item.name"
           ></el-option>
-          <template slot="prefix">
+          <template #prefix>
             <img :src="avatarUrl" alt="" class="main__workspaces--prefix" />
           </template>
         </el-select>
@@ -40,45 +39,35 @@
             <el-button
               :disabled="!selectedWorkspaceId"
               :class="{ active: $route.path.includes('/staff') }"
-              @click="$router.push(`/workspace/staff/${selectedWorkspaceId}`)"
+              @click="navigateTo(`/workspace/staff/${selectedWorkspaceId}`)"
               >Staff</el-button
             >
             <el-button
               :disabled="!selectedWorkspaceId"
               :class="{ active: $route.path.includes('/projects') }"
-              @click="
-                $router.push(`/workspace/projects/${selectedWorkspaceId}`)
-              "
+              @click="navigateTo(`/workspace/projects/${selectedWorkspaceId}`)"
               >Projects</el-button
             >
             <el-button
               :disabled="!selectedWorkspaceId"
               :class="{ active: $route.path.includes('/tasks') }"
-              @click="$router.push(`/workspace/tasks/${selectedWorkspaceId}`)"
+              @click="navigateTo(`/workspace/tasks/${selectedWorkspaceId}`)"
               >Tasks</el-button
             >
           </el-button-group>
         </div>
       </div>
       <div class="main__right">
-        <!-- <el-input
-          v-model="search"
-          class="main__search-input"
-          placeholder="Search"
-          suffix-icon="el-icon-search"
-        ></el-input> -->
-        <el-button
-          type="text"
-          icon="el-icon-bell"
-          class="main__actions"
-        ></el-button>
+        <el-button class="main__actions">
+          <el-icon><Bell /></el-icon>
+        </el-button>
         <el-button
           v-if="!$route.path.includes('/pin')"
-          type="text"
-          icon="el-icon-setting"
           class="main__actions"
-          @click="$router.push('/')"
-        ></el-button>
+          @click="navigateTo('/')"
+        >
+          <el-icon><Setting /></el-icon>
+        </el-button>
         <el-dropdown class="main__user-actions">
           <div class="main__user-actions--activator">
             <img
@@ -88,84 +77,85 @@
             />
             <i class="el-icon-caret-bottom"></i>
           </div>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item @click.native="onLogout">Logout</el-dropdown-item>
-          </el-dropdown-menu>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="onLogout">Logout</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
         </el-dropdown>
       </div>
     </div>
   </nav>
 </template>
 
-<script>
-import { mapGetters, mapActions } from 'vuex'
+<script setup>
+import { computed, getCurrentInstance, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
+import $cookies from 'js-cookie'
+import useProfileStore from '@/stores/profile'
+import { storeToRefs } from 'pinia'
+import { Bell, Setting } from '@element-plus/icons-vue'
 
-export default {
-  name: 'HeaderDefaultLayoutComponent',
-  data() {
-    return {
-      workSpaces: null,
-      selectedWorkspaceId: null,
-      search: null,
-    }
-  },
-  computed: {
-    ...mapGetters('profile', ['profileSuccessData', 'editProfileData']),
-    buttonText() {
-      return this.$route.path === '/login' ? 'Sign up' : 'Sign in'
-    },
-    avatarUrl() {
-      if (this.editProfileData) {
-        return `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.editProfileData.user.avatar}`
-      } else if (this.profileSuccessData) {
-        if (this.profileSuccessData.user.avatar) {
-          return `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.profileSuccessData.user.avatar}`
-        }
-      }
-      return defaultAvatar
-    },
-  },
-  watch: {
-    $route: {
-      immediate: true,
-      handler(v) {
-        if (v.path.includes('/workspace')) {
-          this.selectedWorkspaceId = +v.params.id
-        }
-      },
-    },
-    selectedWorkspaceId(v) {
-      if (v) {
-        this.$router.push({ params: { id: v } })
-      }
-    },
-  },
-  async mounted() {
-    if (this.$cookies.get('login_pin_token')) {
-      this.getProfile()
-      this.workSpaces = await this.getWorkSpaces()
-    }
-    this.$root.$once('loginToken', async () => {
-      this.getProfile()
-      this.workSpaces = await this.getWorkSpaces()
-    })
-  },
-  methods: {
-    ...mapActions('profile', ['getProfile', 'getWorkSpaces']),
-    onRightButtonClick() {
-      this.$route.path === '/login'
-        ? this.$router.push('/register')
-        : this.$router.push('/login')
-    },
-    async onLogout() {
-      await this.$api.post('logout')
-      this.$cookies.remove('token')
-      this.$cookies.remove('first_login')
-      this.$cookies.remove('settings_pin_token')
-      this.$router.push('/login')
-    },
-  },
+const profileStore = useProfileStore()
+const { profileSuccessData, editProfileData } = storeToRefs(profileStore)
+const { $myFetch } = useNuxtApp()
+const config = useRuntimeConfig()
+
+const workSpaces = ref(null)
+const profile = ref(null)
+const selectedWorkspaceId = ref(null)
+const search = ref(null)
+const $route = useRoute()
+const instance = getCurrentInstance()
+
+const buttonText = computed(() =>
+  $route.path === '/login' ? 'Sign up' : 'Sign in'
+)
+const avatarUrl = ref(defaultAvatar)
+
+watch(profileSuccessData, (v) => {
+  if (v.user.avatar) {
+    avatarUrl.value = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
+  }
+})
+
+watch(editProfileData, (v) => {
+  if (v.user.avatar) {
+    avatarUrl.value = `${v.avatarPath}/${v.user.avatar}`
+  }
+})
+
+watch(() => {
+  if ($route.path.includes('/workspace')) {
+    selectedWorkspaceId.value = +$route.params.id
+  }
+  //   selectedWorkspaceId(v) {
+  //     if (v) {
+  //       this.$router.push({ params: { id: v } })
+  //     }
+  //   },
+})
+
+onMounted(async () => {
+  if ($cookies.get('login_pin_token')) {
+    profile.value = profileStore.getProfile()
+    workSpaces.value = await profileStore.getWorkSpaces()
+  }
+  // instance.root.once('loginToken', async () => {
+  //   profile.value = profileStore.getProfile()
+  //   workSpaces.value = await this.getWorkSpaces()
+  // })
+})
+
+const onLogout = async () => {
+  await $myFetch('logout', {
+    method: 'post',
+  })
+  $cookies.remove('token')
+  $cookies.remove('first_login')
+  $cookies.remove('settings_pin_token')
+  navigateTo('/login')
 }
 </script>
 
@@ -219,30 +209,26 @@ export default {
 
   &__workspaces {
     width: 234px;
-    ::v-deep {
-      .el-input {
-        &__inner {
-          font-weight: 600;
-          font-size: 20px;
-          color: black;
-          border: none;
-          border-radius: 0;
-          border-bottom: 1px solid rgba(140, 140, 140, 0.5);
-          padding-left: 47px;
+    .el-input__inner {
+      font-weight: 600;
+      font-size: 20px;
+      color: black;
+      border: none;
+      border-radius: 0;
+      border-bottom: 1px solid rgba(140, 140, 140, 0.5);
+      padding-left: 47px;
+    }
+    .el-input__suffix {
+      padding-right: 0px;
+      transform: rotate(-90deg);
+      cursor: pointer;
+      i {
+        color: black;
+        &::before {
+          content: '\e78f';
         }
-        &__suffix {
-          padding-right: 0px;
-          transform: rotate(-90deg);
-          cursor: pointer;
-          i {
-            color: black;
-            &::before {
-              content: '\e78f';
-            }
-            &.is-reverse {
-              transform: rotate(270deg) !important;
-            }
-          }
+        &.is-reverse {
+          transform: rotate(270deg) !important;
         }
       }
     }
@@ -256,26 +242,24 @@ export default {
   }
 
   &__button-group {
-    ::v-deep {
-      .el-button-group {
+    .el-button-group {
+      border-radius: 6px;
+
+      .el-button {
+        border: none;
+        width: 112px;
         border-radius: 6px;
+        text-transform: uppercase;
+        color: black;
+        font-weight: 500;
+        &:not(.el-button:last-child) {
+          margin-right: 12px;
+        }
 
-        .el-button {
-          border: none;
-          width: 112px;
-          border-radius: 6px;
-          text-transform: uppercase;
-          color: black;
-          font-weight: 500;
-          &:not(.el-button:last-child) {
-            margin-right: 12px;
-          }
-
-          &.active {
-            background: linear-gradient(225deg, #4156f6 0%, #0cb1b9 100%);
-            color: white;
-            font-weight: 600;
-          }
+        &.active {
+          background: linear-gradient(225deg, #4156f6 0%, #0cb1b9 100%);
+          color: white;
+          font-weight: 600;
         }
       }
     }
@@ -283,44 +267,36 @@ export default {
 
   &__search-input {
     margin-right: 16px;
-    ::v-deep {
-      .el-input {
-        &__inner {
-          border: 1px solid #c8c8c8;
-          border-radius: 8px;
-          height: 36px;
-          width: 227px;
-          &::placeholder {
-            color: rgba(0, 0, 0, 0.4);
-          }
-        }
-        &__icon {
-          line-height: 0;
-          color: black;
-          &::before {
-            font-weight: 600;
-            font-size: 16px;
-          }
-        }
+    .el-input__inner {
+      border: 1px solid #c8c8c8;
+      border-radius: 8px;
+      height: 36px;
+      width: 227px;
+      &::placeholder {
+        color: rgba(0, 0, 0, 0.4);
+      }
+    }
+    .el-input__icon {
+      line-height: 0;
+      color: black;
+      &::before {
+        font-weight: 600;
+        font-size: 16px;
       }
     }
   }
 
   &__actions {
-    ::v-deep {
-      i {
-        color: black;
-        &::before {
-          font-size: 24px;
-          font-weight: 500;
-        }
+    i {
+      color: black;
+      &::before {
+        font-size: 24px;
+        font-weight: 500;
       }
     }
     &:hover {
-      ::v-deep {
-        i {
-          color: $ov-primary;
-        }
+      i {
+        color: $ov-primary;
       }
     }
   }

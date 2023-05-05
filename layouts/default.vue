@@ -2,25 +2,20 @@
   <div class="default-layout">
     <Header />
     <div class="default-layout__pages">
-      <Nuxt />
+      <slot />
     </div>
     <Footer v-if="!$route.path.includes('workspace')" />
   </div>
 </template>
 
-<script>
-import auth from '@/middleware/auth'
+<script setup>
 import Header from '@/components/global/default/Header'
 import Footer from '@/components/global/Footer'
-
-export default {
-  name: 'DefaultLayout',
-  components: {
-    Footer,
-    Header,
-  },
-  middleware: [auth],
-}
+import auth from '~/middleware/auth'
+import firstLogin from '~/middleware/firstLogin'
+import cookies from 'js-cookie'
+if (!cookies.get('token')) auth()
+firstLogin()
 </script>
 
 <style scoped lang="scss">

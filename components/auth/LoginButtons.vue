@@ -1,62 +1,71 @@
 <template>
-  <div>
+  <div class="submit-buttons-container">
     <el-form-item class="submit-form-item">
       <div class="submit-button__outer">
         <el-button
           class="submit-button"
           native-type="submit"
-          :loading="loginLoading"
+          :loading="props.loginLoading"
         >
-          <span class="submit-button__text">{{
-            !loginLoading ? loginTitle : ''
-          }}</span>
+          <span class="submit-button__text">
+            {{ !props.loginLoading ? props.loginTitle : '' }}
+          </span>
           <img
             src="@/assets/images/icons/chevron-icon.svg"
             alt="arrow"
-            :class="!loginLoading ? 'arrow_position' : ''"
+            class="arrow_position"
           />
         </el-button>
       </div>
     </el-form-item>
-    <el-form-item v-if="showSocial">
+    <el-form-item v-if="props.showSocial">
       <div class="or-text">or</div>
     </el-form-item>
-    <el-form-item v-if="showSocial" class="submit-form-item">
+    <el-form-item
+      v-if="props.showSocial"
+      class="submit-form-item"
+      style="width: 100%"
+    >
       <el-button class="google-sign-button">
         <div class="google-sign-button__inner">
           <img src="@/assets/images/icons/google-icon.svg" alt="G" />
-          <span class="google-sign-button__inner--text">{{ socialTitle }}</span>
+          <span class="google-sign-button__inner--text">{{
+            props.socialTitle
+          }}</span>
         </div>
       </el-button>
     </el-form-item>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'LoginSubmitButtons',
-  props: {
-    loginTitle: {
-      type: String,
-      default: '',
-    },
-    socialTitle: {
-      type: String,
-      default: '',
-    },
-    showSocial: {
-      type: Boolean,
-      default: true,
-    },
-    loginLoading: {
-      type: Boolean,
-      default: false,
-    },
+<script setup>
+const props = defineProps({
+  loginTitle: {
+    type: String,
+    default: '',
   },
-}
+  socialTitle: {
+    type: String,
+    default: '',
+  },
+  showSocial: {
+    type: Boolean,
+    default: true,
+  },
+  loginLoading: {
+    type: Boolean,
+    default: false,
+  },
+})
 </script>
 
 <style scoped lang="scss">
+.submit-buttons-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 .or-text {
   color: $ov-text--subtitle;
   display: flex;
@@ -87,12 +96,15 @@ export default {
     font-weight: 500;
   }
 }
-::v-deep .el-icon-loading {
+.el-icon {
+  position: absolute;
+}
+
+.el-icon-loading {
   position: absolute;
   top: 16px;
   left: 100px;
 }
-
 .submit-button {
   background: linear-gradient(90.32deg, #0cb1b9 0.28%, #4156f6 99.75%);
   color: white;
@@ -101,7 +113,9 @@ export default {
   height: 48px;
   padding: 0;
   border-radius: 6px;
-  ::v-deep span {
+  span {
+    margin: 0;
+    width: 220px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -121,14 +135,14 @@ export default {
 @media (max-width: 375px) {
   .arrow_position {
     position: absolute;
-    right: 35px;
+    right: 0;
   }
 }
 
 @media (min-width: 375px) {
   .arrow_position {
     position: absolute;
-    right: 90px;
+    right: 0;
   }
 }
 </style>

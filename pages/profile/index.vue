@@ -7,13 +7,7 @@
           :style="!(userFullName && specialty) ? 'align-items:center;' : ''"
           class="user-box__info"
         >
-          <img
-            class="user-box__avatar"
-            width="119px"
-            height="119px"
-            :src="avatarUrl"
-            alt="user_avatar"
-          />
+          <img class="user-box__avatar" :src="avatarUrl" alt="user_avatar" />
           <div class="user-box__user-info">
             <div class="user-box__user-fullname user-box__title">
               <span v-if="userFullName" class="user-box__user-fullname-span">
@@ -47,7 +41,7 @@
                   alt="email_icon"
                 />
                 <div>
-                  {{ profileSuccessData ? profileSuccessData.user.email : '' }}
+                  {{ userEmail }}
                 </div>
               </div>
               <div class="user-box__flex-box">
@@ -58,11 +52,7 @@
                   alt="phone_icon"
                 />
                 <div>
-                  {{
-                    profileSuccessData
-                      ? profileSuccessData.user.phone_number
-                      : ''
-                  }}
+                  {{ userTelNumber }}
                 </div>
               </div>
             </div>
@@ -76,25 +66,22 @@
           accept="image/*"
           :on-success="onAvatarUpload"
         >
-          <el-button type="text" class="change-picture"
-            >Change picture</el-button
-          >
+          <el-button class="change-picture">Change picture</el-button>
         </el-upload>
         <div class="user-workspaces">
           <div class="user-workspaces__header">
             <div class="user-workspaces__title">your workspaces</div>
             <el-button
               v-if="isWithWorkspaces"
-              type="text"
               class="user-workspaces__create-btn-outline"
-              @click="createWorkSpace"
+              @click="navigateTo('/create-workspace')"
             >
               <span>+ Create workspace</span>
             </el-button>
           </div>
           <div v-if="isWithWorkspaces">
             <div
-              v-for="(item, i) in responseWorkspaces.myWorkspaces"
+              v-for="(item, i) in responseWorkspaces?.myWorkspaces"
               :key="`workspace_${i}`"
               class="user-workspaces__container"
               :class="{ small: isWithWorkspaces }"
@@ -125,7 +112,7 @@
             <el-button
               class="user-workspaces__create-btn"
               style="position: absolute"
-              @click="createWorkSpace"
+              @click="navigateTo('/create-workspace')"
             >
               <span>Create</span>
             </el-button>
@@ -143,177 +130,125 @@
       </div>
     </div>
     <check-modal
-      :model="isOpenPINDialog"
+      v-if="isOpenPINDialog"
+      :dialogVisible="isOpenPINDialog"
       @close="isOpenPINDialog = false"
     ></check-modal>
   </div>
 </template>
 
-<script>
-import { mapGetters, mapActions } from 'vuex'
+<script setup>
+definePageMeta({ layout: 'default' })
 import defaultAvatar from '@/assets/images/icons/default-user-icon.jpg'
-import {
-  checkFirstLogin,
-  checkLoginToken,
-  checkSettingsToken,
-} from '~/middleware/helpers'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
-export default {
-  name: 'ProfilePage',
-  components: {
-    CheckModal,
-  },
-  data() {
-    return {
-      responseWorkspaces: null,
-      text: '',
-      payload: {
-        avatar: null,
-      },
-      avatar: null,
-      avatarSrc: null,
-      isOpenPINDialog: false,
-    }
-  },
-  head() {
-    return {
-      title: 'Profile',
-    }
-  },
-  computed: {
-    ...mapGetters('profile', [
-      'profileLoading',
-      'profileSuccessData',
-      'profileFailureData',
-      'editProfileData',
-    ]),
-    avatarUrl() {
-      if (this.editProfileData) {
-        return `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.editProfileData.user.avatar}`
-      } else if (this.profileSuccessData) {
-        if (this.profileSuccessData.user.avatar) {
-          return `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.profileSuccessData.user.avatar}`
-        }
-      }
-      return defaultAvatar
-    },
-    userFullName() {
-      if (this.profileSuccessData) {
-        const [name, lastname, surname] = [
-          this.profileSuccessData.user.name
-            ? this.profileSuccessData.user.name
-            : '',
-          this.profileSuccessData.user.lastname
-            ? this.profileSuccessData.user.lastname
-            : '',
-          this.profileSuccessData.user.surname
-            ? this.profileSuccessData.user.surname
-            : '',
-        ]
-        if (name || lastname || surname) {
-          return `${name} ${lastname} ${surname}`
-        } else return false
-      } else return false
-    },
-    userTelNumber() {
-      if (this.profileSuccessData) {
-        return this.profileSuccessData.user.phone_number
-      } else return null
-    },
-    userInviteWorkspaces() {
-      if (this.profileSuccessData) {
-        return this.profileSuccessData.user.invite_workspaces.length
-      } else return null
-    },
-    specialty() {
-      if (this.profileSuccessData) {
-        return this.profileSuccessData.specialties.find(
-          (el) => el.id === this.profileSuccessData.user.speciality_id
-        )?.name
-      } else return false
-    },
-    isWithWorkspaces() {
-      if (
-        this.responseWorkspaces &&
-        this.responseWorkspaces.myWorkspaces.length
-      ) {
-        return true
-      } else return false
-    },
-  },
-  watch: {
-    profileFailureData(v) {
-      for (const i in v) {
-        if (typeof v[i] !== 'string') {
-          for (const j in v[i]) {
-            this.$notify.error({
-              title: 'Error',
-              dangerouslyUseHTMLString: true,
-              message: `${i}: ${v[i][j]}`,
-            })
-          }
-        } else {
-          this.$notify.error({
-            title: 'Error',
-            message: v[i],
-          })
-        }
-      }
-    },
-    editProfileData(v) {
-      if (v) {
-        this.$message.success('Success!')
-      }
-    },
-  },
-  async created() {
-    try {
-      checkFirstLogin(this.$cookies, this.$router)
-      checkLoginToken(this.$cookies, this.$router)
-      if (!checkSettingsToken(this.$cookies)) {
-        this.isOpenPINDialog = true
-      }
+import settingsToken from '~/middleware/settingsToken'
+import useProfileStore from '~/stores/profile'
+import { storeToRefs } from 'pinia'
+import { onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import auth from '~/middleware/auth'
 
-      this.getProfile()
-      this.responseWorkspaces = await this.getWorkSpaces()
-    } catch {
-      this.$router.push('/login')
-    }
-  },
-  mounted() {
-    window.addEventListener('resize', this.handleResize)
-  },
+const profileStore = useProfileStore()
+const {
+  profileLoading,
+  profileSuccessData,
+  profileFailureData,
+  editProfileData,
+  workspacesSuccessData,
+  workspacesFailureData,
+} = storeToRefs(profileStore)
 
-  methods: {
-    ...mapActions('profile', ['getWorkSpaces', 'getProfile', 'editProfile']),
-    createWorkSpace() {
-      this.$router.push('/create-workspace')
-    },
-    openWorkspace(id) {
-      this.$router.push(`/workspace/staff/${id}`)
-    },
-    handleResize() {
-      this.$forceUpdate()
-    },
-    formattedText() {
-      if (window.innerWidth > 861) {
-        return `Thanks for joining Offiswot!<br /><br />
+const instance = getCurrentInstance()
+const $route = useRoute()
+const $router = useRouter()
+const config = useRuntimeConfig()
+
+const responseWorkspaces = ref(null)
+const text = ref('')
+const payload = ref({
+  avatar: null,
+})
+
+const isOpenPINDialog = ref(null)
+const userFullName = ref(null)
+const userTelNumber = ref(null)
+const userInviteWorkspaces = ref(null)
+const specialty = ref(null)
+const userEmail = ref(null)
+
+const avatarUrl = ref(defaultAvatar)
+const avatarSrc = ref(null)
+
+watch(profileSuccessData, (v) => {
+  if (v.user.avatar) {
+    avatarUrl.value = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
+  }
+
+  const [name, lastname, surname] = [
+    v.user.name ? v.user.name : '',
+    v.user.lastname ? v.user.lastname : '',
+    v.user.surname ? v.user.surname : '',
+  ]
+  if (name || lastname || surname) {
+    userFullName.value = `${name} ${lastname} ${surname}`
+  }
+
+  userTelNumber.value = v.user.phone_number
+  userInviteWorkspaces.value = v.user.invite_workspaces.length
+  userEmail.value = v.user.email
+  specialty.value = v.specialties.find(
+    (el) => el.id === v.user.speciality_id
+  )?.name
+})
+
+watch(editProfileData, (v) => {
+  if (v.user.avatar) {
+    avatarUrl.value = `${v.avatarPath}/${v.user.avatar}`
+  }
+})
+
+watch(workspacesSuccessData, (v) => {
+  responseWorkspaces.value = v
+})
+
+onMounted(async () => {
+  auth()
+  isOpenPINDialog.value = settingsToken()
+  profileStore.getProfile()
+  await profileStore.getWorkSpaces()
+  window.addEventListener('resize', handleResize)
+})
+
+const isWithWorkspaces = () => {
+  return (
+    responseWorkspaces.value && responseWorkspaces.value.myWorkspaces.length
+  )
+}
+
+const openWorkspace = (id) => {
+  navigateTo(`/workspace/staff/${id}`)
+}
+
+const handleResize = () => {
+  instance.update()
+}
+const formattedText = () => {
+  if (window.innerWidth > 861) {
+    return `Thanks for joining Offiswot!<br /><br />
             Create a workspace for your team or company using our productivity platform.<br/>Enjoy collaborating with each other easily and managing yourteam members and the projects effectively.`
-      } else if (window.innerWidth <= 861 && window.innerWidth > 567) {
-        return `Thanks for joining Offiswot!<br /><br />
+  } else if (window.innerWidth <= 861 && window.innerWidth > 567) {
+    return `Thanks for joining Offiswot!<br /><br />
             Create a workspace for your team or company using our productivity platform. Enjoy collaborating with each other easily and managing yourteam members and the projects effectively.`
-      } else {
-        return `Thanks for<br /> joining Offiswot!<br /><br />
+  } else {
+    return `Thanks for<br /> joining Offiswot!<br /><br />
             Create a workspace for your team or company using our productivity platform. Enjoy collaborating with each other easily and managing yourteam members and the projects effectively.`
-      }
-    },
+  }
+}
 
-    onAvatarUpload(e, file) {
-      this.payload.avatar = file.raw
-      this.avatarSrc = URL.createObjectURL(file.raw)
-      this.editProfile(this.payload)
-    },
-  },
+const onAvatarUpload = (e, file) => {
+  payload.value.avatar = file.raw
+  avatarSrc.value = URL.createObjectURL(file.raw)
+  profileStore.editProfile(payload.value)
 }
 </script>
 
@@ -360,6 +295,8 @@ export default {
     display: flex;
   }
   &__avatar {
+    width: 119px;
+    height: 119px;
     border-radius: 50%;
     object-fit: cover;
   }

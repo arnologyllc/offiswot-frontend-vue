@@ -1,12 +1,12 @@
 <template>
   <div class="main">
     <div class="main__form">
-      <div class="main__form--title">Set PIN</div>
+      <div class="main__form--title">Reset PIN</div>
       <div class="main__form--subtitle">
-        Fill in the fields to set your PIN.
+        Enter a new PIN below to change your PIN.
       </div>
       <el-form
-        ref="pinForm"
+        ref="resetForm"
         class="main__form--box"
         hide-required-asterisk
         :model="payload"
@@ -25,7 +25,7 @@
             :type="showPIN ? 'text' : 'password'"
             class="main__form--box__input"
             placeholder="Enter PIN"
-            @blur="validateField('pin')"
+            @change="validateField('pin')"
           >
             <template #suffix>
               <div
@@ -116,7 +116,9 @@
           native-type="submit"
           :loading="isLoadingSubmit"
         >
-          <span class="submit-button__text">Save</span>
+          <span class="submit-button__text">{{
+            isLoadingSubmit ? '' : 'Save'
+          }}</span>
         </el-button>
 
         <error-massage
@@ -125,6 +127,7 @@
           :error-text="errors.pin.value"
           @visible="errors.pin.isShow = false"
         ></error-massage>
+
         <error-massage
           v-if="errors.pin_confirmation.isShow && !isWeb()"
           :dialogVisible="errors.pin_confirmation.isShow && !isWeb()"
@@ -148,7 +151,8 @@ import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
 import auth from '~/middleware/auth'
 
 const pinStore = usePINStore()
-const { setPinData, setPinFailureData, isLoadingSubmit } = storeToRefs(pinStore)
+const { changePinData, changePinFailureData, isLoadingSubmit } =
+  storeToRefs(pinStore)
 
 const instance = getCurrentInstance()
 const $route = useRoute()
@@ -183,6 +187,7 @@ const validatePIN = (rule, value, callback) => {
 const payload = ref({
   pin: null,
   pin_confirmation: null,
+  pinToken: null,
 })
 const errors = ref({
   pin: {
@@ -223,7 +228,7 @@ const rules = ref({
 const showPIN = ref(false)
 const showPINConfirmation = ref(false)
 
-watch(setPinFailureData, (v) => {
+watch(changePinFailureData, (v) => {
   for (const i in v) {
     if (typeof v[i] !== 'string') {
       for (const j in v[i]) {
@@ -235,24 +240,39 @@ watch(setPinFailureData, (v) => {
   }
 })
 
-watch(setPinData, (v) => {
-  $cookies.remove('first_login')
+watch(changePinData, (v) => {
+  payload.value = {
+    pin: null,
+    pin_confirmation: null,
+  }
   navigateTo('/')
 })
 
 onMounted(() => {
   auth()
   if ($route.query.email) {
-    payload.value.email = $route.value.query.email
+    payload.value.email = $route.query.email
+  }
+
+  if ($route.query.token) {
+    payload.value.pinToken = $route.query.token
   }
   window.addEventListener('resize', handleResize)
 })
+
 const onSubmit = () => {
-  pinStore.setPin(payload.value)
+  instance.refs.resetForm.validate((valid) => {
+    if (valid) {
+      pinStore.changePin(payload.value)
+    } else {
+      errors.value.global.value = 'Please fill empty areas'
+      return false
+    }
+  })
 }
 
 const validateField = (fieldName) => {
-  instance.refs.pinForm.validateField(fieldName, (isValid, catchedError) => {
+  instance.refs.resetForm.validateField(fieldName, (isValid, catchedError) => {
     if (!isValid) {
       errors.value[fieldName].value = catchedError[fieldName][0].message
     } else {
@@ -299,7 +319,7 @@ const focusElement = (elem) => {
   display: flex;
   position: relative;
   height: 100%;
-  padding: 100px 0 150px 18%;
+  padding: 100px 0 150px 170px;
   width: 100%;
 
   &__form {
@@ -308,13 +328,13 @@ const focusElement = (elem) => {
       font-size: 20px;
       font-weight: 600;
       color: $ov-text--title;
-      margin-bottom: 4px;
+      margin-bottom: 10px;
     }
 
     &--subtitle {
       font-size: 14px;
       color: $ov-text--subtitle;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
     }
 
     &--box {
@@ -525,6 +545,7 @@ const focusElement = (elem) => {
   gap: 16px;
   margin-bottom: 27px;
 }
+
 .submit-button {
   background: $ov-primary;
   color: white;

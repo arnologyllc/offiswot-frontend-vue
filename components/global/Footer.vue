@@ -15,10 +15,7 @@
           >
             <a v-if="!item.type" href="#">{{ link.title }}</a>
             <div v-else class="footer__grid-item--link__image">
-              <img
-                :src="require(`@/assets/images/icons/${link.title}.svg`)"
-                :alt="item.title"
-              />
+              <img :src="link.title" :alt="item.title" />
             </div>
           </div>
         </div>
@@ -30,51 +27,50 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'FooterComponent',
-  data() {
-    return {
-      footerLinks: [
-        {
-          name: 'Resources',
-          items: [
-            { title: 'Documentation' },
-            { title: 'Terms & Conditions' },
-            { title: 'Privacy Policy' },
-            { title: 'FAQ' },
-          ],
-        },
-        {
-          name: 'Pricing',
-          items: [
-            { title: 'Free trial' },
-            { title: 'Pricing' },
-            { title: 'Premium Plan' },
-          ],
-        },
-        {
-          name: 'Company',
-          items: [
-            { title: 'About Us' },
-            { title: 'Careers' },
-            { title: 'Contact Us' },
-          ],
-        },
-        {
-          name: 'Social',
-          type: 'icon',
-          items: [
-            { title: 'fb-icon' },
-            { title: 'insta-icon' },
-            { title: 'twitter-icon' },
-            { title: 'li-icon' },
-          ],
-        },
-      ],
-    }
+<script setup>
+import { ref } from 'vue'
+import fbIcon from '~/assets/images/icons/fb-icon.svg'
+import instaIcon from '~/assets/images/icons/insta-icon.svg'
+import twitterIcon from '~/assets/images/icons/twitter-icon.svg'
+import liIcon from '~/assets/images/icons/li-icon.svg'
+
+const footerLinks = ref([
+  {
+    name: 'Resources',
+    items: [
+      { title: 'Documentation' },
+      { title: 'Terms & Conditions' },
+      { title: 'Privacy Policy' },
+      { title: 'FAQ' },
+    ],
   },
-}
+  {
+    name: 'Pricing',
+    items: [
+      { title: 'Free trial' },
+      { title: 'Pricing' },
+      { title: 'Premium Plan' },
+    ],
+  },
+  {
+    name: 'Company',
+    items: [
+      { title: 'About Us' },
+      { title: 'Careers' },
+      { title: 'Contact Us' },
+    ],
+  },
+  {
+    name: 'Social',
+    type: 'icon',
+    items: [
+      { title: fbIcon },
+      { title: instaIcon },
+      { title: twitterIcon },
+      { title: liIcon },
+    ],
+  },
+])
 </script>
 
 <style scoped lang="scss">

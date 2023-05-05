@@ -1,59 +1,60 @@
 <template>
   <div class="desk">
-    <div class="desk__main" :class="{ 'edit-mode': !dragOptions.disabled }">
+    <div
+      class="desk__main"
+      :class="{ 'edit-mode': !props.dragOptions.disabled }"
+    >
       <div>
         <div
-          v-for="(item, index) in tablesList"
-          :key="`row_${index}`"
+          v-for="(item, i) in tablesList"
+          :key="`row_${i}`"
           class="desk__row"
         >
-          <div v-for="(col, idx) in item" :key="`col_${idx}`">
+          <div
+            v-for="(col, idx) in item"
+            :key="`col_${idx}`"
+            class="desk__row--col"
+          >
             <draggable
-              v-model="tablesList[index][idx]"
-              v-bind="dragOptions"
+              class="desk__row--col"
+              :list="tablesList[i][idx]"
+              :disabled="props.dragOptions.disabled"
+              group="people"
               :move="handleMove"
-              @end="handleDragEnd(index, idx)"
+              @end="handleDragEnd(i, idx)"
+              itemKey="name"
             >
-              <transition-group
-                :name="
-                  tablesList[index][idx].includes(movingItem) &&
-                  tablesList[index][idx].includes(futureItem)
-                    ? 'grid'
-                    : 'list'
-                "
-                class="desk__row--col"
-              >
+              <template #item="{ element, index }">
                 <div
-                  v-for="(user, i) in col"
-                  :id="user.id"
-                  :key="user.id"
+                  :id="element.id"
+                  :key="element.id"
                   class="desk__row--col__table"
-                  :class="{ disabled: user.disabled }"
+                  :class="{ disabled: element.disabled }"
                 >
-                  <div v-if="user.user" class="outer-box">
+                  <div v-if="element.user" class="outer-box">
                     <div
-                      v-if="i % 2 === 0"
+                      v-if="index % 2 === 0"
                       class="left-box"
-                      :class="{ top: i === 0 || i === 3 }"
+                      :class="{ top: index === 0 || index === 3 }"
                       :style="{
                         border: `3px solid ${
-                          currentProfession(user.professionId).color
+                          currentProfession(element.professionId).color
                         }`,
                       }"
                     >
                       <div class="left-box__left">
                         <div class="left-box__left--name">
-                          {{ user.user.name }}
+                          {{ element.user.name }}
                         </div>
                         <div class="left-box__left--profession">
-                          {{ currentProfession(user.professionId).name }}
+                          {{ currentProfession(element.professionId).name }}
                         </div>
                         <div class="left-box__left--status">
                           <div
                             v-for="bar in 5"
                             :key="`bar_${bar}`"
                             class="bar"
-                            :class="{ active: bar <= user.projectStatus }"
+                            :class="{ active: bar <= element.projectStatus }"
                           ></div>
                         </div>
                       </div>
@@ -61,19 +62,19 @@
                         <div
                           v-if="!dragOptions.disabled"
                           class="close"
-                          @click="handleDeleteUser(index, idx, i)"
+                          @click="handleDeleteUser(i, idx, index)"
                         >
                           <img
                             src="@/assets/images/icons/close-circle-icon.svg"
                             alt="(x)"
                           />
                         </div>
-                        <el-badge v-if="user.online" is-dot class="badge">
+                        <el-badge v-if="element.online" is-dot class="badge">
                           <img
-                            :src="user.user.avatar"
+                            :src="element.user.avatar"
                             :style="{
                               border: `1px solid ${
-                                currentProfession(user.professionId).color
+                                currentProfession(element.professionId).color
                               }`,
                             }"
                             alt=""
@@ -81,10 +82,10 @@
                         </el-badge>
                         <img
                           v-else
-                          :src="user.user.avatar"
+                          :src="element.user.avatar"
                           :style="{
                             border: `1px solid ${
-                              currentProfession(user.professionId).color
+                              currentProfession(element.professionId).color
                             }`,
                           }"
                           alt=""
@@ -94,7 +95,7 @@
                         class="left-box__triangle"
                         :style="{
                           'border-top': `15px solid ${
-                            currentProfession(user.professionId).color
+                            currentProfession(element.professionId).color
                           }`,
                         }"
                       >
@@ -104,26 +105,26 @@
                     <div
                       v-else
                       class="right-box"
-                      :class="{ top: i === 1 || i === 2 }"
+                      :class="{ top: index === 1 || index === 2 }"
                       :style="{
                         border: `3px solid ${
-                          currentProfession(user.professionId).color
+                          currentProfession(element.professionId).color
                         }`,
                       }"
                     >
                       <div class="right-box__left">
                         <div class="right-box__left--name">
-                          {{ user.user.name }}
+                          {{ element.user.name }}
                         </div>
                         <div class="right-box__left--profession">
-                          {{ currentProfession(user.professionId).name }}
+                          {{ currentProfession(element.professionId).name }}
                         </div>
                         <div class="right-box__left--status">
                           <div
                             v-for="bar in 5"
                             :key="`bar_${bar}`"
                             class="bar"
-                            :class="{ active: bar <= user.projectStatus }"
+                            :class="{ active: bar <= element.projectStatus }"
                           ></div>
                         </div>
                       </div>
@@ -131,19 +132,19 @@
                         <div
                           v-if="!dragOptions.disabled"
                           class="close"
-                          @click="handleDeleteUser(index, idx, i)"
+                          @click="handleDeleteUser(i, idx, index)"
                         >
                           <img
                             src="@/assets/images/icons/close-circle-icon.svg"
                             alt="(x)"
                           />
                         </div>
-                        <el-badge v-if="user.online" is-dot class="badge">
+                        <el-badge v-if="element.online" is-dot class="badge">
                           <img
-                            :src="user.user.avatar"
+                            :src="element.user.avatar"
                             :style="{
                               border: `1px solid ${
-                                currentProfession(user.professionId).color
+                                currentProfession(element.professionId).color
                               }`,
                             }"
                             alt=""
@@ -151,10 +152,10 @@
                         </el-badge>
                         <img
                           v-else
-                          :src="user.user.avatar"
+                          :src="element.user.avatar"
                           :style="{
                             border: `1px solid ${
-                              currentProfession(user.professionId).color
+                              currentProfession(element.professionId).color
                             }`,
                           }"
                           alt=""
@@ -164,7 +165,7 @@
                         class="right-box__triangle"
                         :style="{
                           'border-top': `15px solid ${
-                            currentProfession(user.professionId).color
+                            currentProfession(element.professionId).color
                           }`,
                         }"
                       >
@@ -173,16 +174,17 @@
                     </div>
                   </div>
                   <img
-                    :src="tableIcons[i].src"
+                    :src="tableIcons[index].src"
                     :class="{ 'edit-mode': !dragOptions.disabled }"
                     alt="t"
                   />
                 </div>
-              </transition-group>
+              </template>
             </draggable>
           </div>
+
           <el-button
-            v-if="!dragOptions.disabled && index === 0"
+            v-if="!dragOptions.disabled && i === 0"
             class="desk__main--add-col horizontal"
             @click="onAddCol"
           >
@@ -220,36 +222,38 @@
       </el-button>
       <draggable
         v-if="availableMembers.length"
-        group="users"
-        :move="handleMoveFromFooter"
-        v-bind="dragOptions"
-        :value="availableMembers"
+        :list="availableMembers"
+        :disabled="props.dragOptions.disabled"
         class="desk__edit-footer--members__outer"
+        group="people"
+        :move="handleMoveFromFooter"
+        itemKey="name"
         @end="handleFooterDragEnd"
       >
-        <transition-group name="grid" class="desk__edit-footer--members">
-          <div
-            v-for="item in availableMembers"
-            :id="`footer-user_${item.user.user_id}`"
-            :key="`footer-member_${item.user.user_id}`"
-            class="desk__edit-footer--members__member"
-          >
-            <div class="desk__edit-footer--members__member--left">
-              <img :src="item.user.avatar" alt="Avatar" />
-            </div>
-            <div class="desk__edit-footer--members__member--right">
-              <div class="user-name">{{ item.user.name }}</div>
-              <div class="user-profession">
-                {{ currentProfession(item.professionId).name }}
+        <template #item="{ element }">
+          <div class="desk__edit-footer--members">
+            <div
+              :id="`footer-user_${element.user.user_id}`"
+              :key="`footer-member_${element.user.user_id}`"
+              class="desk__edit-footer--members__member"
+            >
+              <div class="desk__edit-footer--members__member--left">
+                <img :src="element.user.avatar" alt="Avatar" />
+              </div>
+              <div class="desk__edit-footer--members__member--right">
+                <div class="user-name">{{ element.user.name }}</div>
+                <div class="user-profession">
+                  {{ currentProfession(element.professionId).name }}
+                </div>
               </div>
             </div>
           </div>
-        </transition-group>
+        </template>
       </draggable>
       <div v-else class="desk__edit-footer--members__outer"></div>
-      <el-button class="desk__edit-footer--save" @click="$emit('save')"
-        >Save</el-button
-      >
+      <el-button class="desk__edit-footer--save" @click="$emit('save')">
+        Save
+      </el-button>
     </div>
     <div v-if="!dragOptions.disabled" class="tutorial-box">
       <img
@@ -273,294 +277,249 @@
         class="tutorial-box__bottom-line"
       />
     </div>
+
     <OvInviteMemberModal
-      :model="isOpenInviteModal"
-      @close="isOpenInviteModal"
-    />
+      v-if="isOpenInviteModal"
+      :dialogVisible="isOpenInviteModal"
+      @close="isOpenInviteModal = false"
+    ></OvInviteMemberModal>
   </div>
 </template>
 
-<script>
-import { mapGetters } from 'vuex'
+<script setup>
+import { nextTick } from 'vue'
 import draggable from 'vuedraggable'
 import OvInviteMemberModal from '@/components/shared/OvInviteMemberModal'
 import AllTablesList from '@/data/tablesList.json'
 import AllUsersList from '@/data/usersList.json'
+import tableTopLeft from '@/assets/images/tables/table-top-left.svg'
+import tableTopRigth from '@/assets/images/tables/table-top-right.svg'
+import tableBottomLeft from '@/assets/images/tables/table-bottom-left.svg'
+import tableBottomRigth from '@/assets/images/tables/table-bottom-right.svg'
 
-export default {
-  name: 'DeskComponent',
-  components: {
-    draggable,
-    OvInviteMemberModal,
+const props = defineProps({
+  dragOptions: {
+    type: Object,
+    default: null,
   },
-  props: {
-    dragOptions: {
-      type: Object,
-      default: null,
-    },
+})
+
+const tablesList = ref(JSON.parse(JSON.stringify(AllTablesList)))
+const usersList = ref(JSON.parse(JSON.stringify(AllUsersList)))
+
+const footerFutureIndex = ref(null)
+const footerMovingIndex = ref(null)
+const footerFutureItem = ref(null)
+const footerMovingElement = ref(null)
+const movingItem = ref(null)
+const movingIndex = ref(null)
+const futureItem = ref(null)
+const isInsideFooter = ref(false)
+const reloadFooter = ref(true)
+
+const tableIcons = ref([
+  {
+    id: 1,
+    src: tableTopLeft,
   },
-  data() {
-    return {
-      tablesList: JSON.parse(JSON.stringify(AllTablesList)),
-      usersList: JSON.parse(JSON.stringify(AllUsersList)),
-      tableIcons: [
-        {
-          id: 1,
-          src: require('@/assets/images/tables/table-top-left.svg'),
-        },
-        {
-          id: 2,
-          src: require('@/assets/images/tables/table-top-right.svg'),
-        },
-        {
-          id: 3,
-          src: require('@/assets/images/tables/table-bottom-left.svg'),
-        },
-        {
-          id: 4,
-          src: require('@/assets/images/tables/table-bottom-right.svg'),
-        },
-      ],
-      hints: [
-        { name: 'Marketing', color: '#4156F6', id: 1 },
-        { name: 'Team Marketing', color: '#E4AC1A', id: 2 },
-      ],
-      movingItem: null,
-      futureItem: null,
-      movingIndex: null,
-
-      availableMembers: [],
-
-      footerMovingIndex: null,
-      footerFutureIndex: null,
-      footerFutureItem: null,
-      footerMovingElement: null,
-      isInsideFooter: false,
-
-      reloadFooter: false,
-
-      lastTableId: null,
-
-      isOpenInviteModal: false,
-    }
+  {
+    id: 2,
+    src: tableTopRigth,
   },
-  computed: {
-    ...mapGetters('workspace', [
-      'isLoadingSubmit',
-      'getMembersSuccess',
-      'getMembersError',
-      'getSeatsSuccess',
-      'getSeatsError',
-      'setSeatsSuccess',
-      'setSeatsError',
-    ]),
+  {
+    id: 3,
+    src: tableBottomLeft,
   },
-  watch: {
-    getMembersSuccess(v) {
-      if (v) {
-        console.log(v)
-      }
-    },
-    getMembersError(v) {
-      if (v) {
-        console.log(v)
-      }
-    },
-    getSeatsSuccess(v) {
-      if (v) {
-        console.log(v)
-      }
-    },
-    getSeatsError(v) {
-      if (v) {
-        console.log(v)
-      }
-    },
-    setSeatsSuccess(v) {
-      if (v) {
-        console.log(v)
-      }
-    },
-    setSeatsError(v) {
-      if (v) {
-        console.log(v)
-      }
-    },
+  {
+    id: 4,
+    src: tableBottomRigth,
   },
-  created() {},
+])
 
-  mounted() {
-    this.setAvailableMembers()
-    this.setLastTableId()
-  },
-  methods: {
-    currentProfession(id) {
-      return this.hints.find((el) => el.id === id)
-    },
-    setAvailableMembers() {
-      const arr = []
-      ;[...this.tablesList].forEach((row, index) => {
-        row.forEach((col, idx) => {
-          col.forEach((user, i) => {
-            if (user.user) {
-              arr.push(user)
-            }
-          })
-        })
-      })
-      this.availableMembers = this.usersList.filter(
-        (el) => !arr.find((elem) => elem.user.user_id === el.user.user_id)
-      )
-    },
-    handleDragEnd(index, subIndex) {
-      if (!this.movingItem || !this.futureItem) {
-        return
-      }
-      if (this.isInsideFooter && this.movingItem.user) {
-        const futureIndex = this.availableMembers.indexOf(this.futureItem)
-        this.availableMembers.splice(futureIndex, 1, this.movingItem)
-        this.tablesList[index][subIndex].splice(this.movingIndex, 1, {
-          id: this.movingItem.id,
-          ...this.futureItem,
-        })
-        this.movingIndex = null
-        this.movingItem = null
-        this.futureItem = null
-        return
-      }
-      const _items = Object.assign([], this.tablesList)
-      _items.forEach((el) => {
-        el.forEach((col) => {
-          if (
-            col[col.indexOf(this.futureItem)] &&
-            this.movingItem.id !== this.futureItem.id
-          ) {
-            col.splice(col.indexOf(this.futureItem), 1, this.movingItem)
-          }
-        })
-      })
-      this.tablesList[index][subIndex].splice(
-        this.movingIndex,
-        1,
-        this.futureItem
-      )
-      this.tablesList = _items
+const hints = ref([
+  { name: 'Marketing', color: '#4156F6', id: 1 },
+  { name: 'Team Marketing', color: '#E4AC1A', id: 2 },
+])
 
-      setTimeout(() => {
-        this.movingItem = null
-        this.futureItem = null
-        this.movingIndex = null
-      }, 300)
-    },
-    handleMove(e) {
-      const { index, element } = e.draggedContext
-      this.movingItem = element
-      this.movingIndex = index
-      this.futureItem = e.relatedContext.element
-      if (e.related.id.includes('footer-user_')) {
-        this.isInsideFooter = true
-      } else {
-        this.isInsideFooter = false
-      }
-      return false
-    },
-    handleMoveFromFooter(e) {
-      const { index, futureIndex, element } = e.draggedContext
-      this.footerMovingIndex = index
-      this.footerFutureIndex = futureIndex
-      this.footerMovingElement = element
-      this.footerFutureItem = e.relatedContext.element
-      if (e.related.id.includes('footer-user')) {
-        this.isInsideFooter = true
-      } else {
-        this.isInsideFooter = false
-      } // Check if drag is into footer
-      return false
-    },
-    handleFooterDragEnd() {
-      if (this.isInsideFooter) {
-        const futureItem = this.availableMembers[this.footerFutureIndex]
-        const movingItem = this.availableMembers[this.footerMovingIndex]
-        const _items = Object.assign([], this.availableMembers)
-        _items[this.footerFutureIndex] = movingItem
-        _items[this.footerMovingIndex] = futureItem
-        this.availableMembers = _items
-      } else {
-        if (this.footerFutureItem.user) {
-          this.availableMembers.splice(
-            this.footerMovingIndex,
-            1,
-            this.footerFutureItem
-          )
-        } else {
-          this.availableMembers.splice(this.footerMovingIndex, 1)
+const lastTableId = ref(null)
+const isOpenInviteModal = ref(false)
+
+const availableMembers = ref([])
+
+onMounted(() => {
+  setAvailableMembers()
+  setLastTableId()
+})
+
+const currentProfession = (id) => {
+  return hints.value.find((el) => el.id === id)
+}
+
+const setAvailableMembers = () => {
+  const arr = []
+  ;[...tablesList.value].forEach((row, index) => {
+    row.forEach((col, idx) => {
+      col.forEach((user, i) => {
+        if (user.user) {
+          arr.push(user)
         }
-        this.tablesList.forEach((row) => {
-          row.forEach((col) => {
-            if (col.includes(this.footerFutureItem)) {
-              col.splice(col.indexOf(this.footerFutureItem), 1, {
-                id: this.footerFutureItem.id,
-                ...this.footerMovingElement,
-              })
-            }
-          })
-        })
+      })
+    })
+  })
+  availableMembers.value = usersList.value.filter(
+    (el) => !arr.find((elem) => elem.user.user_id === el.user.user_id)
+  )
+}
+
+const handleDeleteUser = (index, subIndex, deleteIndex) => {
+  const tableList = JSON.parse(JSON.stringify(tablesList.value))
+  availableMembers.value.push(tableList[index][subIndex][deleteIndex])
+  delete tablesList.value[index][subIndex][deleteIndex].user
+  delete tablesList.value[index][subIndex][deleteIndex].professionId
+  delete tablesList.value[index][subIndex][deleteIndex].projectStatus
+  delete tablesList.value[index][subIndex][deleteIndex].disabled
+}
+const setLastTableId = () => {
+  const arr = []
+  tablesList.value.forEach((row) => {
+    row.forEach((col) => {
+      col.forEach((user) => {
+        arr.push(user.id)
+      })
+    })
+  })
+  lastTableId.value = Math.max(...arr)
+}
+const onAddRow = () => {
+  const arr = []
+  for (const i in Array(tablesList.value[0].length).fill('')) {
+    lastTableId.value += +i + 2
+    arr.push([
+      { id: lastTableId.value + +i + 2 },
+      { id: lastTableId.value + +i + 3 },
+      { id: lastTableId.value + +i + 4 },
+      { id: lastTableId.value + +i + 5 },
+    ])
+  }
+  tablesList.value.push(arr)
+  setLastTableId()
+}
+const onAddCol = () => {
+  tablesList.value((row, index) => {
+    lastTableId.value += index + 2
+    row.push([
+      { id: lastTableId.value + index + 2 },
+      { id: lastTableId.value + index + 3 },
+      { id: lastTableId.value + index + 4 },
+      { id: lastTableId.value + index + 5 },
+    ])
+  })
+}
+
+const handleDragEnd = (index, subIndex) => {
+  if (!movingItem.value || !futureItem.value) {
+    return
+  }
+  if (isInsideFooter.value && movingItem.value.user) {
+    const futureIndex = availableMembers.value.indexOf(futureItem.value)
+    availableMembers.value.splice(futureIndex, 1, movingItem.value)
+    tablesList.value[index][subIndex].splice(movingIndex.value, 1, {
+      id: movingItem.value.id,
+      ...futureItem.value,
+    })
+    movingIndex.value = null
+    movingItem.value = null
+    futureItem.value = null
+    return
+  }
+  const _items = Object.assign([], tablesList.value)
+  _items.forEach((el) => {
+    el.forEach((col) => {
+      if (
+        col[col.indexOf(futureItem.value)] &&
+        movingItem.value.id !== futureItem.value.id
+      ) {
+        col.splice(col.indexOf(futureItem.value), 1, movingItem.value)
       }
-      this.footerFutureIndex = null
-      this.footerMovingIndex = null
-      this.footerFutureItem = null
-      this.footerMovingElement = null
-      this.isInsideFooter = false
-      this.reloadFooter = true
-      this.$nextTick(() => {
-        this.reloadFooter = false
-      })
-    },
-    handleDeleteUser(index, subIndex, deleteIndex) {
-      const tablesList = JSON.parse(JSON.stringify(this.tablesList))
-      this.availableMembers.push(tablesList[index][subIndex][deleteIndex])
-      delete this.tablesList[index][subIndex][deleteIndex].user
-      delete this.tablesList[index][subIndex][deleteIndex].professionId
-      delete this.tablesList[index][subIndex][deleteIndex].projectStatus
-      delete this.tablesList[index][subIndex][deleteIndex].disabled
-    },
-    setLastTableId() {
-      const arr = []
-      this.tablesList.forEach((row) => {
-        row.forEach((col) => {
-          col.forEach((user) => {
-            arr.push(user.id)
+    })
+  })
+  tablesList.value[index][subIndex].splice(
+    movingIndex.value,
+    1,
+    futureItem.value
+  )
+  tablesList.value = _items
+
+  setTimeout(() => {
+    movingItem.value = null
+    futureItem.value = null
+    movingIndex.value = null
+  }, 300)
+}
+const handleMove = (e) => {
+  const { index, element } = e.draggedContext
+  movingItem.value = element
+  movingIndex.value = index
+  futureItem.value = e.relatedContext.element
+  if (e.related.id.includes('footer-user_')) {
+    isInsideFooter.value = true
+  } else {
+    isInsideFooter.value = false
+  }
+  return false
+}
+
+const handleMoveFromFooter = (e) => {
+  const { index, futureIndex, element } = e.draggedContext
+  footerMovingIndex.value = index
+  footerFutureIndex.value = futureIndex
+  footerMovingElement.value = element
+  footerFutureItem.value = e.relatedContext.element
+  if (e.related.id.includes('footer-user')) {
+    isInsideFooter.value = true
+  } else {
+    isInsideFooter.value = false
+  } // Check if drag is into footer
+  return false
+}
+const handleFooterDragEnd = () => {
+  if (isInsideFooter.value) {
+    const futureItem = availableMembers.value[footerFutureIndex.value]
+    const movingItem = availableMembers.value[footerMovingIndex.value]
+    const _items = Object.assign([], availableMembers.value)
+    _items[footerFutureIndex.value] = movingItem
+    _items[footerMovingIndex.value] = futureItem
+    availableMembers.value = _items
+  } else {
+    if (footerFutureItem.value.user) {
+      availableMembers.value.splice(
+        footerMovingIndex.value,
+        1,
+        footerFutureItem.value
+      )
+    } else {
+      availableMembers.value.splice(footerMovingIndex.value, 1)
+    }
+    tablesList.value.forEach((row) => {
+      row.forEach((col) => {
+        if (col.includes(footerFutureItem.value)) {
+          col.splice(col.indexOf(footerFutureItem.value), 1, {
+            id: footerFutureItem.value.id,
+            ...footerMovingElement.value,
           })
-        })
+        }
       })
-      this.lastTableId = Math.max(...arr)
-    },
-    onAddRow() {
-      const arr = []
-      for (const i in Array(this.tablesList[0].length).fill('')) {
-        this.lastTableId += +i + 2
-        arr.push([
-          { id: this.lastTableId + +i + 2 },
-          { id: this.lastTableId + +i + 3 },
-          { id: this.lastTableId + +i + 4 },
-          { id: this.lastTableId + +i + 5 },
-        ])
-      }
-      this.tablesList.push(arr)
-      this.setLastTableId()
-    },
-    onAddCol() {
-      this.tablesList.forEach((row, index) => {
-        this.lastTableId += index + 2
-        row.push([
-          { id: this.lastTableId + index + 2 },
-          { id: this.lastTableId + index + 3 },
-          { id: this.lastTableId + index + 4 },
-          { id: this.lastTableId + index + 5 },
-        ])
-      })
-    },
-  },
+    })
+  }
+  footerFutureIndex.value = null
+  footerMovingIndex.value = null
+  footerFutureItem.value = null
+  footerMovingElement.value = null
+  isInsideFooter.value = false
+  reloadFooter.value = true
+  nextTick(() => {
+    reloadFooter.value = false
+  })
 }
 </script>
 
@@ -582,13 +541,13 @@ export default {
       &.horizontal {
         margin-top: -100px;
         margin-left: -34px;
-        ::v-deep span {
+        span {
           text-orientation: upright;
           writing-mode: vertical-lr;
           letter-spacing: -2px;
         }
       }
-      ::v-deep span {
+      span {
         color: #cdcdcd;
         text-transform: uppercase;
         font-weight: 700;
@@ -669,11 +628,9 @@ export default {
     top: -20px;
     box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
     .badge {
-      ::v-deep {
-        sup {
-          right: 8px;
-          top: 19px;
-        }
+      sup {
+        right: 8px;
+        top: 19px;
       }
     }
     &__triangle {

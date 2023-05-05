@@ -1,10 +1,18 @@
 <template>
   <div class="main">
     <div class="main__form">
-      <div class="main__form--title">Set PIN</div>
-      <div class="main__form--subtitle">
-        Fill in the fields to set your PIN.
+      <div class="main__form--title">
+        <img
+          src="@/assets/images/icons/chevron-left.svg"
+          alt="chevron-left"
+          @click="$router.go(-1)"
+        />
+        <span>Reset PIN</span>
       </div>
+      <div class="main__form--subtitle">
+        Fill in the fields to change your PIN.
+      </div>
+
       <el-form
         ref="pinForm"
         class="main__form--box"
@@ -13,10 +21,64 @@
         :rules="rules"
         @submit.prevent="onSubmit"
       >
-        <div v-if="errors.global.value" class="el-form-item__global-error">
-          <img src="@/assets/images/icons/error.svg" alt="" />
-          <span>{{ errors.global.value }}</span>
+        <div
+          v-if="errors.global.value"
+          class="el-form-item__global-error-container"
+        >
+          <div class="el-form-item__global-error">
+            <img src="@/assets/images/icons/error.svg" alt="" />
+            <span>{{ errors.global.value }}</span>
+          </div>
+          <span class="clear-error" @click="clearError">X</span>
         </div>
+        <el-form-item prop="previous" class="password-form-item">
+          <el-input
+            id="previous"
+            ref="previous"
+            v-model="payload.previous"
+            :type="showPrevious ? 'text' : 'password'"
+            class="main__form--box__input"
+            placeholder="Old PIN"
+            @blur="validateField('previous')"
+          >
+            <template suffix>
+              <div
+                v-if="payload.previous"
+                style="position: relative"
+                @click="focusElement('previous')"
+              >
+                <span for="previous" class="previous_placeholder">
+                  Old PIN
+                </span>
+              </div>
+              <img
+                :class="errors.previous.value ? 'eye_icon' : ''"
+                :src="showPrevious ? hideEyeIcon : showEyeIcon"
+                alt="eye_icon"
+                @click="showPrevious = !showPrevious"
+              />
+              <img
+                v-if="errors.previous.value"
+                src="@/assets/images/icons/error.svg"
+                alt=""
+                class="error_icon"
+                @mouseover="showError('previous')"
+                @mouseout="hideError('previous')"
+                @click="showErrorClick('previous')"
+              />
+            </template>
+          </el-input>
+
+          <template #error>
+            <div
+              v-if="errors.previous.isShow && isWeb()"
+              class="el-form-item__error"
+            >
+              <span v-html="errors.previous.value"></span>
+            </div>
+            <div></div>
+          </template>
+        </el-form-item>
         <el-form-item prop="pin" class="password-form-item">
           <el-input
             id="pin"
@@ -24,7 +86,7 @@
             v-model="payload.pin"
             :type="showPIN ? 'text' : 'password'"
             class="main__form--box__input"
-            placeholder="Enter PIN"
+            placeholder="New PIN"
             @blur="validateField('pin')"
           >
             <template #suffix>
@@ -33,7 +95,7 @@
                 style="position: relative"
                 @click="focusElement('pin')"
               >
-                <span for="pin" class="pin_placeholder"> PIN </span>
+                <span for="pin" class="pin_placeholder"> New PIN </span>
               </div>
               <img
                 :class="errors.pin.value ? 'eye_icon' : ''"
@@ -80,7 +142,7 @@
                 @click="focusElement('pin_confirmation')"
               >
                 <span for="password" class="repeat-placeholder">
-                  PIN Confirmation
+                  Repeat PIN
                 </span>
               </div>
               <img
@@ -111,13 +173,27 @@
             <div></div>
           </template>
         </el-form-item>
+        <div class="forgot-password">
+          <el-button style="font-size: 14px; font-weight: 400" @click="onForgot"
+            >Forgot PIN?</el-button
+          >
+        </div>
         <el-button
           class="submit-button"
           native-type="submit"
           :loading="isLoadingSubmit"
         >
-          <span class="submit-button__text">Save</span>
+          <span class="submit-button__text">{{
+            isLoadingSubmit ? '' : 'Save'
+          }}</span>
         </el-button>
+
+        <error-massage
+          v-if="errors.previous.isShow && !isWeb()"
+          :dialogVisible="errors.previous.isShow && !isWeb()"
+          :error-text="errors.previous.value"
+          @visible="errors.previous.isShow = false"
+        ></error-massage>
 
         <error-massage
           v-if="errors.pin.isShow && !isWeb()"
@@ -125,6 +201,7 @@
           :error-text="errors.pin.value"
           @visible="errors.pin.isShow = false"
         ></error-massage>
+
         <error-massage
           v-if="errors.pin_confirmation.isShow && !isWeb()"
           :dialogVisible="errors.pin_confirmation.isShow && !isWeb()"
@@ -133,22 +210,45 @@
         ></error-massage>
       </el-form>
     </div>
+
+    <ConfirmModal
+      v-if="isOpenEmailDialog"
+      :email="payload.email"
+      :dialogVisible="isOpenEmailDialog"
+      @close="isOpenEmailDialog = false"
+    ></ConfirmModal>
+
+    <check-modal
+      v-if="isOpenPINDialog"
+      :dialogVisible="isOpenPINDialog"
+      @close="isOpenPINDialog = false"
+    ></check-modal>
   </div>
 </template>
 
 <script setup>
 definePageMeta({ layout: 'default' })
-import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import { getCurrentInstance, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import usePINStore from '~/stores/pin'
 import { storeToRefs } from 'pinia'
+
+import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
+import ConfirmModal from '@/components/shared/OvConfirmPINChangeModal.vue'
+import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
+import settingsToken from '~/middleware/settingsToken'
 import auth from '~/middleware/auth'
 
 const pinStore = usePINStore()
-const { setPinData, setPinFailureData, isLoadingSubmit } = storeToRefs(pinStore)
+const {
+  resetPinFailureData,
+  resetPinData,
+  forgotPinFailureData,
+  forgotPinData,
+  isLoadingSubmit,
+} = storeToRefs(pinStore)
 
 const instance = getCurrentInstance()
 const $route = useRoute()
@@ -179,12 +279,22 @@ const validatePIN = (rule, value, callback) => {
     callback()
   }
 }
-
 const payload = ref({
+  previous: null,
   pin: null,
   pin_confirmation: null,
 })
+const showPrevious = ref(false)
+const showPIN = ref(false)
+const showPINConfirmation = ref(false)
+const isOpenEmailDialog = ref(false)
+const isOpenPINDialog = ref(false)
+
 const errors = ref({
+  previous: {
+    value: '',
+    isShow: false,
+  },
   pin: {
     value: '',
     isShow: false,
@@ -199,6 +309,13 @@ const errors = ref({
 })
 
 const rules = ref({
+  previous: [
+    {
+      required: true,
+      message: 'This field is required.',
+      trigger: 'blur',
+    },
+  ],
   pin: [
     {
       required: true,
@@ -220,10 +337,7 @@ const rules = ref({
   ],
 })
 
-const showPIN = ref(false)
-const showPINConfirmation = ref(false)
-
-watch(setPinFailureData, (v) => {
+watch(resetPinFailureData, (v) => {
   for (const i in v) {
     if (typeof v[i] !== 'string') {
       for (const j in v[i]) {
@@ -235,20 +349,41 @@ watch(setPinFailureData, (v) => {
   }
 })
 
-watch(setPinData, (v) => {
-  $cookies.remove('first_login')
-  navigateTo('/')
+watch(resetPinData, (v) => {
+  if (v) navigateTo('/')
 })
 
+watch(forgotPinFailureData, (v) => {
+  for (const i in v) {
+    if (typeof v[i] !== 'string') {
+      for (const j in v[i]) {
+        errors.value.global.value = v[i][j]
+      }
+    } else {
+      errors.value.global.value = v[i]
+    }
+  }
+})
+
+watch(forgotPinData, (v) => {
+  if (v) {
+    isOpenEmailDialog.value = true
+  }
+})
 onMounted(() => {
   auth()
+  isOpenPINDialog.value = settingsToken()
   if ($route.query.email) {
-    payload.value.email = $route.value.query.email
+    payload.value.email = $route.query.email
   }
-  window.addEventListener('resize', handleResize)
+  window.addEventListener('resize', handleResize(instance))
 })
 const onSubmit = () => {
-  pinStore.setPin(payload.value)
+  pinStore.resetPin(payload.value)
+}
+const onForgot = () => {
+  isOpenEmailDialog.value = true
+  pinStore.forgotPin()
 }
 
 const validateField = (fieldName) => {
@@ -260,6 +395,7 @@ const validateField = (fieldName) => {
     }
   })
 }
+
 const clearError = () => {
   errors.value.global.value = ''
 }
@@ -299,22 +435,27 @@ const focusElement = (elem) => {
   display: flex;
   position: relative;
   height: 100%;
-  padding: 100px 0 150px 18%;
-  width: 100%;
+  padding: 100px 0 150px 170px;
 
   &__form {
     width: 390px;
     &--title {
-      font-size: 20px;
+      font-style: normal;
       font-weight: 600;
-      color: $ov-text--title;
-      margin-bottom: 4px;
+      font-size: 24px;
+      line-height: 29px;
+      margin-bottom: 17px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      gap: 16px;
+      color: #0d1c2e;
     }
 
     &--subtitle {
       font-size: 14px;
       color: $ov-text--subtitle;
-      margin-bottom: 40px;
+      margin-bottom: 70px;
     }
 
     &--box {
@@ -351,9 +492,66 @@ const focusElement = (elem) => {
         }
       }
     }
+    .forgot-password {
+      margin-top: 24px;
+      display: flex;
+      color: #6979f8;
+      justify-content: space-between;
+      text-decoration: underline;
+      .el-button {
+        font-size: 12px;
+        font-weight: 500;
+        &:hover {
+          color: $ov-primary;
+        }
+      }
+    }
+    .forgot-password {
+      font-size: 14px;
+    }
+  }
+  .el-form-item__global-error-container {
+    width: 100%;
+    border-color: #e60022;
+    background: #fbe4e8;
+    box-shadow: 0px 7px 64px rgb(0 0 0 / 7%);
+    border-radius: 6px;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 20px;
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 12px;
+    align-items: center;
+    color: #e60022;
+    gap: 16px;
+    margin-bottom: 27px;
+  }
+  .el-form-item__global-error {
+    font-family: 'Montserrat';
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .clear-error {
+    cursor: pointer;
   }
 }
 
+.previous_placeholder {
+  position: relative;
+  top: 0;
+  width: 50px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #717a7f;
+  animation: showPreviousPlaceholder 0.3s;
+  animation-fill-mode: forwards;
+}
 .pin_placeholder {
   position: relative;
   top: 0;
@@ -375,51 +573,74 @@ const focusElement = (elem) => {
   animation-fill-mode: forwards;
 }
 
-@media (min-width: 375px) {
+@media (min-width: 407px) {
+  .main {
+    justify-content: flex-start;
+    &__form {
+      padding-left: 65px;
+      border-left: 1px solid #d0c9d6;
+    }
+  }
+  @keyframes showPreviousPlaceholder {
+    to {
+      top: -34px;
+      left: -240px;
+    }
+  }
   @keyframes showPINPlaceholder {
     to {
       top: -34px;
-      left: -330px;
+      left: -235px;
     }
   }
 
   @keyframes showRepeatPlaceholder {
     to {
       top: -34px;
-      left: -249px;
+      left: -218px;
     }
   }
-
+  .previous_placeholder {
+    left: -230px;
+  }
   .pin_placeholder {
-    left: -310px;
+    left: -225px;
   }
 
   .repeat-placeholder {
-    left: -220px;
+    left: -210px;
   }
 }
 
 @media (max-width: 407px) {
+  @keyframes showPreviousPlaceholder {
+    to {
+      top: -34px;
+      left: -215px;
+    }
+  }
   @keyframes showPINPlaceholder {
     to {
       top: -34px;
-      left: -241px;
+      left: -210px;
     }
   }
 
   @keyframes showRepeatPlaceholder {
     to {
       top: -34px;
-      left: -157px;
+      left: -194px;
     }
   }
-
+  .previous_placeholder {
+    left: -200px;
+  }
   .pin_placeholder {
-    left: -210px;
+    left: -195px;
   }
 
   .repeat-placeholder {
-    left: -130px;
+    left: -180px;
   }
 }
 
@@ -441,7 +662,8 @@ const focusElement = (elem) => {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: 212px;
+  width: max-content;
+  max-width: 212px;
   height: max-content;
   min-height: 48px;
   border-radius: 13px;
@@ -506,25 +728,6 @@ const focusElement = (elem) => {
 .el-form-item {
   margin-bottom: 27px;
 }
-.el-form-item__global-error {
-  width: 100%;
-  border-color: #e60022;
-  background: #fbe4e8;
-  box-shadow: 0px 7px 64px rgb(0 0 0 / 7%);
-  border-radius: 6px;
-  font-family: 'Montserrat';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 20px;
-  display: flex;
-  justify-content: flex-start;
-  padding: 7px 12px;
-  align-items: center;
-  color: #e60022;
-  gap: 16px;
-  margin-bottom: 27px;
-}
 .submit-button {
   background: $ov-primary;
   color: white;
@@ -533,7 +736,7 @@ const focusElement = (elem) => {
   height: 48px;
   padding: 0;
   border-radius: 6px;
-  margin-top: 270px;
+  margin-top: 157px;
   span {
     display: flex;
     align-items: center;

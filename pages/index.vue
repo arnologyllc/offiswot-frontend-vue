@@ -6,7 +6,7 @@
         <div class="account__body">
           <el-button
             class="account__body--block"
-            @click="$router.push('/profile')"
+            @click="navigateTo('/profile')"
           >
             <div>
               <img src="@/assets/images/icons/profile.svg" alt="profile-icon" />
@@ -22,7 +22,7 @@
           </el-button>
           <el-button
             class="account__body--block"
-            @click="$router.push('/profile-settings')"
+            @click="navigateTo('/profile-settings')"
           >
             <div>
               <img src="@/assets/images/icons/lock.svg" alt="lock-icon" />
@@ -51,41 +51,30 @@
       </div>
     </div>
     <check-modal
-      :model="isOpenPINDialog"
+      v-if="isOpenPINDialog"
+      :dialogVisible="isOpenPINDialog"
       @close="isOpenPINDialog = false"
     ></check-modal>
   </div>
 </template>
 
-<script>
-import { checkLoginToken, checkFirstLogin } from '~/middleware/helpers'
+<script setup>
+definePageMeta({ layout: 'default' })
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
+import loginToken from '~/middleware/loginToken'
+import { getCurrentInstance, onMounted } from 'vue'
+import auth from '~/middleware/auth'
 
-export default {
-  name: 'IndexPage',
-  components: {
-    CheckModal,
-  },
-  layout: 'default',
-  data() {
-    return {
-      isOpenPINDialog: null,
-    }
-  },
-  head() {
-    return {
-      title: 'Home',
-    }
-  },
-  mounted() {
-    checkFirstLogin(this.$cookies, this.$router)
-    if (!checkLoginToken(this.$cookies, this.$router)) {
-      this.isOpenPINDialog = true
-    }
-  },
-}
+const instance = getCurrentInstance()
+const isOpenPINDialog = ref(null)
+isOpenPINDialog.value = loginToken()
+
+onMounted(() => {
+  auth()
+})
 </script>
-<style lang="scss">
+
+<style scoped lang="scss">
 .container_account {
   width: 100%;
   margin: 0 auto;

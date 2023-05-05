@@ -1,9 +1,10 @@
 <template>
   <el-dialog
+    v-model="props.dialogVisible"
     :title="modalStep > 2 ? null : 'Delete account'"
     width="30%"
     align-center
-    @close="closeModal"
+    @close="instance.emit('visible')"
   >
     <template #footer>
       <span v-if="modalStep === 0">
@@ -90,7 +91,7 @@
           class="dialog__form"
           :rules="rules"
           :model="payload"
-          @submit.native.prevent="onSubmit"
+          @submit.prevent="onSubmit"
         >
           <h4>Please Enter your PIN.</h4>
           <el-form-item prop="pin">
@@ -101,13 +102,9 @@
               placeholder="PIN"
               :type="showPassword ? 'text' : 'password'"
             >
-              <template slot="suffix">
+              <template #suffix>
                 <img
-                  :src="
-                    require(`@/assets/images/icons/eye-${
-                      !showPassword ? 'close' : 'open'
-                    }-icon.svg`)
-                  "
+                  :src="showPassword ? hideEyeIcon : showEyeIcon"
                   alt="eye_icon"
                   @click="showPassword = !showPassword"
                 />
@@ -144,87 +141,63 @@
   </el-dialog>
 </template>
 
-<script>
-import { mapActions, mapGetters } from 'vuex'
+<script setup>
+import useProfileStore from '~/stores/profile'
+import { storeToRefs } from 'pinia'
+import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
+import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
+const instance = getCurrentInstance()
 
-export default {
-  name: 'ModalDelete',
-  props: {
-    dialogVisible: {
-      type: Boolean,
-      required: false,
-    },
+const profileStore = useProfileStore()
+const { deleteProfileData, deleteFailureData } = storeToRefs(profileStore)
+
+const props = defineProps({
+  dialogVisible: {
+    type: Boolean,
+    required: false,
   },
-  data() {
-    return {
-      visible: false,
-      modalStep: 0,
-      checkbox: {
-        checked1: false,
-        checked2: false,
-      },
-      payload: {
-        pin: null,
-      },
-      rules: {
-        pin: [
-          {
-            required: true,
-            message: 'This field is required.',
-            trigger: 'blur',
-          },
-        ],
-      },
-      showPassword: false,
-    }
-  },
-  computed: {
-    ...mapGetters('profile', ['deleteProfileData', 'deleteFailureData']),
-  },
-  watch: {
-    deleteFailureData(v) {
-      for (const i in v) {
-        if (typeof v[i] !== 'string') {
-          for (const j in v[i]) {
-            this.$notify.error({
-              title: 'Error',
-              dangerouslyUseHTMLString: true,
-              message: `${i}: ${v[i][j]}`,
-            })
-          }
-        } else {
-          this.$notify.error({
-            title: 'Error',
-            message: v[i],
-          })
-        }
-      }
+})
+
+const modalStep = ref(0)
+const checkbox = ref({
+  checked1: false,
+  checked2: false,
+})
+
+const payload = ref({
+  pin: null,
+})
+const rules = ref({
+  pin: [
+    {
+      required: true,
+      message: 'This field is required.',
+      trigger: 'blur',
     },
-    deleteProfileData(v) {
-      if (v) {
-        this.$message.success('Success!')
-      }
-    },
-  },
-  methods: {
-    ...mapActions('profile', ['deleteProfile']),
-    onSubmit() {
-      this.deleteProfile(this.payload)
-    },
-    agreeModal() {
-      this.modalStep += 1
-    },
-    closeModal() {
-      this.$emit('visible', this.visible)
-      setTimeout(() => {
-        this.modalStep = 0
-      }, 200)
-    },
-  },
+  ],
+})
+const showPassword = ref(false)
+
+watch(deleteFailureData, (v) => {
+  for (const i in v) {
+  }
+})
+
+watch(deleteProfileData, (v) => {
+  instance.emit('visible')
+  setTimeout(() => {
+    modalStep.value = 0
+  }, 200)
+})
+const onSubmit = () => {
+  profileStore.deleteProfile(payload.value)
+}
+const agreeModal = () => {
+  modalStep.value += 1
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
 .content {
   &__icon {
     display: flex;
@@ -335,11 +308,9 @@ export default {
     display: flex;
     justify-content: center;
   }
-  ::v-deep {
-    .el-input__suffix {
-      top: 5px !important;
-      right: 10px;
-    }
+  .el-input__suffix {
+    top: 5px !important;
+    right: 10px;
   }
 
   .el-form {
@@ -382,14 +353,14 @@ export default {
   display: flex;
   justify-content: center;
   background-color: #000000da;
-  ::v-deep .el-dialog__header {
+  .el-dialog__header {
     border-bottom: 1px solid #bbbcbd;
     margin-bottom: 22px;
   }
-  ::v-deep .el-dialog__footer {
+  .el-dialog__footer {
     text-align: center;
   }
-  ::v-deep .el-dialog {
+  .el-dialog {
     display: flex;
     flex-direction: column;
     width: 453px !important;

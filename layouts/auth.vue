@@ -5,9 +5,9 @@
       class="main-layout-auth"
       :class="checkPage() === '/expired' ? '' : 'main-layout-auth__background'"
     >
-      <Nuxt />
+      <slot />
       <div v-if="checkPage === '/expired'" class="go-back">
-        <el-button type="text" @click="$router.go(-1)">
+        <el-button @click="$router.go(-1)">
           <img
             src="@/assets/images/icons/chevron-dark-icon.svg"
             class="go-back__icon"
@@ -21,24 +21,21 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import Header from '~/components/global/auth/Header.vue'
 import Footer from '@/components/global/Footer.vue'
-export default {
-  name: 'AuthLayout',
-  components: {
-    Header,
-    Footer,
-  },
-  methods: {
-    checkPage() {
-      return this.$route.path
-    },
-  },
+import { useRoute } from 'vue-router'
+import login from '~/middleware/login'
+const route = useRoute()
+login()
+
+
+const checkPage = () => {
+  return route.path
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .main-layout-auth {
   background: $ov-gray-bg;
   background-repeat: no-repeat;
@@ -59,12 +56,10 @@ export default {
   .go-back {
     position: absolute;
     bottom: 100px;
-    ::v-deep {
-      .el-button span {
-        display: flex;
-        align-items: center;
-        gap: 12.5px;
-      }
+    .el-button span {
+      display: flex;
+      align-items: center;
+      gap: 12.5px;
     }
     &__text {
       color: $ov-primary--light;
@@ -86,13 +81,11 @@ export default {
     background: #f5f7fb;
     padding: 0;
     padding-bottom: 157px;
-    ::v-deep {
-      .main {
-        margin: 100px auto 0;
-        width: max-content;
-        .form-item__label {
-          background: #f5f7fb;
-        }
+    .main {
+      margin: 100px auto 0;
+      width: max-content;
+      .form-item__label {
+        background: #f5f7fb;
       }
     }
     .go-back {
@@ -108,12 +101,10 @@ export default {
   .main-layout-auth {
     background: $ov-gray-bg;
     padding: 0 44px 119px 44px;
-    ::v-deep {
-      .main {
-        width: 287px !important;
-        .form-item__label {
-          background: $ov-gray-bg;
-        }
+    .main {
+      width: 287px !important;
+      .form-item__label {
+        background: $ov-gray-bg;
       }
     }
     .go-back {
