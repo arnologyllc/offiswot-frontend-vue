@@ -1,82 +1,54 @@
-export default {
+// https://nuxt.com/docs/api/configuration/nuxt-config
+import Cookies from 'js-cookie'
+
+export default defineNuxtConfig({
   target: 'static',
   ssr: true,
-  head: {
-    title: 'officewot',
-    htmlAttrs: {
-      lang: 'en',
-    },
-    meta: [
-      { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: '' },
-      { name: 'format-detection', content: 'telephone=no' },
-    ],
-    link: [
-      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap' },
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon-32x32.png' }
-    ],
-  },
-
-  css: ['element-ui/lib/theme-chalk/index.css', './assets/styles/main.css'],
-
-  plugins: ['@/plugins/element-ui', '@/plugins/axios'],
-
   components: true,
 
-  buildModules: [
-    '@nuxtjs/eslint-module',
-    "@nuxtjs/style-resources",
-    [
-      'nuxt-compress',
-      {
-        gzip: {
-          threshold: 8192,
-        },
-        brotli: {
-          threshold: 8192,
-        },
-      },
-    ],
+  buildModules: ['@nuxtjs/eslint-module'],
+  modules: ['@pinia/nuxt', '@element-plus/nuxt'],
+  plugins: ['@/plugins/headers'],
 
-  ],
-
-  styleResources: {
-    scss: ["@/assets/styles/_variables.scss"]
+  pinia: {
+    autoImports: ['defineStore', ['defineStore', 'definePiniaStore']],
   },
 
-
-  modules: [
-    '@nuxtjs/axios',
-    [
-      'nuxt-compress',
-      {
-        gzip: {
-          threshold: 8192,
-        },
-        brotli: {
-          threshold: 8192,
+  vite: {
+    build: { assetsInlineLimit: 0 },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: '@import "@/assets/styles/_variables.scss";',
         },
       },
-    ],
-    'cookie-universal-nuxt',
-  ],
-
-  build: {
-    transpile: [/^element-ui/],
+    },
   },
+
+  css: ['@/assets/styles/main.css', 'maz-ui/css/main.css'],
 
   server: {
     port: process.env.PORT || 8000,
     host: '0.0.0.0',
-    timing: false
+    timing: false,
+  },
+  runtimeConfig: {
+    public: {
+      env: {
+        apiUrl: 'https://offiswot-api.arnologyapps.com/api/',
+        serverUrl: 'https://offiswot-api.arnologyapps.com',
+      },
+    },
   },
 
-  env: {
-    apiUrl: 'https://offiswot-api.arnologyapps.com/api/',
-    serverUrl: 'https://offiswot-api.arnologyapps.com'
+  loading: { color: '#4156F6' },
+
+  vueCompiler: {
+    compilerOptions: {
+      suppressWarnings: true,
+    },
   },
-
-  loading: { color: "#4156F6" },
-}
-
+  build: {
+    transpile: ['maz-ui'],
+  },
+})

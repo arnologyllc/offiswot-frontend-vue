@@ -15,7 +15,7 @@
             <div class="account__body">
               <div
                 class="account__body-block"
-                @click="$router.push('/profile-settings/reset')"
+                @click="navigateTo('/profile-settings/reset')"
               >
                 <div class="">
                   <div class="reset">Reset password</div>
@@ -32,7 +32,7 @@
               </div>
               <div
                 class="account__body-block"
-                @click="$router.push('/profile-settings/update-pin')"
+                @click="navigateTo('/profile-settings/update-pin')"
               >
                 <div>
                   <div class="reset">Reset PIN</div>
@@ -66,52 +66,48 @@
         </div>
       </div>
     </div>
-    <deactivate-modal v-show="dialogVisible" @visible="dialogVisible = false">
+    <deactivate-modal
+      v-if="dialogVisible"
+      :dialogVisible="dialogVisible"
+      @visible="dialogVisible = false"
+    >
     </deactivate-modal>
     <delete-modal
-      v-show="showModal"
-      class="dialog"
+      v-if="showModal"
+      :dialogVisible="showModal"
       @visible="showModal = false"
     ></delete-modal>
     <check-modal
-      :model="isOpenPINDialog"
+      v-if="isOpenPINDialog"
+      :dialogVisible="isOpenPINDialog"
       @close="isOpenPINDialog = false"
     ></check-modal>
   </div>
 </template>
 
-<script>
+<script setup>
+definePageMeta({ layout: 'default' })
 import DeactivateModal from '@/components/profile-settings/DeactivateModal.vue'
 import DeleteModal from '@/components/profile-settings/DeleteModal.vue'
-import {
-  checkFirstLogin,
-  checkLoginToken,
-  checkSettingsToken,
-} from '~/middleware/helpers'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
+import { useRoute, useRouter } from 'vue-router'
+import loginToken from '~/middleware/loginToken'
+import settingsToken from '~/middleware/settingsToken'
+import auth from '~/middleware/auth'
+import { onMounted } from 'vue'
 
-export default {
-  name: 'ProfileSettings',
-  components: {
-    DeleteModal,
-    DeactivateModal,
-    CheckModal,
-  },
-  data() {
-    return {
-      showModal: false,
-      dialogVisible: false,
-      isOpenPINDialog: false,
-    }
-  },
-  mounted() {
-    checkFirstLogin(this.$cookies, this.$router)
-    checkLoginToken(this.$cookies, this.$router)
-    if (!checkSettingsToken(this.$cookies)) {
-      this.isOpenPINDialog = true
-    }
-  },
-}
+loginToken()
+const $route = useRoute()
+const $router = useRouter()
+const showModal = ref(false)
+const dialogVisible = ref(false)
+const isOpenPINDialog = ref(false)
+
+isOpenPINDialog.value = settingsToken()
+
+onMounted(() => {
+  auth()
+})
 </script>
 
 <style lang="scss" scoped>

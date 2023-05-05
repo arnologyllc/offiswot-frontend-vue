@@ -1,8 +1,6 @@
-export default function ({ app, redirect }) {
-  if (
-    !app.$cookies.get('token') &&
-    !(app.router.currentRoute.path === '/expired')
-  ) {
-    return redirect('/login')
+export default defineNuxtRouteMiddleware((to, from) => {
+  const cookies = useCookie('token')
+  if (!cookies._value) {
+    navigateTo('/login')
   }
-}
+})

@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :visible.sync="dialogVisible"
+    v-model="props.dialogVisible"
     :width="dialogWidth"
     show-close
     top="30vh"
@@ -29,7 +29,7 @@
             <span v-if="item.link" class="list_item_isMember">Member</span>
           </template>
 
-          <template v-if="error.value" slot="suffix">
+          <template v-if="error.value" #suffix>
             <img
               src="@/assets/images/icons/error.svg"
               alt=""
@@ -37,13 +37,9 @@
               @mouseover="showError()"
               @mouseout="hideError()"
             />
-          </template>
-
-          <template slot="suffix">
             <div v-if="error.isShow" class="el-form-item__error">
               <span v-html="error.value"></span>
             </div>
-            <div></div>
           </template>
         </el-autocomplete>
         <div class="dialog__chips-box">
@@ -92,137 +88,124 @@
   </el-dialog>
 </template>
 
-<script>
-export default {
-  name: 'OvInviteMemberModal',
-  props: {
-    model: Boolean,
-  },
-  data() {
-    return {
-      dialogVisible: false,
-      error: {
-        value: null,
-        isShow: null,
-      },
-      emails: [
-        {
-          value: 'aaaaaaaaaaaaaaaaaaaaaa@email.ru',
-          link: 'https://github.com/vuejs/vue',
-        },
-        { value: 'bbb@gmail.com', link: 'https://github.com/ElemeFE/element' },
-        { value: 'cc@gmail.com', link: 'https://github.com/ElemeFE/cooking' },
-        { value: 'ffff@mail.ru', link: 'https://github.com/ElemeFE/mint-ui' },
-        { value: 'asas@mail.ru', link: 'https://github.com/vuejs/vuex' },
-        {
-          value: 'dsdf@gmail.com',
-          link: 'https://github.com/vuejs/vue-router',
-        },
-        { value: 'babel@mail.ru', link: 'https://github.com/babel/babel' },
-      ],
-      checkboxItems: [
-        'Name',
-        'Picture',
-        'Surname',
-        'Languages',
-        'Phone number',
-        'Years of experience',
-        'Date of birth',
-        'Specialty',
-        'Upload CV',
-      ],
-      userEmail: '',
-      selectedEmails: [],
-      showSecondPage: false,
-      checkList: [
-        'Name',
-        'Picture',
-        'Surname',
-        'Languages',
-        'Phone number',
-        'Years of experience',
-        'Date of birth',
-        'Specialty',
-        'Upload CV',
-      ],
-    }
-  },
-  computed: {
-    dialogWidth() {
-      if (this.showSecondPage) {
-        return '918px'
-      } else return '432px'
-    },
-  },
-  watch: {
-    model() {
-      this.dialogVisible = this.model
-    },
-    dialogVisible() {
-      if (!this.dialogVisible) {
-        this.$emit('close')
-      }
-    },
-  },
-  methods: {
-    goNextPage() {
-      this.showSecondPage = true
-    },
-    handleSelect(item) {
-      if (!this.selectedEmails.includes(item)) {
-        this.selectedEmails.push(item)
-        this.userEmail = ''
-      }
-      this.emails = this.emails.filter((el) => el.value !== item.value)
-    },
-    querySearch(queryString, cb) {
-      const emails = this.emails
-      const results =
-        queryString && !this.error.value
-          ? emails.filter(this.createFilter(queryString))
-          : []
-      cb(results)
-    },
-    createFilter(queryString) {
-      return (email) => {
-        return (
-          email.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
-        )
-      }
-    },
-    removeChip(item) {
-      this.selectedEmails = this.selectedEmails.filter(
-        (el) => el.value !== item.value
-      )
-      this.emails.push(item)
-    },
+<script setup>
+import { computed } from 'vue'
 
-    validateEmail(value) {
-      const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/
-      if (value.includes('@') && !emailRegex.test(value)) {
-        this.error.value = 'Email is not valid.'
-      } else {
-        this.error.value = ''
-      }
-    },
-
-    showError() {
-      this.error.isShow = true
-    },
-    hideError() {
-      this.error.isShow = false
-    },
-
-    clearError() {
-      this.errors.global.value = ''
-    },
-
-    showingEmail(email, size) {
-      const part1 = email.slice(0, size)
-      const part2 = email.slice(size)
-      return `<span class="list_item_value">${part1}<span style="opacity: 0.3">${part2}</span></span>`
-    },
+const props = defineProps({
+  dialogVisible: {
+    type: Boolean,
+    required: false,
   },
+})
+
+const error = ref({
+  value: null,
+  isShow: null,
+})
+
+const emails = ref([
+  {
+    value: 'aaaaaaaaaaaaaaaaaaaaaa@email.ru',
+    link: 'https://github.com/vuejs/vue',
+  },
+  { value: 'bbb@gmail.com', link: 'https://github.com/ElemeFE/element' },
+  { value: 'cc@gmail.com', link: 'https://github.com/ElemeFE/cooking' },
+  { value: 'ffff@mail.ru', link: 'https://github.com/ElemeFE/mint-ui' },
+  { value: 'asas@mail.ru', link: 'https://github.com/vuejs/vuex' },
+  {
+    value: 'dsdf@gmail.com',
+    link: 'https://github.com/vuejs/vue-router',
+  },
+  { value: 'babel@mail.ru', link: 'https://github.com/babel/babel' },
+])
+
+const checkboxItems = ref([
+  'Name',
+  'Picture',
+  'Surname',
+  'Languages',
+  'Phone number',
+  'Years of experience',
+  'Date of birth',
+  'Specialty',
+  'Upload CV',
+])
+
+const userEmail = ref('')
+const selectedEmails = ref([])
+const showSecondPage = ref(false)
+const checkList = ref([
+  'Name',
+  'Picture',
+  'Surname',
+  'Languages',
+  'Phone number',
+  'Years of experience',
+  'Date of birth',
+  'Specialty',
+  'Upload CV',
+])
+
+const dialogWidth = computed(() => (showSecondPage.value ? '918px' : '432px'))
+
+const goNextPage = () => {
+  showSecondPage.value = true
+}
+
+const handleSelect = (item) => {
+  if (!selectedEmails.value.includes(item)) {
+    selectedEmails.value.push(item)
+    userEmail.value = ''
+  }
+  emails.value = emails.value.filter((el) => el.value !== item.value)
+}
+
+const querySearch = (queryString, cb) => {
+  const allEmails = emails.value
+  const results =
+    queryString && !error.value.value
+      ? allEmails.filter(createFilter(queryString))
+      : []
+  cb(results)
+}
+
+const createFilter = (queryString) => {
+  return (email) => {
+    return email.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+  }
+}
+
+const removeChip = (item) => {
+  selectedEmails.value = selectedEmails.value.filter(
+    (el) => el.value !== item.value
+  )
+  emails.value.push(item)
+}
+
+const validateEmail = (value) => {
+  const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/
+  if (value.includes('@') && !emailRegex.test(value)) {
+    error.value.value = 'Email is not valid.'
+  } else {
+    error.value.value = ''
+  }
+}
+
+const showError = () => {
+  error.value.isShow = true
+}
+const hideError = () => {
+  error.value.isShow = false
+}
+
+const clearError = () => {
+  error.value.global.value = ''
+}
+
+const showingEmail = (email, size) => {
+  const part1 = email.slice(0, size)
+  const part2 = email.slice(size)
+  return `<span class="list_item_value">${part1}<span style="opacity: 0.3">${part2}</span></span>`
 }
 </script>
 
@@ -230,51 +213,49 @@ export default {
 .el-autocomplete {
   width: 100%;
 }
-::v-deep {
-  .el-checkbox__inner {
-    width: 24px;
-    height: 24px;
-    border-radius: 6px;
-    border: 1px solid #cdc7d2 !important;
-    background-color: #fff !important;
+.el-checkbox__inner {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid #cdc7d2 !important;
+  background-color: #fff !important;
+}
+.el-checkbox__inner::after {
+  border: 2px solid #1a051d;
+  transform: rotate(45deg) scaleY(0);
+  border-left: 0;
+  border-top: 0;
+  left: 9px;
+  top: 6px;
+}
+.el-checkbox__label {
+  font-size: 14px;
+  font-weight: 500;
+  color: $ov-text--title !important;
+}
+.el-input__inner {
+  border-radius: 6px;
+  border: 1px solid #cdc7d2;
+}
+.el-dialog {
+  border-radius: 20px;
+  border: 1px solid #4f4cec;
+  &__close {
+    color: black !important;
   }
-  .el-checkbox__inner::after {
-    border: 2px solid #1a051d;
-    transform: rotate(45deg) scaleY(0);
-    border-left: 0;
-    border-top: 0;
-    left: 9px;
-    top: 6px;
+  &__footer {
+    display: flex;
+    justify-content: center;
   }
-  .el-checkbox__label {
-    font-size: 14px;
-    font-weight: 500;
-    color: $ov-text--title !important;
+  &__body {
+    padding: 15px 0 30px 0;
+    color: $ov-text--title;
   }
-  .el-input__inner {
-    border-radius: 6px;
-    border: 1px solid #cdc7d2;
-  }
-  .el-dialog {
-    border-radius: 20px;
-    border: 1px solid #4f4cec;
-    &__close {
-      color: black !important;
-    }
-    &__footer {
-      display: flex;
-      justify-content: center;
-    }
-    &__body {
-      padding: 15px 0 30px 0;
-      color: $ov-text--title;
-    }
-    &__header {
-      display: grid;
-      justify-content: center;
-      padding-top: 0;
-      padding-bottom: 5px;
-    }
+  &__header {
+    display: grid;
+    justify-content: center;
+    padding-top: 0;
+    padding-bottom: 5px;
   }
 }
 .dialog-footer {
@@ -432,63 +413,61 @@ export default {
 .clear-error {
   cursor: pointer;
 }
-::v-deep {
-  .is-error {
-    .el-input__inner {
-      border-color: red !important;
-    }
+.is-error {
+  .el-input__inner {
+    border-color: red !important;
   }
+}
 
-  .error_icon {
-    position: absolute;
-    top: 8px;
-    right: 0;
-  }
-  .el-form-item__error {
-    z-index: 1000;
-  }
-  .el-form-item__error {
-    position: absolute;
-    font-family: 'Montserrat';
-    font-size: 12px;
-    line-height: 20px;
-    font-weight: 400;
-    top: -4px;
-    left: 24px;
-    padding: 14px;
-    color: #e60022;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: max-content;
-    max-width: 212px;
-    height: max-content;
-    min-height: 48px;
-    border-radius: 13px;
-    background-color: white;
-    box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
-  }
-  .el-form-item__error:after,
-  .el-form-item__error:before {
-    position: absolute;
-    content: '';
-    width: 0;
-    height: 0;
-    top: 25px;
-  }
-  .el-form-item__error:before {
-    left: -8px;
-    margin-top: -8px;
-    border-top: 8px solid transparent;
-    border-bottom: 8px solid transparent;
-    border-right: 8px solid #fff;
-  }
-  .el-form-item__error:after {
-    left: -7px;
-    margin-top: -7px;
-    border-top: 7px solid transparent;
-    border-bottom: 7px solid transparent;
-    border-right: 7px solid #fff;
-  }
+.error_icon {
+  position: absolute;
+  top: 8px;
+  right: 0;
+}
+.el-form-item__error {
+  z-index: 1000;
+}
+.el-form-item__error {
+  position: absolute;
+  font-family: 'Montserrat';
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 400;
+  top: -4px;
+  left: 24px;
+  padding: 14px;
+  color: #e60022;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: max-content;
+  max-width: 212px;
+  height: max-content;
+  min-height: 48px;
+  border-radius: 13px;
+  background-color: white;
+  box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
+}
+.el-form-item__error:after,
+.el-form-item__error:before {
+  position: absolute;
+  content: '';
+  width: 0;
+  height: 0;
+  top: 25px;
+}
+.el-form-item__error:before {
+  left: -8px;
+  margin-top: -8px;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid #fff;
+}
+.el-form-item__error:after {
+  left: -7px;
+  margin-top: -7px;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-right: 7px solid #fff;
 }
 </style>

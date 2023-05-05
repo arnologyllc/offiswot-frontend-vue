@@ -7,11 +7,11 @@
       hide-required-asterisk
       label-position="top"
       :model="payload"
-      @submit.native.prevent="onSubmit"
+      @submit.prevent="onSubmit"
     >
       <el-row>
         <el-col :span="12">
-          <el-button type="text" @click="$router.push('/profile')">
+          <el-button @click="$router.push('/profile')">
             <div class="main__title">
               <img
                 src="@/assets/images/icons/chevron-dark-icon.svg"
@@ -42,7 +42,7 @@
               accept="image/*"
               :on-success="onAvatarUpload"
             >
-              <el-button size="small" type="text">Upload picture</el-button>
+              <el-button size="small">Upload picture</el-button>
             </el-upload>
           </el-form-item>
         </el-col>
@@ -117,14 +117,11 @@
           :md="{ span: 8 }"
         >
           <el-form-item prop="phone_number">
-            <phone
+            <MazPhoneNumberInput
               v-model="payload.phone_number"
-              color="#4156F6"
-              valid-color="#007D85"
-              error-color="#ff0000"
               class="main__form--phone-number"
               default-country-code="AM"
-            ></phone>
+            />
           </el-form-item>
         </el-col>
       </el-row>
@@ -190,7 +187,7 @@
                 class="main__form--upload"
                 action="https://offiswot-api.arnologyapps.com/api/update-profile"
               >
-                <el-button type="text">
+                <el-button>
                   <div class="main__form--upload__cv">
                     <img
                       src="@/assets/images/icons/download-icon.svg"
@@ -207,7 +204,7 @@
       </el-row>
       <el-row class="main__form--actions">
         <el-col :span="12">
-          <el-button type="text" @click="$router.push('/profile')">
+          <el-button @click="navigateTo('/profile')">
             <div class="go-back__box">
               <img
                 src="@/assets/images/icons/chevron-dark-icon.svg"
@@ -224,192 +221,141 @@
             native-type="submit"
             :loading="isLoadingSubmit"
           >
-            <span class="submit-button__text">Save</span>
+            <span class="submit-button__text">{{
+              isLoadingSubmit ? '' : 'Save'
+            }}</span>
           </el-button>
         </el-col>
       </el-row>
     </el-form>
     <check-modal
-      :model="isOpenPINDialog"
+      v-if="isOpenPINDialog"
+      :dialogVisible="isOpenPINDialog"
       @close="isOpenPINDialog = false"
     ></check-modal>
   </div>
 </template>
 
-<script>
-import { mapGetters, mapActions } from 'vuex'
-
-import VuePhoneNumberInput from 'vue-phone-number-input'
-import 'vue-phone-number-input/dist/vue-phone-number-input.css'
+<script setup>
+import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
-import {
-  checkFirstLogin,
-  checkLoginToken,
-  checkSettingsToken,
-} from '~/middleware/helpers'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
+import auth from '~/middleware/auth'
+import settingsToken from '~/middleware/settingsToken'
+import useProfileStore from '@/stores/profile'
+import { storeToRefs } from 'pinia'
+import { onMounted } from 'vue'
 
-export default {
-  name: 'EditProfile',
-  components: {
-    phone: VuePhoneNumberInput,
-    CheckModal,
-  },
-  data() {
-    return {
-      payload: {
-        name: null,
-        surname: null,
-        lastname: null,
-        date_of_birth: null,
-        gender: null,
-        phone_number: null,
-        speciality_id: null,
-        languages: null,
-        experience: null,
-        timezone: null,
-        cv: null,
-        avatar: null,
-      },
-      languagesList: [
-        { name: 'EN', id: 'en' },
-        { name: 'RU', id: 'ru' },
-        { name: 'HY', id: 'hy' },
-      ],
-      timeZonesList: [
-        { value: '-12', name: 'Pacific/Kwajalein' },
-        { value: '-11', name: 'Pacific/Samoa' },
-        { value: '-10', name: 'Pacific/Honolulu' },
-        { value: '-9', name: 'America/Juneau' },
-        { value: '-8', name: 'America/Los_Angeles' },
-        { value: '-7', name: 'America/Denver' },
-        { value: '-6', name: 'America/Mexico_City' },
-        { value: '-5', name: 'America/New_York' },
-        { value: '-4', name: 'America/Caracas' },
-        { value: '-3.5', name: 'America/St_Johns' },
-        { value: '-3', name: 'America/Sao_Paulo' },
-        { value: '-2', name: 'Atlantic/South_Georgia' },
-        { value: '-1', name: 'Atlantic/Azores' },
-        { value: '0', name: 'UTC' },
-        { value: '+1', name: 'Europe/Paris' },
-        { value: '+2', name: 'Europe/Helsinki' },
-        { value: '+3', name: 'Europe/Moscow' },
-        { value: '+3.5', name: 'Asia/Tehran' },
-        { value: '+4', name: 'Asia/Yerevan' },
-        { value: '+4.5', name: 'Asia/Kabul' },
-        { value: '+5', name: 'Asia/Karachi' },
-        { value: '+5.5', name: 'Asia/Calcutta' },
-        { value: '+6', name: 'Asia/Dhaka' },
-        { value: '+7', name: 'Asia/Bangkok' },
-        { value: '+8', name: 'Asia/Hong_Kong' },
-        { value: '+9', name: 'Asia/Tokyo' },
-        { value: '+9.5', name: 'Australia/Adelaide' },
-        { value: '+10', name: 'Australia/Sydney' },
-        { value: '+11', name: 'Pacific/Noumea' },
-        { value: '+12', name: 'Pacific/Auckland' },
-      ],
-      avatarSrc: null,
-      isOpenPINDialog: false,
-    }
-  },
-  head() {
-    return {
-      title: 'Edit Profile',
-    }
-  },
-  computed: {
-    ...mapGetters('profile', [
-      'profileLoading',
-      'profileSuccessData',
-      'profileFailureData',
-      'isLoadingSubmit',
-      'editProfileData',
-      'editFailureData',
-    ]),
+const profileStore = useProfileStore()
+const {
+  profileLoading,
+  profileSuccessData,
+  profileFailureData,
+  isLoadingSubmit,
+  editProfileData,
+  editFailureData,
+} = storeToRefs(profileStore)
 
-    avatarUrl() {
-      if (this.editProfileData) {
-        return `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.editProfileData.user.avatar}`
-      } else if (this.profileSuccessData) {
-        if (this.profileSuccessData.user.avatar) {
-          return `${process.env.serverUrl}${this.profileSuccessData.avatarPath}/${this.profileSuccessData.user.avatar}`
-        }
-      }
-      return defaultAvatar
-    },
-  },
-  watch: {
-    profileFailureData(v) {
-      for (const i in v) {
-        if (typeof v[i] !== 'string') {
-          for (const j in v[i]) {
-            this.$notify.error({
-              title: 'Error',
-              dangerouslyUseHTMLString: true,
-              message: `${i}: ${v[i][j]}`,
-            })
-          }
-        } else {
-          this.$notify.error({
-            title: 'Error',
-            message: v[i],
-          })
-        }
-      }
-    },
-    editFailureData(v) {
-      for (const i in v) {
-        if (typeof v[i] !== 'string') {
-          for (const j in v[i]) {
-            this.$notify.error({
-              title: 'Error',
-              dangerouslyUseHTMLString: true,
-              message: `${i}: ${v[i][j]}`,
-            })
-          }
-        } else {
-          this.$notify.error({
-            title: 'Error',
-            message: v[i],
-          })
-        }
-      }
-    },
-    profileSuccessData() {
-      for (const i in this.payload) {
-        this.payload[i] = this.profileSuccessData.user[i]
-      }
-      if (this.payload.phone_number) {
-        this.payload.phone_number = this.payload.phone_number.toString()
-      }
-    },
-    editProfileData(v) {
-      if (v) {
-        this.$message.success('Success!')
-      }
-    },
-  },
-  created() {
-    this.getProfile()
-  },
-  mounted() {
-    checkFirstLogin(this.$cookies, this.$router)
-    checkLoginToken(this.$cookies, this.$router)
-    if (!checkSettingsToken(this.$cookies)) {
-      this.isOpenPINDialog = true
-    }
-  },
-  methods: {
-    ...mapActions('profile', ['getProfile', 'editProfile']),
-    onAvatarUpload(e, file) {
-      this.payload.avatar = file.raw
-      this.avatarSrc = URL.createObjectURL(file.raw)
-      this.editProfile(this.payload)
-    },
-    onSubmit() {
-      this.editProfile(this.payload)
-    },
-  },
+auth()
+
+const payload = ref({
+  name: null,
+  surname: null,
+  lastname: null,
+  date_of_birth: null,
+  gender: null,
+  phone_number: null,
+  speciality_id: null,
+  languages: null,
+  experience: null,
+  timezone: null,
+  cv: null,
+  avatar: null,
+})
+
+const languagesList = ref([
+  { name: 'EN', id: 'en' },
+  { name: 'RU', id: 'ru' },
+  { name: 'HY', id: 'hy' },
+])
+
+const timeZonesList = ref([
+  { value: '-12', name: 'Pacific/Kwajalein' },
+  { value: '-11', name: 'Pacific/Samoa' },
+  { value: '-10', name: 'Pacific/Honolulu' },
+  { value: '-9', name: 'America/Juneau' },
+  { value: '-8', name: 'America/Los_Angeles' },
+  { value: '-7', name: 'America/Denver' },
+  { value: '-6', name: 'America/Mexico_City' },
+  { value: '-5', name: 'America/New_York' },
+  { value: '-4', name: 'America/Caracas' },
+  { value: '-3.5', name: 'America/St_Johns' },
+  { value: '-3', name: 'America/Sao_Paulo' },
+  { value: '-2', name: 'Atlantic/South_Georgia' },
+  { value: '-1', name: 'Atlantic/Azores' },
+  { value: '0', name: 'UTC' },
+  { value: '+1', name: 'Europe/Paris' },
+  { value: '+2', name: 'Europe/Helsinki' },
+  { value: '+3', name: 'Europe/Moscow' },
+  { value: '+3.5', name: 'Asia/Tehran' },
+  { value: '+4', name: 'Asia/Yerevan' },
+  { value: '+4.5', name: 'Asia/Kabul' },
+  { value: '+5', name: 'Asia/Karachi' },
+  { value: '+5.5', name: 'Asia/Calcutta' },
+  { value: '+6', name: 'Asia/Dhaka' },
+  { value: '+7', name: 'Asia/Bangkok' },
+  { value: '+8', name: 'Asia/Hong_Kong' },
+  { value: '+9', name: 'Asia/Tokyo' },
+  { value: '+9.5', name: 'Australia/Adelaide' },
+  { value: '+10', name: 'Australia/Sydney' },
+  { value: '+11', name: 'Pacific/Noumea' },
+  { value: '+12', name: 'Pacific/Auckland' },
+])
+const avatarSrc = ref(null)
+const isOpenPINDialog = ref(null)
+const avatarUrl = ref(defaultAvatar)
+const config = useRuntimeConfig()
+watch(profileSuccessData, (v) => {
+  if (v.user.avatar) {
+    console.log(
+      `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`,
+      'get'
+    )
+    avatarUrl.value = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
+  }
+})
+
+watch(editProfileData, (v) => {
+  if (v.user.avatar) {
+    console.log(`${v.avatarPath}/${v.user.avatar}`)
+    avatarUrl.value = `${v.avatarPath}/${v.user.avatar}`
+  }
+})
+
+watch(profileFailureData, (v) => {})
+watch(editFailureData, (v) => {})
+watch(profileSuccessData, (v) => {
+  for (const i in payload.value) {
+    payload.value[i] = v.user[i]
+  }
+  if (payload.value.phone_number) {
+    payload.value.phone_number = payload.value.phone_number.toString()
+  }
+})
+watch(editProfileData, (v) => {})
+
+onMounted(() => {
+  profileStore.getProfile()
+  isOpenPINDialog.value = settingsToken()
+})
+
+const onAvatarUpload = (e, file) => {
+  payload.value.avatar = file.raw
+  avatarSrc.value = URL.createObjectURL(file.raw)
+  profileStore.editProfile(payload.value)
+}
+const onSubmit = () => {
+  profileStore.editProfile(payload.value)
 }
 </script>
 
@@ -474,26 +420,24 @@ export default {
       &__item {
         flex-basis: 30%;
       }
-      ::v-deep {
-        .el-radio__inner {
-          width: 24px;
-          height: 24px;
-          border: 2px solid #a5affb !important;
-        }
-        .el-radio__input.is-checked .el-radio__inner {
-          background-color: white;
-          border: 2px solid $ov-primary--light !important;
+      .el-radio__inner {
+        width: 24px;
+        height: 24px;
+        border: 2px solid #a5affb !important;
+      }
+      .el-radio__input.is-checked .el-radio__inner {
+        background-color: white;
+        border: 2px solid $ov-primary--light !important;
 
-          &::after {
-            background-color: $ov-primary--light;
-            width: 14px;
-            height: 14px;
-          }
+        &::after {
+          background-color: $ov-primary--light;
+          width: 14px;
+          height: 14px;
         }
-        .el-radio__label {
-          font-weight: 14px;
-          color: #231f20;
-        }
+      }
+      .el-radio__label {
+        font-weight: 14px;
+        color: #231f20;
       }
     }
     &--input {
@@ -504,83 +448,77 @@ export default {
         margin-bottom: 14px;
       }
       &.select {
-        ::v-deep {
-          .el-input__suffix {
-            padding-right: 8px;
-            cursor: pointer;
-            i {
-              color: black;
-              &::before {
-                content: '\e78f';
-              }
+        .el-input__suffix {
+          padding-right: 8px;
+          cursor: pointer;
+          i {
+            color: black;
+            &::before {
+              content: '\e78f';
             }
           }
         }
       }
 
-      ::v-deep {
-        .el-input__inner {
-          padding-left: 16px;
-          height: 48px;
-          border-radius: 6px;
-          border-color: $ov-border--light;
-          padding-right: 45px;
+      .el-input__inner {
+        padding-left: 16px;
+        height: 48px;
+        border-radius: 6px;
+        border-color: $ov-border--light;
+        padding-right: 45px;
 
-          &:focus,
-          &:hover {
-            border-color: $ov-primary;
-          }
-          &::placeholder {
-            color: $ov-placeholder;
-          }
+        &:focus,
+        &:hover {
+          border-color: $ov-primary;
         }
-        .el-input__suffix {
-          padding-right: 8px;
-          cursor: pointer;
+        &::placeholder {
+          color: $ov-placeholder;
         }
-        .el-input__prefix {
-          width: max-content;
-          position: absolute;
-          left: 85%;
-        }
+      }
+      .el-input__suffix {
+        padding-right: 8px;
+        cursor: pointer;
+      }
+      .el-input__prefix {
+        width: max-content;
+        position: absolute;
+        left: 85%;
       }
     }
     &--phone-number {
-      ::v-deep {
-        input {
-          height: 48px;
-          border-color: $ov-border--light;
-          &::placeholder {
-            color: transparent;
-          }
+      input {
+        height: 48px;
+        border-color: $ov-border--light;
+        &::placeholder {
+          color: transparent;
         }
-        .input-tel__label,
-        .country-selector__label {
+      }
+      .input-tel__label,
+      .country-selector__label {
+        display: none;
+      }
+      .input-tel__input {
+        padding-top: 0 !important;
+      }
+      .select-country-container {
+        min-width: 95px;
+        max-width: 95px;
+      }
+      .country-selector__input {
+        padding-top: 0 !important;
+        padding-left: 33px !important;
+        font-size: 15px;
+        font-family: 'Montserrat', sans-serif;
+      }
+      .country-selector__toggle {
+        top: calc(50% - 7px);
+        width: 12px;
+        right: 11px;
+        background-image: url('~/assets/images/icons/arrow-down-icon.svg');
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        svg {
           display: none;
-        }
-        .input-tel__input {
-          padding-top: 0 !important;
-        }
-        .select-country-container {
-          min-width: 95px;
-          max-width: 95px;
-        }
-        .country-selector__input {
-          padding-top: 0 !important;
-          padding-left: 33px !important;
-          font-size: 15px;
-          font-family: 'Montserrat', sans-serif;
-        }
-        .country-selector__toggle {
-          top: calc(50% - 7px);
-          width: 12px;
-          right: 11px;
-          background-image: url('../../assets/images/icons/arrow-down-icon.svg');
-          background-size: 100% 100%;
-          background-repeat: no-repeat;
-          svg {
-            display: none;
-          }
         }
       }
     }
@@ -588,11 +526,9 @@ export default {
       margin-top: 30px;
     }
     &--cv-item {
-      ::v-deep {
-        .el-form-item__label {
-          display: flex;
-          justify-content: center;
-        }
+      .el-form-item__label {
+        display: flex;
+        justify-content: center;
       }
     }
   }
@@ -627,7 +563,7 @@ export default {
     height: 48px;
     padding: 0;
     border-radius: 6px;
-    ::v-deep span {
+    span {
       display: flex;
       align-items: center;
       justify-content: center;

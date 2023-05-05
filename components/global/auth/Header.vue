@@ -12,31 +12,24 @@
       </div>
     </div>
     <div class="main__right">
-      <el-button
-        plain
-        class="main__right--button"
-        @click="onRightButtonClick"
-        >{{ buttonText }}</el-button
-      >
+      <el-button plain class="main__right--button" @click="onRightButtonClick">
+        {{ buttonText }}
+      </el-button>
     </div>
   </nav>
 </template>
 
-<script>
-export default {
-  name: 'HeaderComponent',
-  computed: {
-    buttonText() {
-      return this.$route.path === '/login' ? 'Sign up' : 'Sign in'
-    },
-  },
-  methods: {
-    onRightButtonClick() {
-      this.$route.path === '/login'
-        ? this.$router.push('/register')
-        : this.$router.push('/login')
-    },
-  },
+<script setup>
+import { computed } from 'vue'
+
+const route = useRoute()
+
+const buttonText = computed(() =>
+  route.path === '/login' ? 'Sign up' : 'Sign in'
+)
+
+const onRightButtonClick = () => {
+  route.path === '/login' ? navigateTo('/register') : navigateTo('/login')
 }
 </script>
 

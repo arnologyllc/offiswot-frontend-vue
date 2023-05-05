@@ -1,11 +1,11 @@
 <template>
   <el-dialog
-    :visible.sync="visible"
+    v-model="props.dialogVisible"
     :title="modalStep > 2 ? null : 'Deactivate account'"
     width="30%"
     align-center
     class="dialog"
-    @close="closeModal"
+    @close="instance.emit('visible')"
   >
     <template #footer>
       <span v-if="modalStep === 0">
@@ -59,13 +59,9 @@
               placeholder="PIN"
               :type="showPassword ? 'text' : 'password'"
             >
-              <template slot="suffix">
+              <template #suffix>
                 <img
-                  :src="
-                    require(`@/assets/images/icons/eye-${
-                      !showPassword ? 'close' : 'open'
-                    }-icon.svg`)
-                  "
+                  :src="showPassword ? hideEyeIcon : showEyeIcon"
                   alt="eye_icon"
                   @click="showPassword = !showPassword"
                 />
@@ -77,99 +73,74 @@
             type="danger"
             class="dialog__pin-button"
             plain
-            @click="closeModal"
-            >I AGREE</el-button
+            @click="onSubmit"
           >
+            I AGREE
+          </el-button>
         </el-form>
       </span>
     </template>
   </el-dialog>
 </template>
 
-<script>
-import { mapActions, mapGetters } from 'vuex'
+<script setup>
+import useProfileStore from '~/stores/profile'
+import { storeToRefs } from 'pinia'
+import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
+import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
+const instance = getCurrentInstance()
 
-export default {
-  name: 'DeactivateSettings',
-  props: {
-    dialogVisible: {
-      type: Boolean,
-      required: false,
-    },
+const profileStore = useProfileStore()
+const { deactivateFailureData, deactivateProfileData } =
+  storeToRefs(profileStore)
+
+const props = defineProps({
+  dialogVisible: {
+    type: Boolean,
+    required: false,
   },
-  data() {
-    return {
-      visible: false,
-      modalStep: 0,
-      checkbox: {
-        checked1: false,
-        checked2: false,
-      },
-      payload: {
-        pin: null,
-      },
-      rules: {
-        pin: [
-          {
-            required: true,
-            message: 'This field is required.',
-            trigger: 'blur',
-          },
-        ],
-      },
-      showPassword: false,
-    }
-  },
-  computed: {
-    ...mapGetters('profile', [
-      'deactivateProfileData',
-      'deactivateFailureData',
-    ]),
-  },
-  watch: {
-    deactivateFailureData(v) {
-      for (const i in v) {
-        if (typeof v[i] !== 'string') {
-          for (const j in v[i]) {
-            this.$notify.error({
-              title: 'Error',
-              dangerouslyUseHTMLString: true,
-              message: `${i}: ${v[i][j]}`,
-            })
-          }
-        } else {
-          this.$notify.error({
-            title: 'Error',
-            message: v[i],
-          })
-        }
-      }
+})
+
+const modalStep = ref(0)
+const checkbox = ref({
+  checked1: false,
+  checked2: false,
+})
+
+const payload = ref({
+  pin: null,
+})
+const rules = ref({
+  pin: [
+    {
+      required: true,
+      message: 'This field is required.',
+      trigger: 'blur',
     },
-    deactivateProfileData(v) {
-      if (v) {
-        this.$message.success('Success!')
-      }
-    },
-  },
-  methods: {
-    ...mapActions('profile', ['deactivateProfile']),
-    onSubmit() {
-      this.deactivateProfile(this.payload)
-    },
-    agreeModal() {
-      this.modalStep += 1
-    },
-    closeModal() {
-      this.$emit('visible', this.visible)
-      setTimeout(() => {
-        this.modalStep = 0
-      }, 200)
-    },
-  },
+  ],
+})
+const showPassword = ref(false)
+
+watch(deactivateFailureData, (v) => {
+  for (const i in v) {
+  }
+})
+
+watch(deactivateProfileData, (v) => {
+  instance.emit('visible')
+  setTimeout(() => {
+    modalStep.value = 0
+  }, 200)
+})
+const onSubmit = () => {
+  profileStore.deactivateProfile(payload.value)
+}
+const agreeModal = () => {
+  modalStep.value += 1
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
 .dialog__pin {
   &-icon {
     margin-top: 15px;
@@ -192,11 +163,9 @@ export default {
     border-radius: 6px;
     color: #ff4a66;
   }
-  ::v-deep {
-    .el-input__suffix {
-      top: 5px !important;
-      right: 10px;
-    }
+  .el-input__suffix {
+    top: 5px !important;
+    right: 10px;
   }
 
   .el-form {
@@ -313,13 +282,13 @@ export default {
     color: #ff4a66;
   }
 }
-::v-deep .el-dialog__header {
+.el-dialog__header {
   border-bottom: 1px solid #bbbcbd;
 }
-::v-deep .el-dialog__footer {
+.el-dialog__footer {
   text-align: center;
 }
-::v-deep .el-dialog {
+.el-dialog {
   display: flex;
   flex-direction: column;
   width: 453px !important;
