@@ -21,8 +21,8 @@
               :disabled="props.dragOptions.disabled"
               group="people"
               :move="handleMove"
+              item-key="name"
               @end="handleDragEnd(i, idx)"
-              itemKey="name"
             >
               <template #item="{ element, index }">
                 <div
@@ -227,7 +227,7 @@
         class="desk__edit-footer--members__outer"
         group="people"
         :move="handleMoveFromFooter"
-        itemKey="name"
+        item-key="name"
         @end="handleFooterDragEnd"
       >
         <template #item="{ element }">
@@ -280,7 +280,7 @@
 
     <OvInviteMemberModal
       v-if="isOpenInviteModal"
-      :dialogVisible="isOpenInviteModal"
+      :dialog-visible="isOpenInviteModal"
       @close="isOpenInviteModal = false"
     ></OvInviteMemberModal>
   </div>

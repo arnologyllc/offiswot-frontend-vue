@@ -32,7 +32,6 @@ const useAuthStore = defineStore('auth', {
         })
         .catch((e) => {
           try {
-            console.dir(e)
             JSON.parse(e.data)
           } catch {
             this.loginErrorData = e.data
@@ -111,8 +110,6 @@ const useAuthStore = defineStore('auth', {
         })
         .catch((e) => {
           try {
-            console.dir(e)
-            console.log(e)
             JSON.parse(e.data)
           } catch {
             this.forgotErrorData = e.data

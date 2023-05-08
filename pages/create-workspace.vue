@@ -92,7 +92,7 @@
 
       <error-massage
         v-if="errors.name.isShow && !isWeb()"
-        :dialogVisible="errors.name.isShow && !isWeb()"
+        :dialog-visible="errors.name.isShow && !isWeb()"
         :error-text="errors.name.value"
         @visible="errors.name.isShow = false"
       ></error-massage>
@@ -100,23 +100,24 @@
 
     <check-modal
       v-if="isOpenPINDialog"
-      :dialogVisible="isOpenPINDialog"
+      :dialog-visible="isOpenPINDialog"
       @close="isOpenPINDialog = false"
     ></check-modal>
   </div>
 </template>
 
 <script setup>
-definePageMeta({ layout: 'default' })
+import { storeToRefs } from 'pinia'
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 
 import useWorkspacesStore from '~/stores/workspace'
-import { storeToRefs } from 'pinia'
-import { onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import settingsToken from '~/middleware/settingsToken'
 import auth from '~/middleware/auth'
+definePageMeta({ layout: 'default' })
 
 const workspacesStore = useWorkspacesStore()
 const {
@@ -129,9 +130,7 @@ const {
 } = storeToRefs(workspacesStore)
 
 const instance = getCurrentInstance()
-const $route = useRoute()
 const $router = useRouter()
-const config = useRuntimeConfig()
 
 const payload = ref({
   name: null,

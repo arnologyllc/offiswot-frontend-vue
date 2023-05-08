@@ -22,13 +22,12 @@
 </template>
 
 <script setup>
+import { useRoute } from 'vue-router'
 import Header from '~/components/global/auth/Header.vue'
 import Footer from '@/components/global/Footer.vue'
-import { useRoute } from 'vue-router'
 import login from '~/middleware/login'
 const route = useRoute()
 login()
-
 
 const checkPage = () => {
   return route.path
@@ -47,11 +46,17 @@ const checkPage = () => {
   position: relative;
   &__background {
     background-image: url('@/assets/images/auth-background.svg');
-    padding: 130px 0 150px 18%;
   }
   &__outer {
     display: flex;
     flex-direction: column;
+  }
+  .main {
+    width: 390px;
+    margin-top: 180px;
+    margin-bottom: 100px;
+    margin-left: 290px;
+    height: 100%;
   }
   .go-back {
     position: absolute;

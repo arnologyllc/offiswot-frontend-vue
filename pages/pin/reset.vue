@@ -123,14 +123,14 @@
 
         <error-massage
           v-if="errors.pin.isShow && !isWeb()"
-          :dialogVisible="errors.pin.isShow && !isWeb()"
+          :dialog-visible="errors.pin.isShow && !isWeb()"
           :error-text="errors.pin.value"
           @visible="errors.pin.isShow = false"
         ></error-massage>
 
         <error-massage
           v-if="errors.pin_confirmation.isShow && !isWeb()"
-          :dialogVisible="errors.pin_confirmation.isShow && !isWeb()"
+          :dialog-visible="errors.pin_confirmation.isShow && !isWeb()"
           :error-text="errors.pin_confirmation.value"
           @visible="errors.pin_confirmation.isShow = false"
         ></error-massage>
@@ -140,15 +140,15 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: 'default' })
-import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
-import { getCurrentInstance, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import usePINStore from '~/stores/pin'
 import { storeToRefs } from 'pinia'
+import { getCurrentInstance, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import usePINStore from '~/stores/pin'
+import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
 import auth from '~/middleware/auth'
+definePageMeta({ layout: 'default' })
 
 const pinStore = usePINStore()
 const { changePinData, changePinFailureData, isLoadingSubmit } =
@@ -156,7 +156,6 @@ const { changePinData, changePinFailureData, isLoadingSubmit } =
 
 const instance = getCurrentInstance()
 const $route = useRoute()
-const $router = useRouter()
 
 const validateRepeatPIN = (rule, value, callback) => {
   if (value === '') {
@@ -279,9 +278,6 @@ const validateField = (fieldName) => {
       errors.value[fieldName].value = ''
     }
   })
-}
-const clearError = () => {
-  errors.value.global.value = ''
 }
 
 const isWeb = () => {

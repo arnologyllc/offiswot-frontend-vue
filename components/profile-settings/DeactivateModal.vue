@@ -84,8 +84,8 @@
 </template>
 
 <script setup>
-import useProfileStore from '~/stores/profile'
 import { storeToRefs } from 'pinia'
+import useProfileStore from '~/stores/profile'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
 const instance = getCurrentInstance()
@@ -102,10 +102,6 @@ const props = defineProps({
 })
 
 const modalStep = ref(0)
-const checkbox = ref({
-  checked1: false,
-  checked2: false,
-})
 
 const payload = ref({
   pin: null,
@@ -121,10 +117,7 @@ const rules = ref({
 })
 const showPassword = ref(false)
 
-watch(deactivateFailureData, (v) => {
-  for (const i in v) {
-  }
-})
+watch(deactivateFailureData, (v) => {})
 
 watch(deactivateProfileData, (v) => {
   instance.emit('visible')

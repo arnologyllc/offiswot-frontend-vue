@@ -198,10 +198,6 @@ const hideError = () => {
   error.value.isShow = false
 }
 
-const clearError = () => {
-  error.value.global.value = ''
-}
-
 const showingEmail = (email, size) => {
   const part1 = email.slice(0, size)
   const part2 = email.slice(size)

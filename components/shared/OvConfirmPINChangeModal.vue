@@ -41,9 +41,9 @@
 </template>
 
 <script setup>
-import usePINStore from '@/stores/pin'
 import { storeToRefs } from 'pinia'
 import { onMounted, watch } from 'vue'
+import usePINStore from '@/stores/pin'
 const pinStore = usePINStore()
 const { changePinData, changePinFailureData } = storeToRefs(pinStore)
 

@@ -56,18 +56,18 @@
     <NuxtPage />
     <check-modal
       v-if="isOpenPINDialog"
-      :dialogVisible="isOpenPINDialog"
+      :dialog-visible="isOpenPINDialog"
       @close="isOpenPINDialog = false"
     ></check-modal>
   </div>
 </template>
 
 <script setup>
-definePageMeta({ layout: 'default' })
-import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import { computed } from 'vue'
+import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import workspaceMiddleware from '~/middleware/workspace'
 import settingsToken from '~/middleware/settingsToken'
+definePageMeta({ layout: 'default' })
 
 workspaceMiddleware()
 
@@ -109,7 +109,7 @@ const collapseChannels = computed(() =>
 )
 
 onMounted(() => {
-  isOpenPINDialog = settingsToken()
+  isOpenPINDialog.value = settingsToken()
 })
 </script>
 

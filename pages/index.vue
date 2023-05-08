@@ -52,20 +52,19 @@
     </div>
     <check-modal
       v-if="isOpenPINDialog"
-      :dialogVisible="isOpenPINDialog"
+      :dialog-visible="isOpenPINDialog"
       @close="isOpenPINDialog = false"
     ></check-modal>
   </div>
 </template>
 
 <script setup>
-definePageMeta({ layout: 'default' })
+import { onMounted } from 'vue'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import loginToken from '~/middleware/loginToken'
-import { getCurrentInstance, onMounted } from 'vue'
 import auth from '~/middleware/auth'
+definePageMeta({ layout: 'default' })
 
-const instance = getCurrentInstance()
 const isOpenPINDialog = ref(null)
 isOpenPINDialog.value = loginToken()
 

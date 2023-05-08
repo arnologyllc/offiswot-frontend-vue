@@ -209,13 +209,13 @@
 
         <error-massage
           v-if="errors.old_password.isShow && !isWeb()"
-          :dialogVisible="errors.old_password.isShow && !isWeb()"
+          :dialog-visible="errors.old_password.isShow && !isWeb()"
           :error-text="errors.old_password.value"
           @visible="errors.old_password.isShow = false"
         ></error-massage>
         <error-massage
           v-if="errors.password.isShow && !isWeb()"
-          :dialogVisible="errors.password.isShow && !isWeb()"
+          :dialog-visible="errors.password.isShow && !isWeb()"
           :error-text="errors.password.value"
           :text-color="
             errors.password.status === 'Medium' && payload.password
@@ -229,7 +229,7 @@
 
         <error-massage
           v-if="errors.password_confirmation.isShow && !isWeb()"
-          :dialogVisible="errors.password_confirmation.isShow && !isWeb()"
+          :dialog-visible="errors.password_confirmation.isShow && !isWeb()"
           :error-text="errors.password_confirmation.value"
           @visible="errors.password_confirmation.isShow = false"
         ></error-massage>
@@ -239,32 +239,31 @@
     <ConfirmModal
       v-if="isOpenEmailDialog"
       :email="payload.email"
-      :dialogVisible="isOpenEmailDialog"
+      :dialog-visible="isOpenEmailDialog"
       @close="isOpenEmailDialog = false"
     ></ConfirmModal>
 
     <check-modal
       v-if="isOpenPINDialog"
-      :dialogVisible="isOpenPINDialog"
+      :dialog-visible="isOpenPINDialog"
       @close="isOpenPINDialog = false"
     ></check-modal>
   </div>
 </template>
 
 <script setup>
-definePageMeta({ layout: 'default' })
-
 import { getCurrentInstance } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import ConfirmModal from '@/components/shared/OvConfirmPasswordChangeModal.vue'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import useAuthStore from '~/stores/auth'
-import { storeToRefs } from 'pinia'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
 import settingsToken from '~/middleware/settingsToken'
 import auth from '~/middleware/auth'
+definePageMeta({ layout: 'default' })
 
 const authStore = useAuthStore()
 const {
@@ -273,11 +272,9 @@ const {
   resetLoading,
   forgotSuccessData,
   forgotErrorData,
-  forgotLoading,
 } = storeToRefs(authStore)
 
 const instance = getCurrentInstance()
-const $route = useRoute()
 const $router = useRouter()
 
 const isOpenPINDialog = ref(false)

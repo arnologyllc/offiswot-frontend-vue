@@ -56,8 +56,8 @@
           </el-input>
           <template #error>
             <div
-              class="el-form-item__error"
               v-if="errors.email.isShow && isWeb()"
+              class="el-form-item__error"
             >
               <span>{{ errors.email.value }}</span>
             </div>
@@ -139,19 +139,19 @@
     <confirm-email
       v-if="isOpenEmailDialog"
       :email="payload.email"
-      :dialogVisible="isOpenEmailDialog"
+      :dialog-visible="isOpenEmailDialog"
       @close="isOpenEmailDialog = false"
     ></confirm-email>
 
     <error-massage
       v-if="errors.email.isShow && !isWeb()"
-      :dialogVisible="errors.email.isShow && !isWeb()"
+      :dialog-visible="errors.email.isShow && !isWeb()"
       :error-text="errors.email.value"
       @visible="errors.email.isShow = false"
     ></error-massage>
     <error-massage
       v-if="errors.password.isShow && !isWeb()"
-      :dialogVisible="errors.password.isShow && !isWeb()"
+      :dialog-visible="errors.password.isShow && !isWeb()"
       :error-text="errors.password.value"
       @visible="errors.password.isShow = false"
     ></error-massage>
@@ -159,18 +159,18 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: 'auth' })
-
 import { getCurrentInstance, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import $cookies from 'js-cookie'
+import { storeToRefs } from 'pinia'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
 import ConfirmEmail from '@/components/shared/OvConfirmEmailModal.vue'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import useAuthStore from '~/stores/auth'
-import { storeToRefs } from 'pinia'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
+
+definePageMeta({ layout: 'auth' })
 
 const authStore = useAuthStore()
 const { loginSuccessData, loginErrorData } = storeToRefs(authStore)
@@ -217,12 +217,13 @@ const rules = ref({
   ],
 })
 
-watch(loginSuccessData, ({ access_token, is_first_login }) => {
+watch(loginSuccessData, (v) => {
+  const [accessToken, isFirstLogin] = [v.access_token, v.is_first_login]
   const expirationDate = payload.value.remember_me ? 0 : 1 / 24
-  $cookies.set('token', access_token, { expires: expirationDate })
-  if (is_first_login) {
+  $cookies.set('token', accessToken, { expires: expirationDate })
+  if (isFirstLogin) {
     navigateTo('/pin')
-    $cookies.set('first_login', is_first_login)
+    $cookies.set('first_login', isFirstLogin)
   } else {
     navigateTo('/')
   }
@@ -317,7 +318,6 @@ const clearError = () => {
 
 <style scoped lang="scss">
 .main {
-  width: 100%;
   display: flex;
   position: relative;
   height: 100%;
@@ -339,6 +339,7 @@ const clearError = () => {
 
     &--box {
       &__input {
+        height: 48px;
         .el-input__inner {
           height: 48px;
           border-radius: 6px;
@@ -379,18 +380,15 @@ const clearError = () => {
       width: 100%;
       margin-top: 24px;
       display: flex;
+      font-size: 14px;
       justify-content: space-between;
+      color: $ov-text--subtitle;
+      font-weight: 400 !important;
       .el-button {
         padding: 0;
-        font-size: 12px;
-        font-weight: 500;
-        color: $ov-text--subtitle;
         &:hover {
           color: $ov-primary;
         }
-      }
-      .forgot-password {
-        font-size: 14px;
       }
       .remember-checkbox {
         .el-checkbox__inner {
@@ -398,7 +396,6 @@ const clearError = () => {
           height: 24px;
           border-radius: 6px;
           border-color: $ov-primary--light;
-          font-size: 14px;
           z-index: auto;
           &:hover {
             border-color: $ov-primary;
@@ -413,7 +410,6 @@ const clearError = () => {
         }
         .el-checkbox__label {
           color: $ov-text--subtitle;
-          font-weight: 400;
         }
       }
       & .is-checked {

@@ -42,9 +42,9 @@
 </template>
 
 <script setup>
-import useAuthStore from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import { onMounted, watch } from 'vue'
+import useAuthStore from '@/stores/auth'
 const authStore = useAuthStore()
 const { forgotSuccessData, forgotErrorData } = storeToRefs(authStore)
 

@@ -85,7 +85,7 @@
     <ConfirmModal
       v-if="isOpenEmailDialog"
       :email="payload.email"
-      :dialogVisible="isOpenEmailDialog"
+      :dialog-visible="isOpenEmailDialog"
       :append-to-body="true"
       @close="isOpenEmailDialog = false"
     ></ConfirmModal>
@@ -94,13 +94,13 @@
 
 <script setup>
 import { getCurrentInstance, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import $cookies from 'js-cookie'
 import ConfirmModal from '@/components/shared/OvConfirmPINChangeModal.vue'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
-import $cookies from 'js-cookie'
-import { useRoute, useRouter } from 'vue-router'
 import usePinStore from '~/stores/pin'
-import { storeToRefs } from 'pinia'
 
 const dialogWidth = ref('450px')
 const dialogHeight = ref('400px')
@@ -226,15 +226,11 @@ const onForgot = () => {
   isOpenEmailDialog.value = true
   pinStore.forgotPin()
 }
-const hideError = (fieldName) => {
-  errors.value[fieldName].isShow = false
-}
 
 const clearError = () => {
   errors.value.global.value = ''
 }
 const validateField = (fieldName) => {
-  console.log(instance.refs.pinForm)
   instance.refs.pinForm.validateField(fieldName, (isValid, catchedError) => {
     if (!isValid) {
       errors.value[fieldName].value = catchedError[fieldName][0].message

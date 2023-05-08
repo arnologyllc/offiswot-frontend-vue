@@ -40,12 +40,12 @@
 </template>
 
 <script setup>
-import useAuthStore from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import { onMounted, watch } from 'vue'
+import useAuthStore from '@/stores/auth'
+
 const authStore = useAuthStore()
 const { resendSuccessData, resendFailureData } = storeToRefs(authStore)
-const instance = getCurrentInstance()
 
 const props = defineProps({
   dialogVisible: {

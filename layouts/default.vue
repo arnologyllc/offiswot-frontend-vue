@@ -9,11 +9,11 @@
 </template>
 
 <script setup>
+import cookies from 'js-cookie'
 import Header from '@/components/global/default/Header'
 import Footer from '@/components/global/Footer'
 import auth from '~/middleware/auth'
 import firstLogin from '~/middleware/firstLogin'
-import cookies from 'js-cookie'
 if (!cookies.get('token')) auth()
 firstLogin()
 </script>

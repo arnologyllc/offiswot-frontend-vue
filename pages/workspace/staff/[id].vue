@@ -53,9 +53,9 @@
 </template>
 
 <script setup>
+import { resolveDynamicComponent } from 'vue'
 import Desk from '@/components/staff/Desk.vue'
 import List from '@/components/staff/List.vue'
-import { resolveDynamicComponent } from 'vue'
 
 const desk = resolveDynamicComponent(Desk)
 const list = resolveDynamicComponent(List)

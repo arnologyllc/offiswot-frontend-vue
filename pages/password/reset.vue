@@ -149,7 +149,7 @@
     </div>
     <error-massage
       v-if="errors.password.isShow && !isWeb()"
-      :dialogVisible="errors.password.isShow && !isWeb()"
+      :dialog-visible="errors.password.isShow && !isWeb()"
       :error-text="errors.password.value"
       :text-color="
         errors.password.status === 'Medium' && payload.password
@@ -164,7 +164,7 @@
 
     <error-massage
       v-if="errors.password_confirmation.isShow && !isWeb()"
-      :dialogVisible="errors.password_confirmation.isShow && !isWeb()"
+      :dialog-visible="errors.password_confirmation.isShow && !isWeb()"
       :error-text="errors.password_confirmation.value"
       @visible="errors.password_confirmation.isShow = false"
     >
@@ -173,15 +173,15 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: 'auth' })
-import LoginButtons from '@/components/auth/LoginButtons.vue'
-import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
-import useAuthStore from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
 import $cookies from 'js-cookie'
+import LoginButtons from '@/components/auth/LoginButtons.vue'
+import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
+import useAuthStore from '@/stores/auth'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
+definePageMeta({ layout: 'auth' })
 
 const authStore = useAuthStore()
 const { resetSuccessData, resetErrorData, resetLoading } =
@@ -342,8 +342,7 @@ watch(resetSuccessData, (v) => {
   }
 })
 
-watch(resetErrorData, (v) => {
-})
+watch(resetErrorData, (v) => {})
 
 const onSubmit = () => {
   instance.refs.resetForm.validate((valid) => {

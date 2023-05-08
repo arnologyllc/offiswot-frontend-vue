@@ -68,36 +68,35 @@
     </div>
     <deactivate-modal
       v-if="dialogVisible"
-      :dialogVisible="dialogVisible"
+      :dialog-visible="dialogVisible"
       @visible="dialogVisible = false"
     >
     </deactivate-modal>
     <delete-modal
       v-if="showModal"
-      :dialogVisible="showModal"
+      :dialog-visible="showModal"
       @visible="showModal = false"
     ></delete-modal>
     <check-modal
       v-if="isOpenPINDialog"
-      :dialogVisible="isOpenPINDialog"
+      :dialog-visible="isOpenPINDialog"
       @close="isOpenPINDialog = false"
     ></check-modal>
   </div>
 </template>
 
 <script setup>
-definePageMeta({ layout: 'default' })
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import DeactivateModal from '@/components/profile-settings/DeactivateModal.vue'
 import DeleteModal from '@/components/profile-settings/DeleteModal.vue'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
-import { useRoute, useRouter } from 'vue-router'
 import loginToken from '~/middleware/loginToken'
 import settingsToken from '~/middleware/settingsToken'
 import auth from '~/middleware/auth'
-import { onMounted } from 'vue'
+definePageMeta({ layout: 'default' })
 
 loginToken()
-const $route = useRoute()
 const $router = useRouter()
 const showModal = ref(false)
 const dialogVisible = ref(false)

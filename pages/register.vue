@@ -149,6 +149,7 @@
             placeholder="Password"
             :type="showPassword ? 'text' : 'password'"
             @input="validateField('password')"
+            @blur="validateField('password')"
           >
             <template #prefix>
               <img
@@ -207,13 +208,7 @@
             </template>
           </el-input>
           <template #error>
-            <div
-                  v-if="errors.password.isShow && isWeb()"
-                  :class="getColor()"
-                  class="el-form-item__error strength"
-                >
-                  <span v-html="errors.password.value"></span>
-                </div>
+            <div></div>
           </template>
         </el-form-item>
         <el-form-item prop="password_confirmation" class="form-item">
@@ -286,20 +281,20 @@
     <confirm-email
       v-if="isOpenEmailDialog"
       :email="payload.email"
-      :dialogVisible="isOpenEmailDialog"
+      :dialog-visible="isOpenEmailDialog"
       @close="isOpenEmailDialog = false"
     ></confirm-email>
 
     <error-massage
       v-if="errors.email.isShow && !isWeb()"
-      :dialogVisible="errors.email.isShow && !isWeb()"
+      :dialog-visible="errors.email.isShow && !isWeb()"
       :error-text="errors.email.value"
       @visible="errors.email.isShow = false"
     ></error-massage>
 
     <error-massage
       v-if="errors.username.isShow && !isWeb()"
-      :dialogVisible="errors.username.isShow && !isWeb()"
+      :dialog-visible="errors.username.isShow && !isWeb()"
       :error-text="errors.username.value"
       :text-color="
         errors.username.status === 'Medium' && payload.username
@@ -311,7 +306,7 @@
 
     <error-massage
       v-if="errors.password.isShow && !isWeb()"
-      :dialogVisible="errors.password.isShow && !isWeb()"
+      :dialog-visible="errors.password.isShow && !isWeb()"
       :error-text="errors.password.value"
       :text-color="
         errors.password.status === 'Medium' && payload.password
@@ -325,7 +320,7 @@
 
     <error-massage
       v-if="errors.password_confirmation.isShow && !isWeb()"
-      :dialogVisible="errors.password_confirmation.isShow && !isWeb()"
+      :dialog-visible="errors.password_confirmation.isShow && !isWeb()"
       :error-text="errors.password_confirmation.value"
       @visible="errors.password_confirmation.isShow = false"
     ></error-massage>
@@ -333,17 +328,17 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: 'auth' })
 import { getCurrentInstance, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import $cookies from 'js-cookie'
+import { storeToRefs } from 'pinia'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
 import ConfirmEmail from '@/components/shared/OvConfirmEmailModal.vue'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import useAuthStore from '~/stores/auth'
-import { storeToRefs } from 'pinia'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
+definePageMeta({ layout: 'auth' })
 
 const authStore = useAuthStore()
 const { registerFailureData, registerSuccessData } = storeToRefs(authStore)
@@ -572,7 +567,7 @@ const updatePasswordStrength = (password) => {
   if (
     identicalRegex.test(password) &&
     (password?.length > 15 ||
-      !words.some((elem) => password.toLowerCase().includes(elem)))
+      !words.some((elem) => password?.toLowerCase().includes(elem)))
   ) {
     if (
       strongRegex.test(password) &&
@@ -604,7 +599,7 @@ watch(registerFailureData, (v) => {
     errors.value.global.value = v
   }
   if (v === 'Email already exists but is not verified.') {
-    isOpenEmailDialog = true
+    isOpenEmailDialog.value = true
   }
   if (typeof v !== 'string') {
     for (const i in v) {
@@ -624,7 +619,6 @@ watch(registerFailureData, (v) => {
 
 <style scoped lang="scss">
 .main {
-  width: 100%;
   position: relative;
   display: flex;
 
@@ -645,6 +639,10 @@ watch(registerFailureData, (v) => {
 
     &--box {
       &__input {
+        background: #ffffff;
+        border: 1px solid #ecebed;
+        border-radius: 6px;
+        height: 48px;
         .el-input__inner {
           height: 48px;
           border-radius: 6px;
@@ -868,7 +866,7 @@ watch(registerFailureData, (v) => {
 }
 .error_icon {
   position: absolute;
-  top: 13px;
+  top: 11px;
   right: 7px;
 }
 
@@ -917,11 +915,9 @@ watch(registerFailureData, (v) => {
   gap: 16px;
 }
 
-.clear-error {
+.clear-error,
+u {
   cursor: pointer;
-}
-.strength {
-  left: 127%;
 }
 .done {
   color: #34b53a;
@@ -929,17 +925,6 @@ watch(registerFailureData, (v) => {
 
 .warning {
   color: #ffa26b;
-}
-
-.error_icon {
-  position: absolute;
-  top: 13px;
-  right: 7px;
-}
-
-.eye_icon {
-  position: relative;
-  right: 24px;
 }
 
 .terms {

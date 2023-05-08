@@ -41,7 +41,7 @@
             placeholder="Old PIN"
             @blur="validateField('previous')"
           >
-            <template suffix>
+            <template #suffix>
               <div
                 v-if="payload.previous"
                 style="position: relative"
@@ -190,21 +190,21 @@
 
         <error-massage
           v-if="errors.previous.isShow && !isWeb()"
-          :dialogVisible="errors.previous.isShow && !isWeb()"
+          :dialog-visible="errors.previous.isShow && !isWeb()"
           :error-text="errors.previous.value"
           @visible="errors.previous.isShow = false"
         ></error-massage>
 
         <error-massage
           v-if="errors.pin.isShow && !isWeb()"
-          :dialogVisible="errors.pin.isShow && !isWeb()"
+          :dialog-visible="errors.pin.isShow && !isWeb()"
           :error-text="errors.pin.value"
           @visible="errors.pin.isShow = false"
         ></error-massage>
 
         <error-massage
           v-if="errors.pin_confirmation.isShow && !isWeb()"
-          :dialogVisible="errors.pin_confirmation.isShow && !isWeb()"
+          :dialog-visible="errors.pin_confirmation.isShow && !isWeb()"
           :error-text="errors.pin_confirmation.value"
           @visible="errors.pin_confirmation.isShow = false"
         ></error-massage>
@@ -214,24 +214,23 @@
     <ConfirmModal
       v-if="isOpenEmailDialog"
       :email="payload.email"
-      :dialogVisible="isOpenEmailDialog"
+      :dialog-visible="isOpenEmailDialog"
       @close="isOpenEmailDialog = false"
     ></ConfirmModal>
 
     <check-modal
       v-if="isOpenPINDialog"
-      :dialogVisible="isOpenPINDialog"
+      :dialog-visible="isOpenPINDialog"
       @close="isOpenPINDialog = false"
     ></check-modal>
   </div>
 </template>
 
 <script setup>
-definePageMeta({ layout: 'default' })
 import { getCurrentInstance, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import usePINStore from '~/stores/pin'
 import { storeToRefs } from 'pinia'
+import usePINStore from '~/stores/pin'
 
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import ConfirmModal from '@/components/shared/OvConfirmPINChangeModal.vue'
@@ -240,6 +239,7 @@ import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
 import settingsToken from '~/middleware/settingsToken'
 import auth from '~/middleware/auth'
+definePageMeta({ layout: 'default' })
 
 const pinStore = usePINStore()
 const {

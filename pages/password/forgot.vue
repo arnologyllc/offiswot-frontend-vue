@@ -73,27 +73,27 @@
 
     <error-massage
       v-if="errors.email.isShow && !isWeb()"
-      :dialogVisible="errors.email.isShow && !isWeb()"
+      :dialog-visible="errors.email.isShow && !isWeb()"
       :error-text="errors.email.value"
       @visible="errors.email.isShow = false"
     ></error-massage>
     <ConfirmModal
       v-if="isOpenEmailDialog"
       :email="payload.email"
-      :dialogVisible="isOpenEmailDialog"
+      :dialog-visible="isOpenEmailDialog"
       @close="isOpenEmailDialog = false"
     ></ConfirmModal>
   </div>
 </template>
 
 <script setup>
-definePageMeta({ layout: 'auth' })
+import { storeToRefs } from 'pinia'
+import { onMounted, watch } from 'vue'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
 import ConfirmModal from '@/components/shared/OvConfirmPasswordChangeModal.vue'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import useAuthStore from '@/stores/auth'
-import { storeToRefs } from 'pinia'
-import { onMounted, watch } from 'vue'
+definePageMeta({ layout: 'auth' })
 
 const instance = getCurrentInstance()
 const authStore = useAuthStore()

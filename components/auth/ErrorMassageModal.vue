@@ -2,12 +2,13 @@
   <el-dialog
     v-model="props.dialogVisible"
     width="200px"
+    class="errorDialog"
     :show-close="false"
     :show-header="false"
     @close="closeModal"
   >
     <div class="dialog-text">
-      <span v-html="errorText" :class="textColor"></span>
+      <span :class="textColor" v-html="errorText"></span>
     </div>
     <template #footer>
       <img
@@ -66,7 +67,7 @@ const closeModal = () => {
   border-radius: 13px !important;
   background: #ffffff;
   margin-top: 220px !important;
-  border: 1px solid #4f4cec;
+  border: 1px solid #4f4cec !important;
   .el-dialog__header {
     display: none;
   }

@@ -230,21 +230,21 @@
     </el-form>
     <check-modal
       v-if="isOpenPINDialog"
-      :dialogVisible="isOpenPINDialog"
+      :dialog-visible="isOpenPINDialog"
       @close="isOpenPINDialog = false"
     ></check-modal>
   </div>
 </template>
 
 <script setup>
+import { storeToRefs } from 'pinia'
+import { onMounted } from 'vue'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import auth from '~/middleware/auth'
 import settingsToken from '~/middleware/settingsToken'
 import useProfileStore from '@/stores/profile'
-import { storeToRefs } from 'pinia'
-import { onMounted } from 'vue'
 
 const profileStore = useProfileStore()
 const {
@@ -315,37 +315,36 @@ const avatarSrc = ref(null)
 const isOpenPINDialog = ref(null)
 const avatarUrl = ref(defaultAvatar)
 const config = useRuntimeConfig()
-watch(profileSuccessData, (v) => {
+
+const setProfileData = (v) => {
   if (v.user.avatar) {
-    console.log(
-      `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`,
-      'get'
-    )
     avatarUrl.value = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
   }
-})
-
-watch(editProfileData, (v) => {
-  if (v.user.avatar) {
-    console.log(`${v.avatarPath}/${v.user.avatar}`)
-    avatarUrl.value = `${v.avatarPath}/${v.user.avatar}`
-  }
-})
-
-watch(profileFailureData, (v) => {})
-watch(editFailureData, (v) => {})
-watch(profileSuccessData, (v) => {
   for (const i in payload.value) {
     payload.value[i] = v.user[i]
   }
   if (payload.value.phone_number) {
     payload.value.phone_number = payload.value.phone_number.toString()
   }
+}
+
+watch(editProfileData, (v) => {
+  setProfileData(v)
+  if (v.user.avatar) {
+    avatarUrl.value = `${v.avatarPath}/${v.user.avatar}`
+  }
 })
-watch(editProfileData, (v) => {})
+
+watch(profileFailureData, (v) => {})
+watch(editFailureData, (v) => {})
+watch(profileSuccessData, (v) => setProfileData(v))
 
 onMounted(() => {
-  profileStore.getProfile()
+  if (!profileSuccessData.value) {
+    profileStore.getProfile()
+  } else {
+    setProfileData(profileSuccessData.value)
+  }
   isOpenPINDialog.value = settingsToken()
 })
 
