@@ -1,5 +1,4 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import Cookies from 'js-cookie'
 
 export default defineNuxtConfig({
   target: 'static',
@@ -25,7 +24,12 @@ export default defineNuxtConfig({
     },
   },
 
-  css: ['@/assets/styles/main.css', 'maz-ui/css/main.css'],
+  css: [
+    '@/assets/styles/main.css',
+    '@/assets/styles/errors.scss',
+    '@/assets/styles/modals.scss',
+    'maz-ui/css/main.css',
+  ],
 
   server: {
     port: process.env.PORT || 8000,

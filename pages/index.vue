@@ -80,7 +80,7 @@ onMounted(() => {
 }
 .account {
   width: 80%;
-  margin: 60px auto;
+  margin: 0 auto 60px;
   height: 500px;
   border-left: 1px solid #d0c9d6;
 
@@ -132,36 +132,6 @@ onMounted(() => {
         color: #6d7075;
       }
     }
-  }
-  .el-form-item__global-error-container {
-    width: 100%;
-    border-color: #e60022;
-    background: #fbe4e8;
-    box-shadow: 0px 7px 64px rgb(0 0 0 / 7%);
-    border-radius: 6px;
-    font-family: 'Montserrat';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 20px;
-    display: flex;
-    justify-content: space-between;
-    padding: 7px 12px;
-    align-items: center;
-    color: #e60022;
-    gap: 16px;
-    margin-bottom: 27px;
-  }
-  .el-form-item__global-error {
-    font-family: 'Montserrat';
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .clear-error {
-    cursor: pointer;
   }
 }
 

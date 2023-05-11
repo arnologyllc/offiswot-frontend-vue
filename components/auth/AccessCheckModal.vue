@@ -7,6 +7,7 @@
     text-align="center"
     :show-close="false"
     top="230px"
+    class="access_modal"
     @close="$emit('close')"
   >
     <template #header>
@@ -56,7 +57,7 @@
               style="position: relative"
               @click="focusElement('pin')"
             >
-              <span for="pin" class="pin_placeholder"> Enter PIN </span>
+              <span for="pin" class="custom_placeholder"> Enter PIN </span>
             </div>
             <img
               :src="showPIN ? hideEyeIcon : showEyeIcon"
@@ -153,7 +154,7 @@ const errors = ref({
 const showPIN = ref(false)
 const isOpenEmailDialog = ref(false)
 
-watch(checkPinData, (v) => {
+watch(checkPinData, ({ data: v }) => {
   if (!$cookies.get('login_pin_token'))
     $cookies.set('login_pin_token', v.login_pin_token, { expires: 30 })
   instance.emit('loginToken', $cookies.get('login_pin_token'))
@@ -241,257 +242,4 @@ const validateField = (fieldName) => {
 }
 </script>
 
-<style scoped lang="scss">
-.main {
-  width: 100%;
-  display: flex;
-  position: relative;
-  height: 100%;
-  padding: 100px 0 150px 18%;
-
-  &__form {
-    &--title {
-      font-size: 20px;
-      font-weight: 600;
-      color: $ov-text--title;
-      margin-bottom: 4px;
-    }
-
-    &--subtitle {
-      font-size: 14px;
-      color: $ov-text--subtitle;
-      margin-bottom: 40px;
-    }
-
-    &--box {
-      width: 320px;
-      &__input {
-        .el-input__inner {
-          height: 48px;
-          padding: 0 15px;
-          border-radius: 6px;
-          border-color: $ov-border--light;
-
-          &:focus,
-          &:hover {
-            border-color: $ov-primary;
-          }
-
-          &::placeholder {
-            color: $ov-placeholder;
-          }
-        }
-
-        .el-input__prefix,
-        .el-input__suffix {
-          display: grid;
-          align-items: center;
-        }
-
-        .el-input__prefix {
-          padding-left: 8px;
-        }
-
-        .el-input__suffix {
-          padding-right: 8px;
-          display: flex !important;
-          cursor: pointer;
-        }
-
-        .el-input__suffix-inner {
-          display: flex !important;
-        }
-      }
-    }
-  }
-}
-.forgot-password {
-  text-align: left;
-  color: #6979f8;
-  text-decoration: underline;
-  .el-button {
-    font-size: 12px;
-    font-weight: 500;
-
-    &:hover {
-      color: $ov-primary;
-    }
-
-    .el-button--text {
-      padding: 0;
-      margin-bottom: 40px;
-    }
-  }
-}
-.forgot-password {
-  font-size: 14px;
-}
-.el-form-item {
-  margin-bottom: 15px;
-}
-.el-dialog {
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-  .el-dialog__close {
-    color: black !important;
-  }
-  .el-dialog__footer {
-    display: flex;
-    justify-content: center;
-  }
-  .el-dialog__body {
-    padding: 15px 35px 30px 35px;
-    color: $ov-text--title;
-    word-break: normal;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .el-dialog__header {
-    display: grid;
-    justify-content: center;
-
-    width: 100%;
-    font-family: 'Montserrat';
-    font-style: normal;
-    font-weight: 600;
-    font-size: 20px;
-    line-height: 24px;
-
-    color: #0d1c2e;
-  }
-}
-.el-form-item__global-error-container {
-  width: 100%;
-  border-color: #e60022;
-  background: #fbe4e8;
-  box-shadow: 0px 7px 64px rgb(0 0 0 / 7%);
-  border-radius: 6px;
-  font-family: 'Montserrat';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 20px;
-  display: flex;
-  justify-content: space-between;
-  padding: 7px 12px;
-  align-items: center;
-  color: #e60022;
-  gap: 16px;
-  margin-bottom: 27px;
-}
-.el-form-item__global-error {
-  font-family: 'Montserrat';
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 16px;
-}
-
-.clear-error {
-  cursor: pointer;
-}
-.dialog-footer {
-  &__action {
-    color: $ov-text--title;
-    font-size: 14px;
-    font-weight: 500;
-  }
-}
-.title {
-  text-align: center;
-  display: flex;
-  word-break: break-word;
-
-  &__image {
-    display: flex;
-    justify-content: center;
-    margin-top: 33px;
-    margin-bottom: 42px;
-  }
-  &__text {
-    display: block;
-    padding: 0 60px;
-    font-family: 'Montserrat';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 20px;
-    margin-bottom: 16px;
-    text-align: center;
-
-    color: #0d1c2e;
-  }
-}
-
-.submit-button {
-  background: $ov-primary;
-  color: white;
-  text-transform: uppercase;
-  width: 220px;
-  height: 48px;
-  padding: 0;
-  border-radius: 6px;
-  span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  &__text {
-    width: 100%;
-    display: flex;
-    font-size: 17px;
-    font-weight: 700;
-    justify-content: center !important;
-  }
-  &__box {
-    display: flex;
-    justify-content: flex-end;
-  }
-}
-
-.pin_placeholder {
-  position: relative;
-  top: 0;
-  width: 50px;
-  font-size: 12px;
-  font-weight: 400;
-  color: #717a7f;
-  animation: showPINPlaceholder 0.3s;
-  animation-fill-mode: forwards;
-}
-@media (min-width: 375px) {
-  @keyframes showPINPlaceholder {
-    to {
-      top: -34px;
-      left: -224px;
-    }
-  }
-
-  .pin_placeholder {
-    left: -210px;
-  }
-}
-
-@media (max-width: 407px) {
-  @keyframes showPINPlaceholder {
-    to {
-      top: -34px;
-      left: -241px;
-    }
-  }
-
-  .pin_placeholder {
-    left: -210px;
-  }
-}
-.access-header {
-  width: 450px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #bbbcbd;
-}
-</style>
+<style scoped lang="scss"></style>

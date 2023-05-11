@@ -75,9 +75,11 @@ const setCurrentComponent = (name) => {
 
 <style scoped lang="scss">
 .main-dash {
+  margin: 0 auto;
   width: calc(100% - 146px);
   height: calc(100vh - 80px);
   padding: 16px 66px 16px 21px;
+  margin-top: -100px;
 
   &__header {
     display: flex;
@@ -172,6 +174,8 @@ const setCurrentComponent = (name) => {
       font-size: 16px;
       font-weight: 600;
       color: $ov-primary;
+      border: none;
+      background-color: inherit;
     }
   }
 }

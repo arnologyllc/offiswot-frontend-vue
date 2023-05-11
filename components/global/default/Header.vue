@@ -110,6 +110,13 @@ const selectedWorkspaceId = ref(null)
 const $route = useRoute()
 const avatarUrl = ref(defaultAvatar)
 
+const getAvatar = (v) => {
+  profile.value = v
+  if (v.user.avatar) {
+    avatarUrl.value = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
+  }
+}
+
 watch(profileSuccessData, (v) => {
   profile.value = v
   if (v.user.avatar) {
@@ -133,9 +140,20 @@ watch(() => {
   }
 })
 
-onMounted(() => {
+watch(selectedWorkspaceId, () => {
+  navigateTo(`/workspace/staff/${selectedWorkspaceId.value}`)
+})
+
+onMounted(async () => {
   if (!profileSuccessData.value) {
     profileStore.getProfile()
+  } else {
+    getAvatar(profileSuccessData.value)
+  }
+  if (!workspacesSuccessData.value) {
+    await profileStore.getWorkSpaces()
+  } else {
+    workSpaces.value = workspacesSuccessData.value
   }
 })
 
@@ -196,10 +214,18 @@ const onLogout = async () => {
     display: flex;
     align-items: center;
     gap: 0 8px;
+    .el-button {
+      border: none;
+      width: 24px;
+      height: 24px;
+    }
   }
 
   &__workspaces {
     width: 234px;
+    .el-input__wrapper {
+      box-shadow: none !important;
+    }
     .el-input__inner {
       font-weight: 600;
       font-size: 20px;
@@ -278,14 +304,23 @@ const onLogout = async () => {
   }
 
   &__actions {
+    width: 24px;
+    height: 24px;
     i {
       color: black;
+      width: 24px;
+      height: 24px;
+      svg {
+        width: 24px;
+        height: 24px;
+      }
       &::before {
         font-size: 24px;
         font-weight: 500;
       }
     }
     &:hover {
+      background-color: inherit;
       i {
         color: $ov-primary;
       }

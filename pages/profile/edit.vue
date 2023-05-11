@@ -11,18 +11,16 @@
     >
       <el-row>
         <el-col :span="12">
-          <el-button @click="$router.push('/profile')">
-            <div class="main__title">
-              <img
-                src="@/assets/images/icons/chevron-dark-icon.svg"
-                class="go-back__icon"
-                alt=""
-              />
-              <span :span="24" class="main__title__span"
-                >Complete your profile</span
-              >
-            </div>
-          </el-button>
+          <div class="main__title" @click="$router.push('/profile')">
+            <img
+              src="@/assets/images/icons/chevron-dark-icon.svg"
+              class="go-back__icon"
+              alt=""
+            />
+            <span :span="24" class="main__title__span"
+              >Complete your profile</span
+            >
+          </div>
         </el-col>
       </el-row>
       <el-row :gutter="70">
@@ -96,12 +94,7 @@
         </el-col>
       </el-row>
       <el-row :gutter="70">
-        <el-col
-          :span="8"
-          :xs="{ span: 24 }"
-          :sm="{ span: 12 }"
-          :md="{ span: 8 }"
-        >
+        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
           <el-form-item prop="name">
             <el-input
               v-model="payload.name"
@@ -110,17 +103,17 @@
             ></el-input>
           </el-form-item>
         </el-col>
-        <el-col
-          :span="8"
-          :xs="{ span: 24 }"
-          :sm="{ span: 12 }"
-          :md="{ span: 8 }"
-        >
+        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
           <el-form-item prop="phone_number">
             <MazPhoneNumberInput
               v-model="payload.phone_number"
               class="main__form--phone-number"
               default-country-code="AM"
+              no-example
+              countries-height="48"
+              border-radius="0"
+              size="14px"
+              width="320px"
             />
           </el-form-item>
         </el-col>
@@ -204,16 +197,14 @@
       </el-row>
       <el-row class="main__form--actions">
         <el-col :span="12">
-          <el-button @click="navigateTo('/profile')">
-            <div class="go-back__box">
-              <img
-                src="@/assets/images/icons/chevron-dark-icon.svg"
-                class="go-back__icon"
-                alt=""
-              />
-              <span class="go-back__text">Back</span>
-            </div>
-          </el-button>
+          <div class="go-back__box" @click="navigateTo('/profile')">
+            <img
+              src="@/assets/images/icons/chevron-dark-icon.svg"
+              class="go-back__icon"
+              alt=""
+            />
+            <span class="go-back__text">Back</span>
+          </div>
         </el-col>
         <el-col :span="12" class="submit-button__box">
           <el-button
@@ -361,15 +352,15 @@ const onSubmit = () => {
 <style scoped lang="scss">
 .main {
   min-height: calc(100vh - 286px);
-  padding: 104px 169px 87px 143px;
+  padding: 0 0 87px 143px;
   &__title {
     font-size: 20px;
     font-weight: 600;
     color: $ov-text--title;
-    margin-bottom: 4px;
     margin-bottom: 41px;
     display: flex;
     gap: 20px;
+    cursor: pointer;
   }
   &__form {
     min-height: calc(100vh - 286px);
@@ -378,7 +369,23 @@ const onSubmit = () => {
     width: 100%;
     border-left: 1px solid #d0c9d6;
     padding: 0 45px 21px 45px;
-
+    .el-input__inner {
+      min-width: 100% !important;
+      max-width: 320px !important;
+      height: 48px !important;
+    }
+    &-item {
+      min-width: 100%;
+      max-width: 320px;
+      height: 48px;
+      margin: 0 !important;
+    }
+    .el-input--suffix {
+      min-width: 100%;
+      max-width: 320px;
+      height: 48px !important;
+      margin: 0 !important;
+    }
     &--picture {
       display: flex;
       margin-bottom: 32px;
@@ -398,6 +405,8 @@ const onSubmit = () => {
       width: 115px;
       button {
         color: $ov-text--aqua;
+        border: none;
+        background-color: inherit;
         &:hover {
           text-decoration: underline;
         }
@@ -440,15 +449,17 @@ const onSubmit = () => {
       }
     }
     &--input {
-      width: 100%;
       position: relative;
+      min-width: 100% !important;
+      max-width: 320px !important;
+      height: 48px !important;
 
       &.date-picker {
         margin-bottom: 14px;
       }
-      &.select {
+      &.el-select {
+        height: 48px !important;
         .el-input__suffix {
-          padding-right: 8px;
           cursor: pointer;
           i {
             color: black;
@@ -456,16 +467,16 @@ const onSubmit = () => {
               content: '\e78f';
             }
           }
+          &-inner {
+            margin-right: 0 !important;
+          }
         }
       }
-
       .el-input__inner {
         padding-left: 16px;
-        height: 48px;
         border-radius: 6px;
         border-color: $ov-border--light;
         padding-right: 45px;
-
         &:focus,
         &:hover {
           border-color: $ov-primary;
@@ -485,8 +496,10 @@ const onSubmit = () => {
       }
     }
     &--phone-number {
+      border-radius: 0;
+      min-width: 100%;
+      max-width: 320px;
       input {
-        height: 48px;
         border-color: $ov-border--light;
         &::placeholder {
           color: transparent;
@@ -546,12 +559,14 @@ const onSubmit = () => {
       transition: 0.2s;
       font-size: 17px;
       font-weight: 500;
+      cursor: pointer;
       &:hover {
         color: $ov-primary;
       }
     }
     &__icon {
       width: 9.5px;
+      cursor: pointer;
     }
   }
   .submit-button {
@@ -579,5 +594,9 @@ const onSubmit = () => {
       justify-content: flex-end;
     }
   }
+}
+.m-select {
+  width: 100px !important;
+  font-size: 14px !important;
 }
 </style>

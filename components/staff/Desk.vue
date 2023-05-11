@@ -10,11 +10,7 @@
           :key="`row_${i}`"
           class="desk__row"
         >
-          <div
-            v-for="(col, idx) in item"
-            :key="`col_${idx}`"
-            class="desk__row--col"
-          >
+          <div v-for="(col, idx) in item" :key="`col_${idx}`">
             <draggable
               class="desk__row--col"
               :list="tablesList[i][idx]"
@@ -182,7 +178,6 @@
               </template>
             </draggable>
           </div>
-
           <el-button
             v-if="!dragOptions.disabled && i === 0"
             class="desk__main--add-col horizontal"
@@ -405,7 +400,8 @@ const onAddRow = () => {
   setLastTableId()
 }
 const onAddCol = () => {
-  tablesList.value((row, index) => {
+  console.log(tablesList.value)
+  tablesList.value.forEach((row, index) => {
     lastTableId.value += index + 2
     row.push([
       { id: lastTableId.value + index + 2 },
@@ -539,8 +535,6 @@ const handleFooterDragEnd = () => {
       border: none;
       background: transparent;
       &.horizontal {
-        margin-top: -100px;
-        margin-left: -34px;
         span {
           text-orientation: upright;
           writing-mode: vertical-lr;
@@ -568,7 +562,7 @@ const handleFooterDragEnd = () => {
       padding: 41px 100px 41px 101px;
       display: grid;
       border-right: 1px solid $ov-border--light;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, 0fr);
       &__table {
         position: relative;
         cursor: pointer;
@@ -738,14 +732,16 @@ const handleFooterDragEnd = () => {
       padding: 21px 31px;
     }
     &--members {
-      width: 100%;
-      overflow-x: auto;
+      min-width: 190px;
+      overflow-x: hidden;
       overflow-y: hidden;
       display: flex;
       align-items: center;
       gap: 0 20px;
       &__outer {
         width: calc(100% - 397px);
+        display: flex;
+        overflow-x: auto;
       }
 
       &__member {

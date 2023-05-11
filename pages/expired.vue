@@ -17,11 +17,11 @@ definePageMeta({ layout: 'auth' })
 <style scoped lang="scss">
 .main {
   display: flex;
+  width: 100% !important;
   flex-direction: column;
   justify-content: center;
   gap: 34px;
-  margin-top: 200px;
-  margin-bottom: 130px;
+  margin: 280px auto 260px !important;
   align-items: center;
   background: none;
   &__container {

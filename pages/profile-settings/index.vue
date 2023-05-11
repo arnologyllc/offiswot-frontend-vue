@@ -116,7 +116,7 @@ onMounted(() => {
 }
 .account {
   width: 80%;
-  margin: 60px auto;
+  margin: 0 auto 60px;
   height: 500px;
   border-left: 1px solid #d0c9d6;
 

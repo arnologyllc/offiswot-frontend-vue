@@ -294,6 +294,7 @@ const agreeModal = () => {
   line-height: 28px;
   justify-content: center;
   color: #0d1c2e;
+  text-align: center;
   .warning {
     color: #ff4a66;
   }

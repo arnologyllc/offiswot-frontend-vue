@@ -262,7 +262,6 @@ const onAvatarUpload = (e, file) => {
 <style scoped lang="scss">
 .main {
   background-color: $ov-background;
-  padding-top: 67px;
   padding-bottom: 186px;
   &__user-container {
     max-width: 1200px;
@@ -346,6 +345,8 @@ const onAvatarUpload = (e, file) => {
   line-height: 20px;
   text-decoration: underline;
   font-weight: 400;
+  border: none;
+  background-color: inherit;
 }
 .user-workspaces {
   position: relative;
@@ -396,11 +397,14 @@ const onAvatarUpload = (e, file) => {
   &__buttons {
     display: flex;
     align-items: center;
+    width: 100%;
+    max-width: 200px;
   }
   &__create-btn {
     top: 82px;
     right: 103px;
-    min-width: 137px;
+    width: 100%;
+    max-width: 200px;
     height: 40px;
     border-radius: 6px;
     color: $ov-primary;
@@ -421,6 +425,8 @@ const onAvatarUpload = (e, file) => {
     color: $ov-primary;
     font-weight: 600;
     padding: 0;
+    border: none;
+    background-color: inherit;
   }
 }
 .small {
@@ -479,9 +485,6 @@ const onAvatarUpload = (e, file) => {
       top: 65px;
       right: 50px;
     }
-    &__container {
-      display: block;
-    }
   }
 }
 
@@ -498,6 +501,20 @@ const onAvatarUpload = (e, file) => {
     &__create-btn {
       top: 65px;
       right: 85px;
+    }
+  }
+  .user-workspaces {
+    &__container {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    &__buttons {
+      justify-content: center;
+      align-items: center;
+    }
+    &__create-btn {
+      margin: 0;
     }
   }
 }
