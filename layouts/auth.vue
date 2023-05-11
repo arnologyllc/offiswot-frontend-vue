@@ -22,13 +22,12 @@
 </template>
 
 <script setup>
+import { useRoute } from 'vue-router'
 import Header from '~/components/global/auth/Header.vue'
 import Footer from '@/components/global/Footer.vue'
-import { useRoute } from 'vue-router'
 import login from '~/middleware/login'
 const route = useRoute()
-login()
-
+await login()
 
 const checkPage = () => {
   return route.path
@@ -47,11 +46,75 @@ const checkPage = () => {
   position: relative;
   &__background {
     background-image: url('@/assets/images/auth-background.svg');
-    padding: 130px 0 150px 18%;
   }
   &__outer {
     display: flex;
     flex-direction: column;
+  }
+  .main {
+    display: flex;
+    position: relative;
+    height: 100%;
+    margin-top: 180px;
+    margin-bottom: 100px;
+    margin-left: 290px;
+    width: 390px;
+
+    &__form {
+      width: 390px;
+      &--title {
+        font-size: 20px;
+        font-weight: 600;
+        color: $ov-text--title;
+        margin-bottom: 4px;
+      }
+
+      &--subtitle {
+        font-size: 14px;
+        color: $ov-text--subtitle;
+        margin-bottom: 40px;
+      }
+
+      &--box {
+        &__input {
+          height: 48px;
+          .el-input__inner {
+            height: 48px;
+            border-radius: 6px;
+            border-color: $ov-border--light;
+            padding-left: 37px;
+
+            &:focus,
+            &:hover {
+              border-color: $ov-primary;
+            }
+
+            &::placeholder {
+              color: $ov-placeholder;
+            }
+          }
+
+          .el-input__prefix,
+          .el-input__suffix {
+            display: grid;
+            align-items: center;
+            position: absolute;
+          }
+
+          .el-input__prefix {
+            width: 48px;
+            left: 8px;
+          }
+          .el-input__suffix {
+            cursor: pointer;
+            right: 0;
+            .el-input__suffix-inner {
+              display: flex;
+            }
+          }
+        }
+      }
+    }
   }
   .go-back {
     position: absolute;
@@ -75,12 +138,12 @@ const checkPage = () => {
     }
   }
 }
+
 @media (max-width: 990px) {
   .main-layout-auth {
     background-image: none;
     background: #f5f7fb;
     padding: 0;
-    padding-bottom: 157px;
     .main {
       margin: 100px auto 0;
       width: max-content;
@@ -100,7 +163,7 @@ const checkPage = () => {
 @media (max-width: 375px) {
   .main-layout-auth {
     background: $ov-gray-bg;
-    padding: 0 44px 119px 44px;
+    padding: 0 44px 0 44px;
     .main {
       width: 287px !important;
       .form-item__label {

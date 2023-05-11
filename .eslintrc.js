@@ -11,5 +11,10 @@ module.exports = {
   extends: ['@nuxtjs', 'plugin:nuxt/recommended', 'prettier'],
   plugins: [],
   // add your custom rules here
-  rules: {},
+  rules: {
+    'no-undef': 'off',
+    'vue/multi-word-component-names': 0,
+    'vue/no-v-html': 'off',
+    'vue/no-mutating-props': 'off',
+  },
 }

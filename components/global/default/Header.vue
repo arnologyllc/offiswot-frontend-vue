@@ -10,10 +10,11 @@
         >
           <el-option
             v-for="(item, index) in workSpaces?.myWorkspaces"
-            :key="`workspace_${index}`"
+            :key="`${index}_workspace_${item.name}`"
             :value="item.id"
             :label="item.name"
-          ></el-option>
+          >
+          </el-option>
           <template #prefix>
             <img :src="avatarUrl" alt="" class="main__workspaces--prefix" />
           </template>
@@ -89,32 +90,35 @@
 </template>
 
 <script setup>
-import { computed, getCurrentInstance, onMounted, watch } from 'vue'
+import { onMounted, watch, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
 import $cookies from 'js-cookie'
-import useProfileStore from '@/stores/profile'
 import { storeToRefs } from 'pinia'
 import { Bell, Setting } from '@element-plus/icons-vue'
+import useProfileStore from '@/stores/profile'
+import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
 
 const profileStore = useProfileStore()
-const { profileSuccessData, editProfileData } = storeToRefs(profileStore)
+const { profileSuccessData, editProfileData, workspacesSuccessData } =
+  storeToRefs(profileStore)
 const { $myFetch } = useNuxtApp()
 const config = useRuntimeConfig()
 
 const workSpaces = ref(null)
 const profile = ref(null)
 const selectedWorkspaceId = ref(null)
-const search = ref(null)
 const $route = useRoute()
-const instance = getCurrentInstance()
-
-const buttonText = computed(() =>
-  $route.path === '/login' ? 'Sign up' : 'Sign in'
-)
 const avatarUrl = ref(defaultAvatar)
 
+const getAvatar = (v) => {
+  profile.value = v
+  if (v.user.avatar) {
+    avatarUrl.value = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
+  }
+}
+
 watch(profileSuccessData, (v) => {
+  profile.value = v
   if (v.user.avatar) {
     avatarUrl.value = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
   }
@@ -126,26 +130,31 @@ watch(editProfileData, (v) => {
   }
 })
 
+watch(workspacesSuccessData, (v) => {
+  workSpaces.value = v
+})
+
 watch(() => {
   if ($route.path.includes('/workspace')) {
     selectedWorkspaceId.value = +$route.params.id
   }
-  //   selectedWorkspaceId(v) {
-  //     if (v) {
-  //       this.$router.push({ params: { id: v } })
-  //     }
-  //   },
+})
+
+watch(selectedWorkspaceId, () => {
+  navigateTo(`/workspace/staff/${selectedWorkspaceId.value}`)
 })
 
 onMounted(async () => {
-  if ($cookies.get('login_pin_token')) {
-    profile.value = profileStore.getProfile()
-    workSpaces.value = await profileStore.getWorkSpaces()
+  if (!profileSuccessData.value) {
+    profileStore.getProfile()
+  } else {
+    getAvatar(profileSuccessData.value)
   }
-  // instance.root.once('loginToken', async () => {
-  //   profile.value = profileStore.getProfile()
-  //   workSpaces.value = await this.getWorkSpaces()
-  // })
+  if (!workspacesSuccessData.value) {
+    await profileStore.getWorkSpaces()
+  } else {
+    workSpaces.value = workspacesSuccessData.value
+  }
 })
 
 const onLogout = async () => {
@@ -205,10 +214,18 @@ const onLogout = async () => {
     display: flex;
     align-items: center;
     gap: 0 8px;
+    .el-button {
+      border: none;
+      width: 24px;
+      height: 24px;
+    }
   }
 
   &__workspaces {
     width: 234px;
+    .el-input__wrapper {
+      box-shadow: none !important;
+    }
     .el-input__inner {
       font-weight: 600;
       font-size: 20px;
@@ -287,14 +304,23 @@ const onLogout = async () => {
   }
 
   &__actions {
+    width: 24px;
+    height: 24px;
     i {
       color: black;
+      width: 24px;
+      height: 24px;
+      svg {
+        width: 24px;
+        height: 24px;
+      }
       &::before {
         font-size: 24px;
         font-weight: 500;
       }
     }
     &:hover {
+      background-color: inherit;
       i {
         color: $ov-primary;
       }

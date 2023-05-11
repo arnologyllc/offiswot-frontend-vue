@@ -33,7 +33,9 @@
               style="position: relative"
               @click="focusElement('name')"
             >
-              <span for="name" class="name_placeholder"> Workspace Name </span>
+              <span for="name" class="custom_placeholder">
+                Workspace Name
+              </span>
             </div>
             <img
               v-if="errors.name.value"
@@ -92,7 +94,7 @@
 
       <error-massage
         v-if="errors.name.isShow && !isWeb()"
-        :dialogVisible="errors.name.isShow && !isWeb()"
+        :dialog-visible="errors.name.isShow && !isWeb()"
         :error-text="errors.name.value"
         @visible="errors.name.isShow = false"
       ></error-massage>
@@ -100,23 +102,24 @@
 
     <check-modal
       v-if="isOpenPINDialog"
-      :dialogVisible="isOpenPINDialog"
+      :dialog-visible="isOpenPINDialog"
       @close="isOpenPINDialog = false"
     ></check-modal>
   </div>
 </template>
 
 <script setup>
-definePageMeta({ layout: 'default' })
+import { storeToRefs } from 'pinia'
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 
 import useWorkspacesStore from '~/stores/workspace'
-import { storeToRefs } from 'pinia'
-import { onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import settingsToken from '~/middleware/settingsToken'
 import auth from '~/middleware/auth'
+definePageMeta({ layout: 'default' })
 
 const workspacesStore = useWorkspacesStore()
 const {
@@ -129,9 +132,7 @@ const {
 } = storeToRefs(workspacesStore)
 
 const instance = getCurrentInstance()
-const $route = useRoute()
 const $router = useRouter()
-const config = useRuntimeConfig()
 
 const payload = ref({
   name: null,
@@ -241,7 +242,7 @@ const clearError = () => {
   display: flex;
   position: relative;
   height: 100%;
-  padding: 100px 0 150px 170px;
+  padding: 0 0 150px 170px;
 
   &__title {
     font-size: 20px;
@@ -291,12 +292,14 @@ const clearError = () => {
       display: flex;
       justify-content: space-between;
       align-items: center;
-
+      gap: 50px;
       &__text-btn {
         font-size: 17px;
         font-weight: 600;
         text-transform: uppercase;
         color: $ov-primary--light;
+        border: none;
+        background-color: inherit;
         &:hover {
           color: $ov-primary;
         }
@@ -336,62 +339,12 @@ const clearError = () => {
       margin-bottom: 0;
     }
   }
-
-  .el-form-item__global-error-container {
-    width: 100%;
-    border-color: #e60022;
-    background: #fbe4e8;
-    box-shadow: 0px 7px 64px rgb(0 0 0 / 7%);
-    border-radius: 6px;
-    font-family: 'Montserrat';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 20px;
-    display: flex;
-    justify-content: space-between;
-    padding: 7px 12px;
-    align-items: center;
-    color: #e60022;
-    gap: 16px;
-    margin-bottom: 27px;
-  }
-  .el-form-item__global-error {
-    font-family: 'Montserrat';
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .clear-error {
-    cursor: pointer;
-  }
-  .el-form-item.is-error {
-    .el-input__inner {
-      border-color: red !important;
-    }
-  }
-  .el-form-item__error {
-    z-index: 1000;
-  }
-}
-
-.name_placeholder {
-  position: relative;
-  top: 0;
-  width: 50px;
-  font-size: 12px;
-  font-weight: 400;
-  color: #717a7f;
-  animation: showNamePlaceholder 0.3s;
-  animation-fill-mode: forwards;
 }
 
 @media (min-width: 490px) {
   .main {
     justify-content: flex-start;
-    margin: 100px 0 150px 170px;
+    margin: 0 0 150px 170px;
     &__form {
       padding-left: 65px;
       border-left: 1px solid #d0c9d6;
@@ -404,29 +357,11 @@ const clearError = () => {
       }
     }
   }
-  @keyframes showNamePlaceholder {
-    to {
-      top: -34px;
-      left: -270px;
-    }
-  }
-  .name_placeholder {
-    left: -255px;
-  }
 }
 
 @media (max-width: 490px) {
-  @keyframes showNamePlaceholder {
-    to {
-      top: -34px;
-      left: -180px;
-    }
-  }
-  .name_placeholder {
-    left: -165px;
-  }
   .main {
-    margin: 100px auto 150px;
+    margin: 0 auto 150px;
     padding: 0;
     width: 300px;
     justify-content: center;
@@ -448,76 +383,6 @@ const clearError = () => {
   }
 }
 
-.el-form-item.is-error {
-  .el-input__inner {
-    border-color: #e60022 !important;
-  }
-}
-.el-form-item__error {
-  position: absolute;
-  font-family: 'Montserrat';
-  font-size: 12px;
-  line-height: 20px;
-  font-weight: 400;
-  top: 0;
-  left: 110%;
-  padding: 14px;
-  color: #e60022;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: max-content;
-  max-width: 212px;
-  height: max-content;
-  min-height: 48px;
-  border-radius: 13px;
-  background-color: white;
-  box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
-}
-.error_info {
-  color: #717a7f;
-  font-style: italic;
-  font-weight: 400;
-}
-
-.error_info > li {
-  margin-left: 15px;
-}
-
-.error_info > li::marker {
-  font-size: 0.5em;
-}
-.el-form-item__error:after,
-.el-form-item__error:before {
-  position: absolute;
-  content: '';
-  width: 0;
-  height: 0;
-  top: 25px;
-}
-.el-form-item__error:before {
-  left: -8px;
-  margin-top: -8px;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-right: 8px solid #fff;
-}
-.el-form-item__error:after {
-  left: -7px;
-  margin-top: -7px;
-  border-top: 7px solid transparent;
-  border-bottom: 7px solid transparent;
-  border-right: 7px solid #fff;
-}
-.error_icon {
-  position: absolute;
-  top: 12px;
-  right: 7px;
-}
-
-.weak {
-  color: #e60022;
-}
 .el-input__suffix {
   display: flex !important;
 }
@@ -530,7 +395,7 @@ const clearError = () => {
 
 @media (max-width: 990px) {
   .main {
-    margin: 100px auto 150px;
+    margin: 0 auto 150px;
     padding: 0;
     justify-content: center;
   }

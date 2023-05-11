@@ -33,7 +33,7 @@
                 style="position: relative"
                 @click="focusElement('pin')"
               >
-                <span for="pin" class="pin_placeholder"> PIN </span>
+                <span for="pin" class="custom_placeholder"> PIN </span>
               </div>
               <img
                 :class="errors.pin.value ? 'eye_icon' : ''"
@@ -79,7 +79,7 @@
                 style="position: relative"
                 @click="focusElement('pin_confirmation')"
               >
-                <span for="password" class="repeat-placeholder">
+                <span for="password" class="custom_placeholder">
                   PIN Confirmation
                 </span>
               </div>
@@ -121,13 +121,13 @@
 
         <error-massage
           v-if="errors.pin.isShow && !isWeb()"
-          :dialogVisible="errors.pin.isShow && !isWeb()"
+          :dialog-visible="errors.pin.isShow && !isWeb()"
           :error-text="errors.pin.value"
           @visible="errors.pin.isShow = false"
         ></error-massage>
         <error-massage
           v-if="errors.pin_confirmation.isShow && !isWeb()"
-          :dialogVisible="errors.pin_confirmation.isShow && !isWeb()"
+          :dialog-visible="errors.pin_confirmation.isShow && !isWeb()"
           :error-text="errors.pin_confirmation.value"
           @visible="errors.pin_confirmation.isShow = false"
         ></error-massage>
@@ -137,22 +137,21 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: 'default' })
-import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import { getCurrentInstance, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import usePINStore from '~/stores/pin'
+import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
+import usePINStore from '~/stores/pin'
+import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
 import auth from '~/middleware/auth'
+definePageMeta({ layout: 'default' })
 
 const pinStore = usePINStore()
 const { setPinData, setPinFailureData, isLoadingSubmit } = storeToRefs(pinStore)
 
 const instance = getCurrentInstance()
 const $route = useRoute()
-const $router = useRouter()
 
 const validateRepeatPIN = (rule, value, callback) => {
   if (value === '') {
@@ -260,9 +259,6 @@ const validateField = (fieldName) => {
     }
   })
 }
-const clearError = () => {
-  errors.value.global.value = ''
-}
 
 const isWeb = () => {
   return window.innerWidth > 990
@@ -304,199 +300,9 @@ const focusElement = (elem) => {
 
   &__form {
     width: 390px;
-    &--title {
-      font-size: 20px;
-      font-weight: 600;
-      color: $ov-text--title;
-      margin-bottom: 4px;
-    }
-
-    &--subtitle {
-      font-size: 14px;
-      color: $ov-text--subtitle;
-      margin-bottom: 40px;
-    }
-
-    &--box {
-      &__input {
-        .el-input__inner {
-          height: 48px;
-          padding: 0 15px;
-          border-radius: 6px;
-          border-color: $ov-border--light;
-
-          &:focus,
-          &:hover {
-            border-color: $ov-primary;
-          }
-          &::placeholder {
-            color: $ov-placeholder;
-          }
-        }
-        .el-input__prefix,
-        .el-input__suffix {
-          display: grid;
-          align-items: center;
-        }
-
-        .el-input__prefix {
-          padding-left: 8px;
-        }
-        .el-input__suffix {
-          padding-right: 8px;
-          cursor: pointer;
-          &-inner {
-            display: grid;
-          }
-        }
-      }
-    }
   }
 }
 
-.pin_placeholder {
-  position: relative;
-  top: 0;
-  width: 50px;
-  font-size: 12px;
-  font-weight: 400;
-  color: #717a7f;
-  animation: showPINPlaceholder 0.3s;
-  animation-fill-mode: forwards;
-}
-
-.repeat-placeholder {
-  position: relative;
-  top: 0;
-  font-size: 12px;
-  font-weight: 400;
-  color: #717a7f;
-  animation: showRepeatPlaceholder 0.3s;
-  animation-fill-mode: forwards;
-}
-
-@media (min-width: 375px) {
-  @keyframes showPINPlaceholder {
-    to {
-      top: -34px;
-      left: -330px;
-    }
-  }
-
-  @keyframes showRepeatPlaceholder {
-    to {
-      top: -34px;
-      left: -249px;
-    }
-  }
-
-  .pin_placeholder {
-    left: -310px;
-  }
-
-  .repeat-placeholder {
-    left: -220px;
-  }
-}
-
-@media (max-width: 407px) {
-  @keyframes showPINPlaceholder {
-    to {
-      top: -34px;
-      left: -241px;
-    }
-  }
-
-  @keyframes showRepeatPlaceholder {
-    to {
-      top: -34px;
-      left: -157px;
-    }
-  }
-
-  .pin_placeholder {
-    left: -210px;
-  }
-
-  .repeat-placeholder {
-    left: -130px;
-  }
-}
-
-.el-form-item.is-error {
-  .el-input__inner {
-    border-color: #e60022 !important;
-  }
-}
-.el-form-item__error {
-  position: absolute;
-  font-family: 'Montserrat';
-  font-size: 12px;
-  line-height: 20px;
-  font-weight: 400;
-  top: 0;
-  left: 105%;
-  padding: 14px;
-  color: #e60022;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 212px;
-  height: max-content;
-  min-height: 48px;
-  border-radius: 13px;
-  background-color: white;
-  box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
-}
-.error_info {
-  color: #717a7f;
-  font-style: italic;
-  font-weight: 400;
-}
-
-.error_info > li {
-  margin-left: 15px;
-}
-
-.error_info > li::marker {
-  font-size: 0.5em;
-}
-.el-form-item__error:after,
-.el-form-item__error:before {
-  position: absolute;
-  content: '';
-  width: 0;
-  height: 0;
-  top: 25px;
-}
-.el-form-item__error:before {
-  left: -8px;
-  margin-top: -8px;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-right: 8px solid #fff;
-}
-.el-form-item__error:after {
-  left: -7px;
-  margin-top: -7px;
-  border-top: 7px solid transparent;
-  border-bottom: 7px solid transparent;
-  border-right: 7px solid #fff;
-}
-.error_icon {
-  position: absolute;
-  top: 12px;
-  right: 7px;
-}
-
-.eye_icon {
-  position: relative;
-  right: 32px;
-}
-
-.weak {
-  color: #e60022;
-}
 .el-input__suffix {
   display: flex !important;
 }
@@ -504,25 +310,6 @@ const focusElement = (elem) => {
   display: flex !important;
 }
 .el-form-item {
-  margin-bottom: 27px;
-}
-.el-form-item__global-error {
-  width: 100%;
-  border-color: #e60022;
-  background: #fbe4e8;
-  box-shadow: 0px 7px 64px rgb(0 0 0 / 7%);
-  border-radius: 6px;
-  font-family: 'Montserrat';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 20px;
-  display: flex;
-  justify-content: flex-start;
-  padding: 7px 12px;
-  align-items: center;
-  color: #e60022;
-  gap: 16px;
   margin-bottom: 27px;
 }
 .submit-button {
@@ -564,7 +351,7 @@ const focusElement = (elem) => {
 
 @media (max-width: 990px) {
   .main {
-    margin: 100px auto 150px;
+    margin: 0 auto 150px;
     padding: 0;
     justify-content: center;
   }
@@ -572,7 +359,7 @@ const focusElement = (elem) => {
 
 @media (max-width: 450px) {
   .main {
-    margin: 100px auto 150px;
+    margin: 0 auto 150px;
     padding: 0;
     justify-content: center;
   }
@@ -585,7 +372,7 @@ const focusElement = (elem) => {
 
 @media (max-width: 407px) {
   .main {
-    margin: 100px auto 150px;
+    margin: 0 auto 150px;
     padding: 0;
     width: 300px;
     justify-content: center;

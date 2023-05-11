@@ -29,11 +29,11 @@ const useProfileStore = defineStore('profile', {
         })
         .catch((e) => {
           try {
-            JSON.parse(e.response.data)
+            JSON.parse(e.data)
           } catch {
-            this.profileFailureData = e.response.data
+            this.profileFailureData = e.data
           }
-          this.profileFailureData = JSON.parse(e.response.data)
+          this.profileFailureData = JSON.parse(e.data)
         })
         .finally(() => {
           this.profileLoading = false
@@ -45,14 +45,15 @@ const useProfileStore = defineStore('profile', {
       $myFetch('workspaces')
         .then((data) => {
           this.workspacesSuccessData = data
+          return data
         })
         .catch((e) => {
           try {
-            JSON.parse(e.response.data)
+            JSON.parse(e.data)
           } catch {
-            return e.response.data
+            return e.data
           }
-          return JSON.parse(e.response.data)
+          return JSON.parse(e.data)
         })
     },
 
@@ -78,9 +79,6 @@ const useProfileStore = defineStore('profile', {
         } else {
           formData.append(i, payload[i])
         }
-      }
-      for (const value of formData.entries()) {
-        console.log(value)
       }
       const { $myFetch } = useNuxtApp()
       this.isLoadingSubmit = true

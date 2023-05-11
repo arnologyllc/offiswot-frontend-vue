@@ -138,11 +138,11 @@ const usePinStore = defineStore('pin', {
         })
         .catch((e) => {
           try {
-            JSON.parse(e.data.message)
+            JSON.parse(e.data)
           } catch {
-            this.checkPinFailureData = e.data.message
+            this.checkPinFailureData = e.data
           }
-          this.checkPinFailureData = JSON.parse(e.data.message)
+          this.checkPinFailureData = JSON.parse(e.data)
         })
         .finally(() => {
           this.isLoadingSubmit = false

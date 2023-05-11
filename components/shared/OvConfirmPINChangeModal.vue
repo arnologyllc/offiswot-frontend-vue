@@ -5,6 +5,7 @@
     :append-to-body="appendToBody"
     show-close
     top="30vh"
+    class="customModal"
     @close="$emit('close')"
   >
     <template #header>
@@ -41,9 +42,9 @@
 </template>
 
 <script setup>
-import usePINStore from '@/stores/pin'
 import { storeToRefs } from 'pinia'
 import { onMounted, watch } from 'vue'
+import usePINStore from '@/stores/pin'
 const pinStore = usePINStore()
 const { changePinData, changePinFailureData } = storeToRefs(pinStore)
 
@@ -104,61 +105,4 @@ onMounted(() => {
 })
 </script>
 
-<style scoped lang="scss">
-.el-dialog {
-  border-radius: 20px;
-
-  &__close {
-    color: black !important;
-  }
-  &__footer {
-    display: flex;
-    justify-content: center;
-  }
-  &__body {
-    padding: 15px 35px 15px 35px;
-    color: $ov-text--title;
-  }
-  &__header {
-    display: grid;
-    justify-content: center;
-    padding-top: 40px;
-  }
-}
-.dialog-footer {
-  &__action {
-    color: $ov-text--title;
-    font-size: 14px;
-    font-weight: 500;
-  }
-}
-.title {
-  text-align: center;
-  justify-content: center;
-  display: flex;
-  word-break: break-word;
-
-  &__image {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-  }
-  &__text {
-    font-weight: 600;
-    font-size: 18px;
-    color: $ov-text--title;
-  }
-}
-
-.error {
-  font-size: 13px;
-  color: #e60022;
-  margin-top: 15px;
-  word-wrap: break-word;
-  display: block;
-  text-align: center;
-}
-.later {
-  font-size: 13px;
-}
-</style>
+<style scoped lang="scss"></style>

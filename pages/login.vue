@@ -48,7 +48,9 @@
                 style="position: relative"
                 @click="focusElement('email')"
               >
-                <span for="email" class="placeholder"> Email or username </span>
+                <span for="email" class="custom_placeholder">
+                  Email or username
+                </span>
               </div>
 
               <div></div>
@@ -56,8 +58,8 @@
           </el-input>
           <template #error>
             <div
-              class="el-form-item__error"
               v-if="errors.email.isShow && isWeb()"
+              class="el-form-item__error"
             >
               <span>{{ errors.email.value }}</span>
             </div>
@@ -86,7 +88,7 @@
                 style="position: relative"
                 @click="focusElement('password')"
               >
-                <span for="password" class="password-placeholder">
+                <span for="password" class="custom_placeholder">
                   Password
                 </span>
               </div>
@@ -119,12 +121,9 @@
           </template>
           <div class="forgot-password">
             <el-checkbox v-model="payload.remember_me" class="remember-checkbox"
-              >Remember me</el-checkbox
+              ><span style="font-weight: 400">Remember me</span></el-checkbox
             >
-            <el-button
-              text
-              style="font-size: 14px; font-weight: 400"
-              @click="navigateTo('/password/forgot')"
+            <el-button text @click="navigateTo('/password/forgot')"
               >Forgot Password?</el-button
             >
           </div>
@@ -139,19 +138,19 @@
     <confirm-email
       v-if="isOpenEmailDialog"
       :email="payload.email"
-      :dialogVisible="isOpenEmailDialog"
+      :dialog-visible="isOpenEmailDialog"
       @close="isOpenEmailDialog = false"
     ></confirm-email>
 
     <error-massage
       v-if="errors.email.isShow && !isWeb()"
-      :dialogVisible="errors.email.isShow && !isWeb()"
+      :dialog-visible="errors.email.isShow && !isWeb()"
       :error-text="errors.email.value"
       @visible="errors.email.isShow = false"
     ></error-massage>
     <error-massage
       v-if="errors.password.isShow && !isWeb()"
-      :dialogVisible="errors.password.isShow && !isWeb()"
+      :dialog-visible="errors.password.isShow && !isWeb()"
       :error-text="errors.password.value"
       @visible="errors.password.isShow = false"
     ></error-massage>
@@ -159,18 +158,18 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: 'auth' })
-
 import { getCurrentInstance, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import $cookies from 'js-cookie'
+import { storeToRefs } from 'pinia'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
 import ConfirmEmail from '@/components/shared/OvConfirmEmailModal.vue'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import useAuthStore from '~/stores/auth'
-import { storeToRefs } from 'pinia'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
+
+definePageMeta({ layout: 'auth' })
 
 const authStore = useAuthStore()
 const { loginSuccessData, loginErrorData } = storeToRefs(authStore)
@@ -217,12 +216,13 @@ const rules = ref({
   ],
 })
 
-watch(loginSuccessData, ({ access_token, is_first_login }) => {
-  const expirationDate = payload.value.remember_me ? 0 : 1 / 24
-  $cookies.set('token', access_token, { expires: expirationDate })
-  if (is_first_login) {
+watch(loginSuccessData, (v) => {
+  const [accessToken, isFirstLogin] = [v.access_token, v.is_first_login]
+  const expirationDate = payload.value.remember_me ? null : 1 / 24
+  $cookies.set('token', accessToken, { expires: expirationDate })
+  if (isFirstLogin) {
     navigateTo('/pin')
-    $cookies.set('first_login', is_first_login)
+    $cookies.set('first_login', isFirstLogin)
   } else {
     navigateTo('/')
   }
@@ -317,257 +317,31 @@ const clearError = () => {
 
 <style scoped lang="scss">
 .main {
-  width: 100%;
   display: flex;
   position: relative;
   height: 100%;
 
   &__form {
     width: 390px;
-    &--title {
-      font-size: 20px;
-      font-weight: 600;
-      color: $ov-text--title;
-      margin-bottom: 4px;
-    }
 
-    &--subtitle {
-      font-size: 14px;
-      color: $ov-text--subtitle;
-      margin-bottom: 40px;
-    }
-
-    &--box {
-      &__input {
-        .el-input__inner {
-          height: 48px;
-          border-radius: 6px;
-          border-color: $ov-border--light;
-          padding-left: 48px;
-
-          &:focus,
-          &:hover {
-            border-color: $ov-primary;
-          }
-
-          &::placeholder {
-            color: $ov-placeholder;
-          }
-        }
-
-        .el-input__prefix,
-        .el-input__suffix {
-          display: grid;
-          align-items: center;
-          position: absolute;
-        }
-
-        .el-input__prefix {
-          width: 32px;
-          left: 16px;
-        }
-        .el-input__suffix {
-          cursor: pointer;
-          right: 0;
-          .el-input__suffix-inner {
-            display: flex;
-          }
-        }
-      }
-    }
     .forgot-password {
       width: 100%;
       margin-top: 24px;
       display: flex;
+      font-size: 14px;
       justify-content: space-between;
+      color: $ov-text--subtitle;
       .el-button {
         padding: 0;
-        font-size: 12px;
-        font-weight: 500;
-        color: $ov-text--subtitle;
+        font-weight: 400 !important;
         &:hover {
           color: $ov-primary;
         }
       }
-      .forgot-password {
-        font-size: 14px;
-      }
-      .remember-checkbox {
-        .el-checkbox__inner {
-          width: 24px;
-          height: 24px;
-          border-radius: 6px;
-          border-color: $ov-primary--light;
-          font-size: 14px;
-          z-index: auto;
-          &:hover {
-            border-color: $ov-primary;
-          }
-          &::after {
-            border-width: 2px;
-            height: 8px;
-            left: 7px;
-            top: 3.5px;
-            width: 4px;
-          }
-        }
-        .el-checkbox__label {
-          color: $ov-text--subtitle;
-          font-weight: 400;
-        }
-      }
-      & .is-checked {
-        .el-checkbox__inner {
-          background: $ov-primary;
-        }
-      }
     }
   }
 }
 
-.placeholder {
-  position: relative;
-  top: 0;
-  width: 50px;
-  font-size: 12px;
-  font-weight: 400;
-  color: #717a7f;
-  animation: showPlaceholder 0.3s;
-  animation-fill-mode: forwards;
-}
-
-.password-placeholder {
-  position: relative;
-  top: 0;
-  font-size: 12px;
-  font-weight: 400;
-  color: #717a7f;
-  animation: showPasswordPlaceholder 0.3s;
-  animation-fill-mode: forwards;
-}
-
-@media (min-width: 375px) {
-  @keyframes showPlaceholder {
-    to {
-      top: -34px;
-      left: -260px;
-    }
-  }
-
-  @keyframes showPasswordPlaceholder {
-    to {
-      top: -34px;
-      left: -292px;
-    }
-  }
-
-  .placeholder {
-    left: -220px;
-  }
-
-  .password-placeholder {
-    left: -250px;
-  }
-}
-
-@media (max-width: 375px) {
-  @keyframes showPlaceholder {
-    to {
-      top: -34px;
-      left: -157px;
-    }
-  }
-
-  @keyframes showPasswordPlaceholder {
-    to {
-      top: -34px;
-      left: -189px;
-    }
-  }
-
-  .placeholder {
-    left: -100px;
-  }
-
-  .password-placeholder {
-    left: -130px;
-  }
-}
-
-.el-form-item.is-error {
-  .el-input__inner {
-    border-color: #e60022 !important;
-  }
-}
-.el-form-item__error {
-  position: absolute;
-  font-family: 'Montserrat';
-  font-size: 12px;
-  line-height: 20px;
-  font-weight: 400;
-  top: 0;
-  left: 105%;
-  padding: 14px;
-  color: #e60022;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: max-content;
-  max-width: 212px;
-  height: max-content;
-  min-height: 48px;
-  border-radius: 13px;
-  background-color: white;
-  box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
-}
-.error_info {
-  color: #717a7f;
-  font-style: italic;
-  font-weight: 400;
-}
-
-.error_info > li {
-  margin-left: 15px;
-}
-
-.error_info > li::marker {
-  font-size: 0.5em;
-}
-.el-form-item__error:after,
-.el-form-item__error:before {
-  position: absolute;
-  content: '';
-  width: 0;
-  height: 0;
-  top: 25px;
-}
-.el-form-item__error:before {
-  left: -8px;
-  margin-top: -8px;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-right: 8px solid #fff;
-}
-.el-form-item__error:after {
-  left: -7px;
-  margin-top: -7px;
-  border-top: 7px solid transparent;
-  border-bottom: 7px solid transparent;
-  border-right: 7px solid #fff;
-}
-.error_icon {
-  position: absolute;
-  top: 13px;
-  right: 7px;
-}
-
-.eye_icon {
-  position: relative;
-  right: 24px;
-}
-.weak {
-  color: #e60022 !important;
-}
 .el-input__suffix {
   display: flex !important;
 }
@@ -577,36 +351,6 @@ const clearError = () => {
 }
 .el-form-item {
   margin-bottom: 27px;
-}
-.el-form-item__global-error-container {
-  width: 100%;
-  border-color: #e60022;
-  background: #fbe4e8;
-  box-shadow: 0px 7px 64px rgb(0 0 0 / 7%);
-  border-radius: 6px;
-  font-family: 'Montserrat';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 20px;
-  display: flex;
-  justify-content: space-between;
-  padding: 7px 12px;
-  align-items: center;
-  color: #e60022;
-  gap: 16px;
-  margin-bottom: 27px;
-}
-.el-form-item__global-error {
-  font-family: 'Montserrat';
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 16px;
-}
-
-.clear-error {
-  cursor: pointer;
 }
 
 .dialog {

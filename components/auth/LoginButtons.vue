@@ -100,10 +100,8 @@ const props = defineProps({
   position: absolute;
 }
 
-.el-icon-loading {
+.el-icon.is-loading {
   position: absolute;
-  top: 16px;
-  left: 100px;
 }
 .submit-button {
   background: linear-gradient(90.32deg, #0cb1b9 0.28%, #4156f6 99.75%);

@@ -18,12 +18,12 @@
                 class="user-box__user-edit-icon"
                 src="@/assets/images/icons/edit-icon.svg"
                 alt="edit_icon"
-                @click="$router.push('/profile/edit')"
+                @click="navigateTo('/profile/edit')"
               />
               <el-button
                 v-else
                 class="user-box__user-edit-btn"
-                @click="$router.push('/profile/edit')"
+                @click="navigateTo('/profile/edit')"
               >
                 <span>Edit Profile</span>
               </el-button>
@@ -131,40 +131,34 @@
     </div>
     <check-modal
       v-if="isOpenPINDialog"
-      :dialogVisible="isOpenPINDialog"
+      :dialog-visible="isOpenPINDialog"
       @close="isOpenPINDialog = false"
     ></check-modal>
   </div>
 </template>
 
 <script setup>
-definePageMeta({ layout: 'default' })
+import { storeToRefs } from 'pinia'
+import { onMounted } from 'vue'
 import defaultAvatar from '@/assets/images/icons/default-user-icon.jpg'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import settingsToken from '~/middleware/settingsToken'
 import useProfileStore from '~/stores/profile'
-import { storeToRefs } from 'pinia'
-import { onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import auth from '~/middleware/auth'
+definePageMeta({ layout: 'default' })
 
 const profileStore = useProfileStore()
 const {
   profileLoading,
   profileSuccessData,
-  profileFailureData,
   editProfileData,
   workspacesSuccessData,
-  workspacesFailureData,
 } = storeToRefs(profileStore)
 
 const instance = getCurrentInstance()
-const $route = useRoute()
-const $router = useRouter()
 const config = useRuntimeConfig()
 
 const responseWorkspaces = ref(null)
-const text = ref('')
 const payload = ref({
   avatar: null,
 })
@@ -179,7 +173,7 @@ const userEmail = ref(null)
 const avatarUrl = ref(defaultAvatar)
 const avatarSrc = ref(null)
 
-watch(profileSuccessData, (v) => {
+const setProfileData = (v) => {
   if (v.user.avatar) {
     avatarUrl.value = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
   }
@@ -199,7 +193,13 @@ watch(profileSuccessData, (v) => {
   specialty.value = v.specialties.find(
     (el) => el.id === v.user.speciality_id
   )?.name
-})
+}
+
+const setWorkspaceData = (v) => {
+  responseWorkspaces.value = v
+}
+
+watch(profileSuccessData, (v) => setProfileData(v))
 
 watch(editProfileData, (v) => {
   if (v.user.avatar) {
@@ -207,15 +207,22 @@ watch(editProfileData, (v) => {
   }
 })
 
-watch(workspacesSuccessData, (v) => {
-  responseWorkspaces.value = v
-})
+watch(workspacesSuccessData, (v) => setWorkspaceData(v))
 
 onMounted(async () => {
   auth()
   isOpenPINDialog.value = settingsToken()
-  profileStore.getProfile()
-  await profileStore.getWorkSpaces()
+  if (!profileSuccessData.value || editProfileData.value) {
+    profileStore.getProfile()
+  } else {
+    setProfileData(profileSuccessData.value)
+  }
+  if (!workspacesSuccessData.value) {
+    await profileStore.getWorkSpaces()
+  } else {
+    setWorkspaceData(workspacesSuccessData.value)
+  }
+
   window.addEventListener('resize', handleResize)
 })
 
@@ -255,7 +262,6 @@ const onAvatarUpload = (e, file) => {
 <style scoped lang="scss">
 .main {
   background-color: $ov-background;
-  padding-top: 67px;
   padding-bottom: 186px;
   &__user-container {
     max-width: 1200px;
@@ -339,6 +345,8 @@ const onAvatarUpload = (e, file) => {
   line-height: 20px;
   text-decoration: underline;
   font-weight: 400;
+  border: none;
+  background-color: inherit;
 }
 .user-workspaces {
   position: relative;
@@ -389,11 +397,14 @@ const onAvatarUpload = (e, file) => {
   &__buttons {
     display: flex;
     align-items: center;
+    width: 100%;
+    max-width: 200px;
   }
   &__create-btn {
     top: 82px;
     right: 103px;
-    min-width: 137px;
+    width: 100%;
+    max-width: 200px;
     height: 40px;
     border-radius: 6px;
     color: $ov-primary;
@@ -414,6 +425,8 @@ const onAvatarUpload = (e, file) => {
     color: $ov-primary;
     font-weight: 600;
     padding: 0;
+    border: none;
+    background-color: inherit;
   }
 }
 .small {
@@ -472,9 +485,6 @@ const onAvatarUpload = (e, file) => {
       top: 65px;
       right: 50px;
     }
-    &__container {
-      display: block;
-    }
   }
 }
 
@@ -491,6 +501,20 @@ const onAvatarUpload = (e, file) => {
     &__create-btn {
       top: 65px;
       right: 85px;
+    }
+  }
+  .user-workspaces {
+    &__container {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    &__buttons {
+      justify-content: center;
+      align-items: center;
+    }
+    &__create-btn {
+      margin: 0;
     }
   }
 }

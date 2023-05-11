@@ -198,10 +198,6 @@ const hideError = () => {
   error.value.isShow = false
 }
 
-const clearError = () => {
-  error.value.global.value = ''
-}
-
 const showingEmail = (email, size) => {
   const part1 = email.slice(0, size)
   const part2 = email.slice(size)
@@ -408,66 +404,5 @@ const showingEmail = (email, size) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.clear-error {
-  cursor: pointer;
-}
-.is-error {
-  .el-input__inner {
-    border-color: red !important;
-  }
-}
-
-.error_icon {
-  position: absolute;
-  top: 8px;
-  right: 0;
-}
-.el-form-item__error {
-  z-index: 1000;
-}
-.el-form-item__error {
-  position: absolute;
-  font-family: 'Montserrat';
-  font-size: 12px;
-  line-height: 20px;
-  font-weight: 400;
-  top: -4px;
-  left: 24px;
-  padding: 14px;
-  color: #e60022;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: max-content;
-  max-width: 212px;
-  height: max-content;
-  min-height: 48px;
-  border-radius: 13px;
-  background-color: white;
-  box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
-}
-.el-form-item__error:after,
-.el-form-item__error:before {
-  position: absolute;
-  content: '';
-  width: 0;
-  height: 0;
-  top: 25px;
-}
-.el-form-item__error:before {
-  left: -8px;
-  margin-top: -8px;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-right: 8px solid #fff;
-}
-.el-form-item__error:after {
-  left: -7px;
-  margin-top: -7px;
-  border-top: 7px solid transparent;
-  border-bottom: 7px solid transparent;
-  border-right: 7px solid #fff;
 }
 </style>

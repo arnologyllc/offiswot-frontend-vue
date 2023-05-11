@@ -41,15 +41,13 @@
             placeholder="Old PIN"
             @blur="validateField('previous')"
           >
-            <template suffix>
+            <template #suffix>
               <div
                 v-if="payload.previous"
                 style="position: relative"
                 @click="focusElement('previous')"
               >
-                <span for="previous" class="previous_placeholder">
-                  Old PIN
-                </span>
+                <span for="previous" class="custom_placeholder"> Old PIN </span>
               </div>
               <img
                 :class="errors.previous.value ? 'eye_icon' : ''"
@@ -95,7 +93,7 @@
                 style="position: relative"
                 @click="focusElement('pin')"
               >
-                <span for="pin" class="pin_placeholder"> New PIN </span>
+                <span for="pin" class="custom_placeholder"> New PIN </span>
               </div>
               <img
                 :class="errors.pin.value ? 'eye_icon' : ''"
@@ -141,7 +139,7 @@
                 style="position: relative"
                 @click="focusElement('pin_confirmation')"
               >
-                <span for="password" class="repeat-placeholder">
+                <span for="password" class="custom_placeholder">
                   Repeat PIN
                 </span>
               </div>
@@ -190,21 +188,21 @@
 
         <error-massage
           v-if="errors.previous.isShow && !isWeb()"
-          :dialogVisible="errors.previous.isShow && !isWeb()"
+          :dialog-visible="errors.previous.isShow && !isWeb()"
           :error-text="errors.previous.value"
           @visible="errors.previous.isShow = false"
         ></error-massage>
 
         <error-massage
           v-if="errors.pin.isShow && !isWeb()"
-          :dialogVisible="errors.pin.isShow && !isWeb()"
+          :dialog-visible="errors.pin.isShow && !isWeb()"
           :error-text="errors.pin.value"
           @visible="errors.pin.isShow = false"
         ></error-massage>
 
         <error-massage
           v-if="errors.pin_confirmation.isShow && !isWeb()"
-          :dialogVisible="errors.pin_confirmation.isShow && !isWeb()"
+          :dialog-visible="errors.pin_confirmation.isShow && !isWeb()"
           :error-text="errors.pin_confirmation.value"
           @visible="errors.pin_confirmation.isShow = false"
         ></error-massage>
@@ -214,24 +212,23 @@
     <ConfirmModal
       v-if="isOpenEmailDialog"
       :email="payload.email"
-      :dialogVisible="isOpenEmailDialog"
+      :dialog-visible="isOpenEmailDialog"
       @close="isOpenEmailDialog = false"
     ></ConfirmModal>
 
     <check-modal
       v-if="isOpenPINDialog"
-      :dialogVisible="isOpenPINDialog"
+      :dialog-visible="isOpenPINDialog"
       @close="isOpenPINDialog = false"
     ></check-modal>
   </div>
 </template>
 
 <script setup>
-definePageMeta({ layout: 'default' })
 import { getCurrentInstance, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import usePINStore from '~/stores/pin'
 import { storeToRefs } from 'pinia'
+import usePINStore from '~/stores/pin'
 
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import ConfirmModal from '@/components/shared/OvConfirmPINChangeModal.vue'
@@ -240,6 +237,7 @@ import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
 import settingsToken from '~/middleware/settingsToken'
 import auth from '~/middleware/auth'
+definePageMeta({ layout: 'default' })
 
 const pinStore = usePINStore()
 const {
@@ -435,7 +433,7 @@ const focusElement = (elem) => {
   display: flex;
   position: relative;
   height: 100%;
-  padding: 100px 0 150px 170px;
+  padding: 0 0 150px 170px;
 
   &__form {
     width: 390px;
@@ -458,119 +456,28 @@ const focusElement = (elem) => {
       margin-bottom: 70px;
     }
 
-    &--box {
-      &__input {
-        .el-input__inner {
-          height: 48px;
-          padding: 0 15px;
-          border-radius: 6px;
-          border-color: $ov-border--light;
-
-          &:focus,
-          &:hover {
-            border-color: $ov-primary;
-          }
-          &::placeholder {
-            color: $ov-placeholder;
-          }
-        }
-        .el-input__prefix,
-        .el-input__suffix {
-          display: grid;
-          align-items: center;
-        }
-
-        .el-input__prefix {
-          padding-left: 8px;
-        }
-        .el-input__suffix {
-          padding-right: 8px;
-          cursor: pointer;
-          &-inner {
-            display: grid;
-          }
-        }
-      }
-    }
     .forgot-password {
       margin-top: 24px;
       display: flex;
-      color: #6979f8;
       justify-content: space-between;
-      text-decoration: underline;
+      text-decoration: underline #6979f8;
+      font-size: 14px;
+      text-align: left;
       .el-button {
         font-size: 12px;
         font-weight: 500;
+        border: none;
+        background-color: inherit;
+        padding: 0;
+        color: #6979f8;
         &:hover {
           color: $ov-primary;
+          border: none;
+          background-color: inherit;
         }
       }
     }
-    .forgot-password {
-      font-size: 14px;
-    }
   }
-  .el-form-item__global-error-container {
-    width: 100%;
-    border-color: #e60022;
-    background: #fbe4e8;
-    box-shadow: 0px 7px 64px rgb(0 0 0 / 7%);
-    border-radius: 6px;
-    font-family: 'Montserrat';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 20px;
-    display: flex;
-    justify-content: space-between;
-    padding: 7px 12px;
-    align-items: center;
-    color: #e60022;
-    gap: 16px;
-    margin-bottom: 27px;
-  }
-  .el-form-item__global-error {
-    font-family: 'Montserrat';
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .clear-error {
-    cursor: pointer;
-  }
-}
-
-.previous_placeholder {
-  position: relative;
-  top: 0;
-  width: 50px;
-  font-size: 12px;
-  font-weight: 400;
-  color: #717a7f;
-  animation: showPreviousPlaceholder 0.3s;
-  animation-fill-mode: forwards;
-}
-.pin_placeholder {
-  position: relative;
-  top: 0;
-  width: 50px;
-  font-size: 12px;
-  font-weight: 400;
-  color: #717a7f;
-  animation: showPINPlaceholder 0.3s;
-  animation-fill-mode: forwards;
-}
-
-.repeat-placeholder {
-  position: relative;
-  top: 0;
-  font-size: 12px;
-  font-weight: 400;
-  color: #717a7f;
-  animation: showRepeatPlaceholder 0.3s;
-  animation-fill-mode: forwards;
 }
 
 @media (min-width: 407px) {
@@ -581,144 +488,8 @@ const focusElement = (elem) => {
       border-left: 1px solid #d0c9d6;
     }
   }
-  @keyframes showPreviousPlaceholder {
-    to {
-      top: -34px;
-      left: -240px;
-    }
-  }
-  @keyframes showPINPlaceholder {
-    to {
-      top: -34px;
-      left: -235px;
-    }
-  }
-
-  @keyframes showRepeatPlaceholder {
-    to {
-      top: -34px;
-      left: -218px;
-    }
-  }
-  .previous_placeholder {
-    left: -230px;
-  }
-  .pin_placeholder {
-    left: -225px;
-  }
-
-  .repeat-placeholder {
-    left: -210px;
-  }
 }
 
-@media (max-width: 407px) {
-  @keyframes showPreviousPlaceholder {
-    to {
-      top: -34px;
-      left: -215px;
-    }
-  }
-  @keyframes showPINPlaceholder {
-    to {
-      top: -34px;
-      left: -210px;
-    }
-  }
-
-  @keyframes showRepeatPlaceholder {
-    to {
-      top: -34px;
-      left: -194px;
-    }
-  }
-  .previous_placeholder {
-    left: -200px;
-  }
-  .pin_placeholder {
-    left: -195px;
-  }
-
-  .repeat-placeholder {
-    left: -180px;
-  }
-}
-
-.el-form-item.is-error {
-  .el-input__inner {
-    border-color: #e60022 !important;
-  }
-}
-.el-form-item__error {
-  position: absolute;
-  font-family: 'Montserrat';
-  font-size: 12px;
-  line-height: 20px;
-  font-weight: 400;
-  top: 0;
-  left: 105%;
-  padding: 14px;
-  color: #e60022;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: max-content;
-  max-width: 212px;
-  height: max-content;
-  min-height: 48px;
-  border-radius: 13px;
-  background-color: white;
-  box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
-}
-.error_info {
-  color: #717a7f;
-  font-style: italic;
-  font-weight: 400;
-}
-
-.error_info > li {
-  margin-left: 15px;
-}
-
-.error_info > li::marker {
-  font-size: 0.5em;
-}
-.el-form-item__error:after,
-.el-form-item__error:before {
-  position: absolute;
-  content: '';
-  width: 0;
-  height: 0;
-  top: 25px;
-}
-.el-form-item__error:before {
-  left: -8px;
-  margin-top: -8px;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-right: 8px solid #fff;
-}
-.el-form-item__error:after {
-  left: -7px;
-  margin-top: -7px;
-  border-top: 7px solid transparent;
-  border-bottom: 7px solid transparent;
-  border-right: 7px solid #fff;
-}
-.error_icon {
-  position: absolute;
-  top: 12px;
-  right: 7px;
-}
-
-.eye_icon {
-  position: relative;
-  right: 32px;
-}
-
-.weak {
-  color: #e60022;
-}
 .el-input__suffix {
   display: flex !important;
 }
@@ -767,7 +538,7 @@ const focusElement = (elem) => {
 
 @media (max-width: 990px) {
   .main {
-    margin: 100px auto 150px;
+    margin: 0 auto 150px;
     padding: 0;
     justify-content: center;
   }
@@ -775,7 +546,7 @@ const focusElement = (elem) => {
 
 @media (max-width: 450px) {
   .main {
-    margin: 100px auto 150px;
+    margin: 0 auto 150px;
     padding: 0;
     justify-content: center;
   }
@@ -788,7 +559,7 @@ const focusElement = (elem) => {
 
 @media (max-width: 407px) {
   .main {
-    margin: 100px auto 150px;
+    margin: 0 auto 150px;
     padding: 0;
     width: 300px;
     justify-content: center;

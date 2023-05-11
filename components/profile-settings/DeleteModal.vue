@@ -142,8 +142,8 @@
 </template>
 
 <script setup>
-import useProfileStore from '~/stores/profile'
 import { storeToRefs } from 'pinia'
+import useProfileStore from '~/stores/profile'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
 const instance = getCurrentInstance()
@@ -178,10 +178,7 @@ const rules = ref({
 })
 const showPassword = ref(false)
 
-watch(deleteFailureData, (v) => {
-  for (const i in v) {
-  }
-})
+watch(deleteFailureData, (v) => {})
 
 watch(deleteProfileData, (v) => {
   instance.emit('visible')
@@ -297,6 +294,7 @@ const agreeModal = () => {
   line-height: 28px;
   justify-content: center;
   color: #0d1c2e;
+  text-align: center;
   .warning {
     color: #ff4a66;
   }

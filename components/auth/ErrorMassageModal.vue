@@ -2,12 +2,13 @@
   <el-dialog
     v-model="props.dialogVisible"
     width="200px"
+    class="errorDialog"
     :show-close="false"
     :show-header="false"
     @close="closeModal"
   >
     <div class="dialog-text">
-      <span v-html="errorText" :class="textColor"></span>
+      <span :class="textColor" v-html="errorText"></span>
     </div>
     <template #footer>
       <img
@@ -57,66 +58,12 @@ const closeModal = () => {
 .dialog-text {
   padding: 12px 16px !important;
 }
-.el-dialog {
-  display: flex;
-  flex-direction: column;
-  width: max-content !important;
-  font-size: 12px;
-  height: max-content;
-  border-radius: 13px !important;
-  background: #ffffff;
-  margin-top: 220px !important;
-  border: 1px solid #4f4cec;
-  .el-dialog__header {
-    display: none;
-  }
-  &__footer {
-    position: absolute;
-    text-align: left;
-    width: 100%;
-    padding: 0;
-    margin: 0;
-    bottom: -40px;
-  }
-  &__header {
-    display: block;
-  }
-  &__body {
-    padding: 0 !important;
-  }
-  .error_info {
-    display: block;
-    margin-top: 15px;
-  }
-}
 
-.weak {
-  color: #e60022 !important;
-}
-.done {
-  color: #34b53a;
-}
-
-.warning {
-  color: #ffa26b;
-}
 .close_btn {
   color: white;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   cursor: pointer;
-}
-
-.el-dialog {
-  display: flex;
-  flex-direction: column;
-  width: max-content !important;
-  font-size: 12px;
-  height: max-content;
-  border-radius: 13px !important;
-  background: #ffffff;
-  margin-top: 220px !important;
-  border: 1px solid #4f4cec;
 }
 </style>

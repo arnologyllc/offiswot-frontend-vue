@@ -1,10 +1,54 @@
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Montserrat", sans-serif;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.m-phone-number-input__select {
+  width: 100px !important;
+  height: 48px;
+  border-radius: 0;
+}
+
+.m-input-wrapper {
+  border: none !important;
+  box-shadow: 0 0 0 1px #dcdfe6 inset;
+  min-width: 100% !important;
+  max-width: 320px !important;
+}
+
+.m-input-input[data-v-447d0d16] {
+  padding-top: 0 !important;
+  padding-right: 0 !important;
+}
+
+.maz-rounded {
+  border-radius: 4px !important;
+}
+
+.m-phone-number-input__country-flag[data-v-b43ec161] {
+  position: absolute;
+  left: 16px !important;
+  bottom: 17px !important;
+}
+
+.m-select-input.m-phone-number-input__select.m-input-input {
+  position: absolute !important;
+  left: -4px;
+  bottom: -2px;
+}
+
+.m-input-wrapper-right {
+  position: absolute !important;
+  left: 73px;
+  bottom: 7px;
+}
+
+.m-input-label {
+  display: none !important;
 }
 
 /* width */
@@ -36,7 +80,7 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type="number"] {
+input[type='number'] {
   -moz-appearance: textfield;
 }
 
@@ -64,4 +108,44 @@ input[type="number"] {
 
 .popper__arrow {
   display: none !important;
+}
+
+.el-input__suffix-inner {
+  margin-right: 12px;
+  gap: 5px;
+}
+
+.eye_icon {
+  margin-right: 20px;
+}
+
+.custom_placeholder {
+  position: fixed;
+  top: 0;
+  left: 20px;
+  width: max-content;
+  font-size: 12px;
+  font-weight: 400;
+  color: #717a7f;
+  animation: showPlaceholder 0.3s;
+  animation-fill-mode: forwards;
+  text-align: left;
+}
+@keyframes showPlaceholder {
+  to {
+    top: -22px;
+    left: 0;
+  }
+}
+
+.el-input.el-input--suffix,
+.el-date-editor > .el-input__wrapper,
+.m-input-wrapper-input {
+  height: 48px !important;
+  min-width: 100% !important;
+  max-width: 320px !important;
+}
+
+.el-form-item__content {
+  justify-content: center;
 }

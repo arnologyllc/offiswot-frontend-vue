@@ -47,7 +47,7 @@
                 style="position: relative"
                 @click="focusElement('old_password')"
               >
-                <span for="old_password" class="old_password_placeholder">
+                <span for="old_password" class="custom_placeholder">
                   Old Password
                 </span>
               </div>
@@ -87,6 +87,7 @@
             placeholder="Password"
             :type="showPassword ? 'text' : 'password'"
             @input="validateField('password')"
+            @blur="validateField('password')"
           >
             <template #suffix>
               <div
@@ -94,7 +95,7 @@
                 style="position: relative"
                 @click="focusElement('password')"
               >
-                <span for="password" class="placeholder password_placeholder">
+                <span for="password" class="custom_placeholder">
                   New password
                 </span>
               </div>
@@ -160,7 +161,7 @@
                 style="position: relative"
                 @click="focusElement('password_confirmation')"
               >
-                <span for="password" class="repeat-placeholder">
+                <span for="password" class="custom_placeholder">
                   Repeat Password
                 </span>
               </div>
@@ -209,13 +210,13 @@
 
         <error-massage
           v-if="errors.old_password.isShow && !isWeb()"
-          :dialogVisible="errors.old_password.isShow && !isWeb()"
+          :dialog-visible="errors.old_password.isShow && !isWeb()"
           :error-text="errors.old_password.value"
           @visible="errors.old_password.isShow = false"
         ></error-massage>
         <error-massage
           v-if="errors.password.isShow && !isWeb()"
-          :dialogVisible="errors.password.isShow && !isWeb()"
+          :dialog-visible="errors.password.isShow && !isWeb()"
           :error-text="errors.password.value"
           :text-color="
             errors.password.status === 'Medium' && payload.password
@@ -229,7 +230,7 @@
 
         <error-massage
           v-if="errors.password_confirmation.isShow && !isWeb()"
-          :dialogVisible="errors.password_confirmation.isShow && !isWeb()"
+          :dialog-visible="errors.password_confirmation.isShow && !isWeb()"
           :error-text="errors.password_confirmation.value"
           @visible="errors.password_confirmation.isShow = false"
         ></error-massage>
@@ -239,32 +240,31 @@
     <ConfirmModal
       v-if="isOpenEmailDialog"
       :email="payload.email"
-      :dialogVisible="isOpenEmailDialog"
+      :dialog-visible="isOpenEmailDialog"
       @close="isOpenEmailDialog = false"
     ></ConfirmModal>
 
     <check-modal
       v-if="isOpenPINDialog"
-      :dialogVisible="isOpenPINDialog"
+      :dialog-visible="isOpenPINDialog"
       @close="isOpenPINDialog = false"
     ></check-modal>
   </div>
 </template>
 
 <script setup>
-definePageMeta({ layout: 'default' })
-
 import { getCurrentInstance } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import ConfirmModal from '@/components/shared/OvConfirmPasswordChangeModal.vue'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import useAuthStore from '~/stores/auth'
-import { storeToRefs } from 'pinia'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
 import settingsToken from '~/middleware/settingsToken'
 import auth from '~/middleware/auth'
+definePageMeta({ layout: 'default' })
 
 const authStore = useAuthStore()
 const {
@@ -273,11 +273,9 @@ const {
   resetLoading,
   forgotSuccessData,
   forgotErrorData,
-  forgotLoading,
 } = storeToRefs(authStore)
 
 const instance = getCurrentInstance()
-const $route = useRoute()
 const $router = useRouter()
 
 const isOpenPINDialog = ref(false)
@@ -490,7 +488,7 @@ const getColor = () => {
   display: flex;
   position: relative;
   height: 100%;
-  padding: 100px 0 150px 170px;
+  padding: 0 0 150px 170px;
   width: 100%;
 
   &__form {
@@ -514,119 +512,28 @@ const getColor = () => {
       margin-bottom: 70px;
     }
 
-    &--box {
-      &__input {
-        .el-input__inner {
-          height: 48px;
-          padding: 0 15px;
-          border-radius: 6px;
-          border-color: $ov-border--light;
-
-          &:focus,
-          &:hover {
-            border-color: $ov-primary;
-          }
-          &::placeholder {
-            color: $ov-placeholder;
-          }
-        }
-        .el-input__prefix,
-        .el-input__suffix {
-          display: grid;
-          align-items: center;
-        }
-
-        .el-input__prefix {
-          padding-left: 8px;
-        }
-        .el-input__suffix {
-          padding-right: 8px;
-          cursor: pointer;
-          &-inner {
-            display: grid;
-          }
-        }
-      }
-    }
     .forgot-password {
       margin-top: 24px;
       display: flex;
-      color: #6979f8;
       justify-content: space-between;
-      text-decoration: underline;
+      text-decoration: underline #6979f8;
+      font-size: 14px;
+      text-align: left;
       .el-button {
         font-size: 12px;
         font-weight: 500;
+        border: none;
+        background-color: inherit;
+        padding: 0;
+        color: #6979f8;
         &:hover {
           color: $ov-primary;
+          border: none;
+          background-color: inherit;
         }
       }
     }
-    .forgot-password {
-      font-size: 14px;
-    }
   }
-  .el-form-item__global-error-container {
-    width: 100%;
-    border-color: #e60022;
-    background: #fbe4e8;
-    box-shadow: 0px 7px 64px rgb(0 0 0 / 7%);
-    border-radius: 6px;
-    font-family: 'Montserrat';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 20px;
-    display: flex;
-    justify-content: space-between;
-    padding: 7px 12px;
-    align-items: center;
-    color: #e60022;
-    gap: 16px;
-    margin-bottom: 27px;
-  }
-  .el-form-item__global-error {
-    font-family: 'Montserrat';
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .clear-error {
-    cursor: pointer;
-  }
-}
-
-.old_password_placeholder {
-  position: relative;
-  top: 0;
-  width: 50px;
-  font-size: 12px;
-  font-weight: 400;
-  color: #717a7f;
-  animation: showPreviousPlaceholder 0.3s;
-  animation-fill-mode: forwards;
-}
-.password_placeholder {
-  position: relative;
-  top: 0;
-  width: 50px;
-  font-size: 12px;
-  font-weight: 400;
-  color: #717a7f;
-  animation: showPasswordPlaceholder 0.3s;
-  animation-fill-mode: forwards;
-}
-
-.repeat-placeholder {
-  position: relative;
-  top: 0;
-  font-size: 12px;
-  font-weight: 400;
-  color: #717a7f;
-  animation: showRepeatPlaceholder 0.3s;
-  animation-fill-mode: forwards;
 }
 
 @media (min-width: 407px) {
@@ -637,157 +544,12 @@ const getColor = () => {
       border-left: 1px solid #d0c9d6;
     }
   }
-  @keyframes showPreviousPlaceholder {
-    to {
-      top: -34px;
-      left: -204px;
-    }
-  }
-  @keyframes showPasswordPlaceholder {
-    to {
-      top: -34px;
-      left: -199px;
-    }
-  }
-
-  @keyframes showRepeatPlaceholder {
-    to {
-      top: -34px;
-      left: -182px;
-    }
-  }
-  .old_password_placeholder {
-    left: -190px;
-  }
-  .password_placeholder {
-    left: -183px;
-  }
-
-  .repeat-placeholder {
-    left: -168px;
-  }
-}
-
-@media (max-width: 407px) {
-  @keyframes showPreviousPlaceholder {
-    to {
-      top: -34px;
-      left: -180px;
-    }
-  }
-  @keyframes showPasswordPlaceholder {
-    to {
-      top: -34px;
-      left: -175px;
-    }
-  }
-
-  @keyframes showRepeatPlaceholder {
-    to {
-      top: -34px;
-      left: -158px;
-    }
-  }
-  .old_password_placeholder {
-    left: -165px;
-  }
-  .password_placeholder {
-    left: -160px;
-  }
-
-  .repeat-placeholder {
-    left: -143px;
-  }
-}
-
-.el-form-item.is-error {
-  .el-input__inner {
-    border-color: #e60022 !important;
-  }
-}
-.el-form-item__error {
-  position: absolute;
-  font-family: 'Montserrat';
-  font-size: 12px;
-  line-height: 20px;
-  font-weight: 400;
-  top: 0;
-  left: 105%;
-  padding: 14px;
-  color: #e60022;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 212px;
-  height: max-content;
-  min-height: 48px;
-  border-radius: 13px;
-  background-color: white;
-  box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
 }
 
 .strength {
   left: 127%;
 }
-.done {
-  color: #34b53a;
-}
 
-.warning {
-  color: #ffa26b;
-}
-.weak {
-  color: #e60022;
-}
-.error_info {
-  color: #717a7f;
-  font-style: italic;
-  font-weight: 400;
-}
-
-.error_info > li {
-  margin-left: 15px;
-}
-
-.error_info > li::marker {
-  font-size: 0.5em;
-}
-.el-form-item__error:after,
-.el-form-item__error:before {
-  position: absolute;
-  content: '';
-  width: 0;
-  height: 0;
-  top: 25px;
-}
-.el-form-item__error:before {
-  left: -8px;
-  margin-top: -8px;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-right: 8px solid #fff;
-}
-.el-form-item__error:after {
-  left: -7px;
-  margin-top: -7px;
-  border-top: 7px solid transparent;
-  border-bottom: 7px solid transparent;
-  border-right: 7px solid #fff;
-}
-.error_icon {
-  position: absolute;
-  top: 12px;
-  right: 7px;
-}
-
-.eye_icon {
-  position: relative;
-  right: 32px;
-}
-
-.weak {
-  color: #e60022;
-}
 .el-input__suffix {
   display: flex !important;
 }
@@ -836,7 +598,7 @@ const getColor = () => {
 
 @media (max-width: 990px) {
   .main {
-    margin: 100px auto 150px;
+    margin: 0 auto 150px;
     padding: 0;
     justify-content: center;
   }
@@ -844,7 +606,7 @@ const getColor = () => {
 
 @media (max-width: 450px) {
   .main {
-    margin: 100px auto 150px;
+    margin: 0 auto 150px;
     padding: 0;
     justify-content: center;
   }
@@ -857,7 +619,7 @@ const getColor = () => {
 
 @media (max-width: 407px) {
   .main {
-    margin: 100px auto 150px;
+    margin: 0 auto 150px;
     padding: 0;
     width: 300px;
     justify-content: center;

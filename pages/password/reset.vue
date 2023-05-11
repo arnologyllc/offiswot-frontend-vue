@@ -21,6 +21,7 @@
             placeholder="Password"
             :type="showPassword ? 'text' : 'password'"
             @input="validateField('password')"
+            @blur="validateField('password')"
           >
             <template #prefix>
               <img
@@ -34,7 +35,7 @@
                 style="position: relative"
                 @click="focusElement('password')"
               >
-                <span for="password" class="placeholder placeholder__password">
+                <span for="password" class="custom_placeholder">
                   Password
                 </span>
               </div>
@@ -106,10 +107,7 @@
                 style="position: relative"
                 @click="focusElement('password_confirmation')"
               >
-                <span
-                  for="password_confirmation"
-                  class="placeholder placeholder__passwordConfirmation"
-                >
+                <span for="password_confirmation" class="custom_placeholder">
                   Confirm Password
                 </span>
               </div>
@@ -149,7 +147,7 @@
     </div>
     <error-massage
       v-if="errors.password.isShow && !isWeb()"
-      :dialogVisible="errors.password.isShow && !isWeb()"
+      :dialog-visible="errors.password.isShow && !isWeb()"
       :error-text="errors.password.value"
       :text-color="
         errors.password.status === 'Medium' && payload.password
@@ -164,7 +162,7 @@
 
     <error-massage
       v-if="errors.password_confirmation.isShow && !isWeb()"
-      :dialogVisible="errors.password_confirmation.isShow && !isWeb()"
+      :dialog-visible="errors.password_confirmation.isShow && !isWeb()"
       :error-text="errors.password_confirmation.value"
       @visible="errors.password_confirmation.isShow = false"
     >
@@ -173,15 +171,15 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: 'auth' })
-import LoginButtons from '@/components/auth/LoginButtons.vue'
-import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
-import useAuthStore from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
 import $cookies from 'js-cookie'
+import LoginButtons from '@/components/auth/LoginButtons.vue'
+import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
+import useAuthStore from '@/stores/auth'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
+definePageMeta({ layout: 'auth' })
 
 const authStore = useAuthStore()
 const { resetSuccessData, resetErrorData, resetLoading } =
@@ -342,8 +340,7 @@ watch(resetSuccessData, (v) => {
   }
 })
 
-watch(resetErrorData, (v) => {
-})
+watch(resetErrorData, (v) => {})
 
 const onSubmit = () => {
   instance.refs.resetForm.validate((valid) => {
@@ -365,251 +362,18 @@ const onSubmit = () => {
 
   &__form {
     width: 390px;
-    &--title {
-      font-size: 20px;
-      font-weight: 600;
-      color: $ov-text--title;
-      margin-bottom: 4px;
-    }
-
-    &--subtitle {
-      font-size: 14px;
-      color: $ov-text--subtitle;
-      margin-bottom: 47px;
-    }
-
-    &--box {
-      &__input {
-        .el-input__inner {
-          height: 48px;
-          padding: 0 45px;
-          border-radius: 6px;
-          border-color: $ov-border--light;
-
-          &:focus,
-          &:hover {
-            border-color: $ov-primary;
-          }
-          &::placeholder {
-            color: $ov-placeholder;
-          }
-        }
-        .el-input__prefix,
-        .el-input__suffix {
-          display: grid;
-          align-items: center;
-        }
-        .el-input__prefix {
-          padding-left: 8px;
-        }
-        .el-input__suffix {
-          padding-right: 8px;
-          cursor: pointer;
-          &-inner {
-            display: grid;
-          }
-        }
-      }
-    }
   }
-}
-
-@media (min-width: 375px) {
-  @keyframes showEmailPlaceholder {
-    to {
-      top: -34px;
-      left: -343px;
-    }
-  }
-  @keyframes showUsernamePlaceholder {
-    to {
-      top: -34px;
-      left: -315px;
-    }
-  }
-  @keyframes showPasswordPlaceholder {
-    to {
-      top: -34px;
-      left: -295px;
-    }
-  }
-  @keyframes showPasswordConfirmationPlaceholder {
-    to {
-      top: -34px;
-      left: -243px;
-    }
-  }
-  .placeholder {
-    &__email {
-      left: -300px;
-    }
-    &__username {
-      left: -270px;
-    }
-    &__password {
-      left: -250px;
-    }
-    &__passwordConfirmation {
-      left: -200px;
-    }
-  }
-}
-
-@media (max-width: 375px) {
-  @keyframes showEmailPlaceholder {
-    to {
-      top: -34px;
-      left: -240px;
-    }
-  }
-  @keyframes showUsernamePlaceholder {
-    to {
-      top: -34px;
-      left: -212px;
-    }
-  }
-  @keyframes showPasswordPlaceholder {
-    to {
-      top: -34px;
-      left: -192px;
-    }
-  }
-  @keyframes showPasswordConfirmationPlaceholder {
-    to {
-      top: -34px;
-      left: -139px;
-    }
-  }
-  .placeholder {
-    &__email {
-      left: -197px;
-    }
-    &__username {
-      left: -167px;
-    }
-    &__password {
-      left: -147px;
-    }
-    &__passwordConfirmation {
-      left: -96px;
-    }
-  }
-}
-
-.placeholder {
-  position: relative;
-  top: 0;
-  font-size: 12px;
-  font-weight: 400;
-  color: #717a7f;
-  &__email {
-    animation: showEmailPlaceholder 0.3s;
-    animation-fill-mode: forwards;
-  }
-  &__username {
-    animation: showUsernamePlaceholder 0.3s;
-    animation-fill-mode: forwards;
-  }
-  &__password {
-    animation: showPasswordPlaceholder 0.3s;
-    animation-fill-mode: forwards;
-  }
-  &__passwordConfirmation {
-    animation: showPasswordConfirmationPlaceholder 0.3s;
-    animation-fill-mode: forwards;
-  }
-}
-
-.el-form-item.is-error {
-  .el-input__inner {
-    border-color: red !important;
-  }
-}
-.el-form-item__error {
-  position: absolute;
-  font-family: 'Montserrat';
-  font-size: 12px;
-  line-height: 20px;
-  font-weight: 400;
-  top: 0;
-  left: 105%;
-  padding: 14px;
-  color: #e60022;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: max-content;
-  max-width: 212px;
-  height: max-content;
-  border-radius: 13px;
-  background-color: white;
-  box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
 }
 
 .strength {
   left: 127%;
 }
-.done {
-  color: #34b53a;
-}
 
-.warning {
-  color: #ffa26b;
-}
-.weak {
-  color: #e60022;
-}
-.error_info {
-  color: #717a7f;
-  font-style: italic;
-  font-weight: 400;
-}
-
-.error_info > li {
-  margin-left: 15px;
-}
-.el-form-item__error:after,
-.el-form-item__error:before {
-  position: absolute;
-  content: '';
-  width: 0;
-  height: 0;
-  top: 25px;
-}
-
-.error_info > li::marker {
-  font-size: 0.5em;
-}
-.el-form-item__error:before {
-  left: -8px;
-  margin-top: -8px;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-right: 8px solid #fff;
-}
-.el-form-item__error:after {
-  left: -7px;
-  margin-top: -7px;
-  border-top: 7px solid transparent;
-  border-bottom: 7px solid transparent;
-  border-right: 8px solid #fff;
-}
 .el-input__suffix {
   display: flex !important;
 }
 .el-input__suffix-inner {
   display: flex !important;
-}
-
-.error_icon {
-  position: absolute;
-  top: 12px;
-  right: 7px;
-}
-
-.eye_icon {
-  position: relative;
-  right: 32px;
 }
 
 .terms {
