@@ -105,10 +105,7 @@
               </div>
             </div>
           </div>
-          <div
-            v-else-if="responseWorkspaces && !responseWorkspaces.length"
-            class="user-workspaces__container"
-          >
+          <div v-else-if="!isWithWorkspaces" class="user-workspaces__container">
             <el-button
               class="user-workspaces__create-btn"
               style="position: absolute"
@@ -117,7 +114,7 @@
               <span>Create</span>
             </el-button>
             <div class="user-workspaces__container-text">
-              <span v-html="formattedText()"> </span>
+              <span v-html="formattedText"> </span>
             </div>
           </div>
           <div
@@ -143,6 +140,7 @@ import { onMounted } from 'vue'
 import defaultAvatar from '@/assets/images/icons/default-user-icon.jpg'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import settingsToken from '~/middleware/settingsToken'
+import loginToken from '~/middleware/loginToken'
 import useProfileStore from '~/stores/profile'
 import auth from '~/middleware/auth'
 definePageMeta({ layout: 'default' })
@@ -169,30 +167,35 @@ const userTelNumber = ref(null)
 const userInviteWorkspaces = ref(null)
 const specialty = ref(null)
 const userEmail = ref(null)
+const formattedText = ref(null)
 
 const avatarUrl = ref(defaultAvatar)
 const avatarSrc = ref(null)
 
 const setProfileData = (v) => {
-  if (v.user.avatar) {
-    avatarUrl.value = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
-  }
+  if (v) {
+    if (v.user.avatar) {
+      avatarUrl.value = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
+    } else {
+      avatarUrl.value = defaultAvatar
+    }
 
-  const [name, lastname, surname] = [
-    v.user.name ? v.user.name : '',
-    v.user.lastname ? v.user.lastname : '',
-    v.user.surname ? v.user.surname : '',
-  ]
-  if (name || lastname || surname) {
-    userFullName.value = `${name} ${lastname} ${surname}`
-  }
+    const [name, lastname, surname] = [
+      v.user.name ? v.user.name : '',
+      v.user.lastname ? v.user.lastname : '',
+      v.user.surname ? v.user.surname : '',
+    ]
+    if (name || lastname || surname) {
+      userFullName.value = `${name} ${lastname} ${surname}`
+    }
 
-  userTelNumber.value = v.user.phone_number
-  userInviteWorkspaces.value = v.user.invite_workspaces.length
-  userEmail.value = v.user.email
-  specialty.value = v.specialties.find(
-    (el) => el.id === v.user.speciality_id
-  )?.name
+    userTelNumber.value = v.user.phone_number
+    userInviteWorkspaces.value = v.user.invite_workspaces.length
+    userEmail.value = v.user.email
+    specialty.value = v.specialties.find(
+      (el) => el.id === v.user.speciality_id
+    )?.name
+  }
 }
 
 const setWorkspaceData = (v) => {
@@ -204,6 +207,8 @@ watch(profileSuccessData, (v) => setProfileData(v))
 watch(editProfileData, (v) => {
   if (v.user.avatar) {
     avatarUrl.value = `${v.avatarPath}/${v.user.avatar}`
+  } else {
+    avatarUrl.value = defaultAvatar
   }
 })
 
@@ -211,39 +216,38 @@ watch(workspacesSuccessData, (v) => setWorkspaceData(v))
 
 onMounted(async () => {
   auth()
+  isOpenPINDialog.value = loginToken()
   isOpenPINDialog.value = settingsToken()
   if (!profileSuccessData.value || editProfileData.value) {
     profileStore.getProfile()
   } else {
     setProfileData(profileSuccessData.value)
   }
-  if (!workspacesSuccessData.value) {
-    await profileStore.getWorkSpaces()
-  } else {
-    setWorkspaceData(workspacesSuccessData.value)
-  }
+  await profileStore.getWorkSpaces()
 
   window.addEventListener('resize', handleResize)
+  formattedText.value = formattedTextFtn()
 })
 
-const isWithWorkspaces = () => {
+const isWithWorkspaces = computed(() => {
   return (
     responseWorkspaces.value && responseWorkspaces.value.myWorkspaces.length
   )
-}
+})
 
 const openWorkspace = (id) => {
   navigateTo(`/workspace/staff/${id}`)
 }
 
 const handleResize = () => {
+  formattedText.value = formattedTextFtn()
   instance.update()
 }
-const formattedText = () => {
-  if (window.innerWidth > 861) {
+const formattedTextFtn = () => {
+  if (window.innerWidth > 935) {
     return `Thanks for joining Offiswot!<br /><br />
             Create a workspace for your team or company using our productivity platform.<br/>Enjoy collaborating with each other easily and managing yourteam members and the projects effectively.`
-  } else if (window.innerWidth <= 861 && window.innerWidth > 567) {
+  } else if (window.innerWidth <= 935 && window.innerWidth > 628) {
     return `Thanks for joining Offiswot!<br /><br />
             Create a workspace for your team or company using our productivity platform. Enjoy collaborating with each other easily and managing yourteam members and the projects effectively.`
   } else {
@@ -435,7 +439,7 @@ const onAvatarUpload = (e, file) => {
   flex-direction: row;
   align-items: center;
 }
-@media (max-width: 425px) {
+@media (max-width: 475px) {
   .user-box {
     &__title {
       padding-left: 34px;
@@ -488,15 +492,16 @@ const onAvatarUpload = (e, file) => {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 700px) {
   .user-workspaces {
     &__create-btn {
       right: 92px;
+      max-width: 130px;
     }
   }
 }
 
-@media (max-width: 475px) {
+@media (max-width: 535px) {
   .user-workspaces {
     &__create-btn {
       top: 65px;
@@ -515,6 +520,16 @@ const onAvatarUpload = (e, file) => {
     }
     &__create-btn {
       margin: 0;
+    }
+  }
+}
+
+@media (max-width: 475px) {
+  .user-workspaces {
+    &__create-btn {
+      top: 55px;
+      right: 40px;
+      max-width: 70px;
     }
   }
 }

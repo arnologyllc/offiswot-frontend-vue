@@ -118,6 +118,7 @@ import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 
 import useWorkspacesStore from '~/stores/workspace'
 import settingsToken from '~/middleware/settingsToken'
+import loginToken from '~/middleware/loginToken'
 import auth from '~/middleware/auth'
 definePageMeta({ layout: 'default' })
 
@@ -177,6 +178,7 @@ watch(industriesError, (v) => {
 
 onMounted(async () => {
   auth()
+  isOpenPINDialog.value = loginToken()
   isOpenPINDialog.value = settingsToken()
   window.addEventListener('resize', handleResize)
   await workspacesStore.getIndustries()

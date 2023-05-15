@@ -43,7 +43,7 @@
 
 .m-input-wrapper-right {
   position: absolute !important;
-  left: 73px;
+  left: 78px;
   bottom: 7px;
 }
 
@@ -116,7 +116,7 @@ input[type='number'] {
 }
 
 .eye_icon {
-  margin-right: 20px;
+  margin-right: 27px;
 }
 
 .custom_placeholder {

@@ -31,7 +31,7 @@
           v-if="!error && !timer"
           href=""
           class="dialog-footer__action"
-          @click.prevent="authStore.resendEmail(email)"
+          @click.prevent="onSubmit"
           >Resend Verification Email</a
         >
         <span v-if="error" class="later"> Please try again later. </span>
@@ -63,23 +63,18 @@ const dialogWidth = ref('560px')
 const timer = ref(59)
 const error = ref(null)
 
-watch(resendSuccessData, (v) => {
-  if (v) {
-    timer.value = 59
-    const ID = setInterval(() => {
-      if (timer.value) timer.value--
-    }, 1000)
-    setTimeout(() => {
-      clearInterval(ID)
-    }, 60000)
-  }
-})
+watch(resendSuccessData, (v) => {})
 
 watch(resendFailureData, (v) => {
   if (!v) {
     error.value = `You have exceeded the maximum number of reset password requests.`
   }
 })
+
+const onSubmit = () => {
+  timer._value = 59
+  authStore.resendEmail(props.email)
+}
 
 onMounted(() => {
   if (document.documentElement.clientWidth <= 425) {
@@ -90,13 +85,10 @@ onMounted(() => {
       dialogWidth.value = '315px'
     } else dialogWidth.value = '560px'
   })
-  timer.value = 59
-  const ID = setInterval(() => {
+  timer._value = 59
+  setInterval(() => {
     if (timer.value) timer.value--
   }, 1000)
-  setTimeout(() => {
-    clearInterval(ID)
-  }, 60000)
 })
 </script>
 

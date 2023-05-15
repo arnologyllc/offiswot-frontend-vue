@@ -76,6 +76,7 @@ const footerLinks = ref([
 <style scoped lang="scss">
 .footer {
   width: 100%;
+  margin-top: 100px !important;
   padding: 45px 96px 22px 96px;
   margin-top: auto;
   background: linear-gradient(270deg, #4156f6 0%, #0cb1b9 113.37%);

@@ -98,10 +98,13 @@ import { getCurrentInstance, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import $cookies from 'js-cookie'
+import nuxtStorage from 'nuxt-storage'
 import ConfirmModal from '@/components/shared/OvConfirmPINChangeModal.vue'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
 import usePinStore from '~/stores/pin'
+import useProfileStore from '~/stores/profile'
+const profileStore = useProfileStore()
 
 const dialogWidth = ref('450px')
 const dialogHeight = ref('400px')
@@ -116,6 +119,8 @@ const {
   forgotPinFailureData,
   isLoadingSubmit,
 } = storeToRefs(pinStore)
+
+const { profileSuccessData } = storeToRefs(profileStore)
 const props = defineProps({
   dialogVisible: {
     type: Boolean,
@@ -155,22 +160,42 @@ const showPIN = ref(false)
 const isOpenEmailDialog = ref(false)
 
 watch(checkPinData, ({ data: v }) => {
-  if (!$cookies.get('login_pin_token'))
-    $cookies.set('login_pin_token', v.login_pin_token, { expires: 30 })
+  const userID = $cookies.get('currentAccountID')
+  const initAccountValue = nuxtStorage.localStorage.getData('accounts')
+  if (
+    !$cookies.get('login_pin_token') &&
+    $cookies.get('login_pin_token') !== v.login_pin_token
+  ) {
+    const loginPinTokenExpires = new Date()
+    loginPinTokenExpires.setDate(loginPinTokenExpires.getDate() + 30)
+    $cookies.set('login_pin_token', v.login_pin_token, {
+      expires: (Date.parse(loginPinTokenExpires) - new Date()) / 86400000,
+    })
+    initAccountValue[userID].login_pin_token = v.login_pin_token
+    initAccountValue[userID].login_pin_token_expires = loginPinTokenExpires
+  }
   instance.emit('loginToken', $cookies.get('login_pin_token'))
   $cookies.set('settings_pin_token', v.settings_pin_token, 0)
+  initAccountValue[userID].settings_pin_token = v.settings_pin_token
+
+  nuxtStorage.localStorage.setData('accounts', initAccountValue, 30, 'd')
   instance.emit('close')
+  $router.go()
 })
 
 watch(checkPinFailureData, (v) => {
-  for (const i in v) {
-    if (typeof v[i] !== 'string') {
-      for (const j in v[i]) {
-        errors.value.global.value = v[i][j]
+  if (typeof v !== 'string') {
+    for (const i in v) {
+      if (typeof v[i] !== 'string') {
+        for (const j in v[i]) {
+          errors.value.global.value = v[i][j]
+        }
+      } else {
+        errors.value.global.value = v[i]
       }
-    } else {
-      errors.value.global.value = v
     }
+  } else {
+    errors.value.global.value = v
   }
   if ($route.path !== '/')
     setTimeout(() => {
@@ -197,6 +222,9 @@ watch(forgotPinData, (v) => {
 })
 
 onMounted(() => {
+  if (profileSuccessData.value?.user.email) {
+    payload.value.email = profileSuccessData.value?.user.email
+  }
   if (document.documentElement.clientWidth <= 425) {
     dialogWidth.value = '315px'
   }
@@ -234,9 +262,9 @@ const clearError = () => {
 const validateField = (fieldName) => {
   instance.refs.pinForm.validateField(fieldName, (isValid, catchedError) => {
     if (!isValid) {
-      errors.value[fieldName].value = catchedError[fieldName][0].message
+      errors.value.global.value = catchedError[fieldName][0].message
     } else {
-      errors.value[fieldName].value = ''
+      errors.value.global.value = ''
     }
   })
 }

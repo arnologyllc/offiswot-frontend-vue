@@ -26,8 +26,8 @@ import { useRoute } from 'vue-router'
 import Header from '~/components/global/auth/Header.vue'
 import Footer from '@/components/global/Footer.vue'
 import login from '~/middleware/login'
-const route = useRoute()
 await login()
+const route = useRoute()
 
 const checkPage = () => {
   return route.path

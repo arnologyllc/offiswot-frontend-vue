@@ -96,12 +96,12 @@ import settingsToken from '~/middleware/settingsToken'
 import auth from '~/middleware/auth'
 definePageMeta({ layout: 'default' })
 
-loginToken()
 const $router = useRouter()
 const showModal = ref(false)
 const dialogVisible = ref(false)
 const isOpenPINDialog = ref(false)
 
+isOpenPINDialog.value = loginToken()
 isOpenPINDialog.value = settingsToken()
 
 onMounted(() => {

@@ -255,3 +255,58 @@
     width: 4px !important;
   }
 }
+
+@media (max-width: 500px) {
+  .access_modal {
+    .el-form-item__global-error-container {
+      width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .el-input.el-input--suffix {
+      min-width: 80% !important;
+      max-width: 290px !important;
+    }
+    .forgot-password {
+      text-align: left;
+      text-decoration: underline #6979f8;
+      font-size: 14px;
+      padding-bottom: 40px;
+      padding-left: 17px;
+      .el-button {
+        font-size: 12px;
+        font-weight: 500;
+        border: none;
+        background-color: inherit;
+        padding: 0;
+        color: #6979f8;
+
+        &:hover {
+          color: $ov-primary;
+          border: none;
+          background-color: inherit;
+        }
+
+        .el-button--text {
+          padding: 0;
+          margin-bottom: 40px;
+        }
+      }
+    }
+
+    .dialog-footer {
+      &__action {
+        color: $ov-text--title;
+        font-size: 14px;
+        font-weight: 500;
+      }
+    }
+
+    .access-header {
+      width: 315px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #bbbcbd;
+      text-align: center;
+    }
+  }
+}

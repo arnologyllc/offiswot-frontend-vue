@@ -67,6 +67,7 @@ import { computed } from 'vue'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import workspaceMiddleware from '~/middleware/workspace'
 import settingsToken from '~/middleware/settingsToken'
+import loginToken from '~/middleware/loginToken'
 definePageMeta({ layout: 'default' })
 
 workspaceMiddleware()
@@ -109,6 +110,7 @@ const collapseChannels = computed(() =>
 )
 
 onMounted(() => {
+  isOpenPINDialog.value = loginToken()
   isOpenPINDialog.value = settingsToken()
 })
 </script>

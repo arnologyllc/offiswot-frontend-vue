@@ -77,7 +77,7 @@
           </el-input>
           <template #error>
             <div
-              v-if="errors.password.isShow && isWeb()"
+              v-if="!payload.password && errors.password.isShow && isWeb()"
               class="el-form-item__error"
             >
               <span v-html="errors.password.value"></span>

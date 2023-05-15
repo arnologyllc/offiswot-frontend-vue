@@ -140,7 +140,9 @@
 import { getCurrentInstance, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
+import $cookies from 'js-cookie'
 import usePINStore from '~/stores/pin'
+import useProfileStore from '~/stores/profile'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
@@ -148,6 +150,7 @@ import auth from '~/middleware/auth'
 definePageMeta({ layout: 'default' })
 
 const pinStore = usePINStore()
+const profileStore = useProfileStore()
 const { setPinData, setPinFailureData, isLoadingSubmit } = storeToRefs(pinStore)
 
 const instance = getCurrentInstance()
@@ -241,7 +244,7 @@ watch(setPinData, (v) => {
 
 onMounted(() => {
   auth()
-  if ($route.query.email) {
+  if (profileStore.profileSuccessData.value?.user.email) {
     payload.value.email = $route.value.query.email
   }
   window.addEventListener('resize', handleResize)

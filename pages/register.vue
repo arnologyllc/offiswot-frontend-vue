@@ -323,8 +323,6 @@
 
 <script setup>
 import { getCurrentInstance, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import $cookies from 'js-cookie'
 import { storeToRefs } from 'pinia'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
 import ConfirmEmail from '@/components/shared/OvConfirmEmailModal.vue'
@@ -338,7 +336,6 @@ const authStore = useAuthStore()
 const { registerFailureData, registerSuccessData } = storeToRefs(authStore)
 
 const instance = getCurrentInstance()
-const $route = useRoute()
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const isOpenEmailDialog = ref(false)
@@ -479,12 +476,6 @@ const rules = ref({
 })
 
 onMounted(() => {
-  if ($route.query.email) {
-    payload.email = $route.query.email
-  }
-  if ($cookies.get('token')) {
-    navigateTo('/')
-  }
   window.addEventListener('resize', handleResize)
 })
 

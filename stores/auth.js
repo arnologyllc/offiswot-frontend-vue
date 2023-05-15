@@ -88,12 +88,12 @@ const useAuthStore = defineStore('auth', {
         })
         .catch((e) => {
           try {
-            JSON.parse(e.response.data)
+            JSON.parse(e.data)
           } catch {
-            this.resendFailureData = e.response.data
+            this.resendFailureData = e.data
             return
           }
-          this.resendFailureData = JSON.parse(e.response.data)
+          this.resendFailureData = JSON.parse(e.data)
         })
     },
 
@@ -133,13 +133,13 @@ const useAuthStore = defineStore('auth', {
         })
         .catch((e) => {
           try {
-            JSON.parse(e.response.data)
+            JSON.parse(e.data)
           } catch {
-            this.forgotErrorData = e.response.data
+            this.forgotErrorData = e.data
             this.forgotLoading = false
             return
           }
-          this.forgotErrorData = JSON.parse(e.response.data)
+          this.forgotErrorData = JSON.parse(e.data)
         })
         .finally(() => {
           this.forgotLoading = false
@@ -163,13 +163,13 @@ const useAuthStore = defineStore('auth', {
         })
         .catch((e) => {
           try {
-            JSON.parse(e.response.data)
+            JSON.parse(e.data)
           } catch {
-            this.resetErrorData = e.response.data
+            this.resetErrorData = e.data
             this.resetLoading = false
             return
           }
-          this.resetErrorData = JSON.parse(e.response.data)
+          this.resetErrorData = JSON.parse(e.data)
         })
         .finally(() => {
           this.resetLoading = false
