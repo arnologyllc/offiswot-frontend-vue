@@ -159,9 +159,9 @@
 
 <script setup>
 import { getCurrentInstance, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
 import $cookies from 'js-cookie'
 import { storeToRefs } from 'pinia'
+import nuxtStorage from 'nuxt-storage'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
 import ConfirmEmail from '@/components/shared/OvConfirmEmailModal.vue'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
@@ -175,9 +175,20 @@ const authStore = useAuthStore()
 const { loginSuccessData, loginErrorData } = storeToRefs(authStore)
 
 const instance = getCurrentInstance()
-const $route = useRoute()
 const showPassword = ref(false)
 const isOpenEmailDialog = ref(false)
+
+const accountTokens = ref({
+  ID: null,
+  email: null,
+  avatarUrl: null,
+  token: null,
+  token_expires: null,
+  first_login: null,
+  settings_pin_token: null,
+  login_pin_token: null,
+  login_pin_token_expires: null,
+})
 
 const payload = ref({
   email: null,
@@ -217,9 +228,35 @@ const rules = ref({
 })
 
 watch(loginSuccessData, (v) => {
+  $cookies.remove('token')
+  $cookies.remove('first_login')
+  $cookies.remove('settings_pin_token')
+  $cookies.remove('login_pin_token')
+  $cookies.remove('addAccount')
+
+  const accounts = nuxtStorage.localStorage.getData('accounts')
+    ? nuxtStorage.localStorage.getData('accounts')
+    : []
   const [accessToken, isFirstLogin] = [v.access_token, v.is_first_login]
   const expirationDate = payload.value.remember_me ? null : 1 / 24
+
+  const loginPinTokenExpires = new Date()
+  loginPinTokenExpires.setHours(loginPinTokenExpires.getHours() + 1)
+  Date.parse(loginPinTokenExpires)
+  if (expirationDate) {
+    accountTokens.value.token_expires = loginPinTokenExpires
+  } else {
+    accountTokens.value.token_expires = null
+  }
+
   $cookies.set('token', accessToken, { expires: expirationDate })
+  accountTokens.value.email = v.user.email
+  accountTokens.value.token = accessToken
+  accountTokens.value.first_login = isFirstLogin
+  accounts.unshift(accountTokens.value)
+  accounts.forEach((elem, index) => (elem.ID = index))
+  nuxtStorage.localStorage.setData('accounts', accounts, 30, 'd')
+  $cookies.set('currentAccountID', 0)
   if (isFirstLogin) {
     navigateTo('/pin')
     $cookies.set('first_login', isFirstLogin)
@@ -252,19 +289,24 @@ watch(loginErrorData, (v) => {
 })
 
 onMounted(() => {
-  if ($route.query.email) {
-    payload.email = $route.query.email
-  }
-  if ($cookies.get('token')) {
-    navigateTo('/')
-  }
+  const currentDate = new Date()
+  currentDate.setDate(currentDate.getDate() + 30)
+
   window.addEventListener('resize', handleResize)
 })
 
 const onSubmit = () => {
   instance.refs.loginForm.validate((valid) => {
     if (valid) {
-      authStore.loginUser(payload.value)
+      if (
+        nuxtStorage.localStorage
+          .getData('accounts')
+          ?.some((elem) => elem.email === payload.value.email)
+      ) {
+        errors.value.global.value = 'Account already logined'
+      } else {
+        authStore.loginUser(payload.value)
+      }
     } else {
       errors.value.global.value = 'Please fill empty areas'
       return false

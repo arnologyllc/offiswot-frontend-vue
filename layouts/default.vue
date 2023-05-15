@@ -1,19 +1,23 @@
 <template>
   <div class="default-layout">
+    <Sidebar />
     <Header />
     <div class="default-layout__pages">
       <slot />
     </div>
-    <Footer v-if="!$route.path.includes('workspace')" />
+    <Footer v-if="!$route.path.includes('/workspace')" />
   </div>
 </template>
 
 <script setup>
 import cookies from 'js-cookie'
 import Header from '@/components/global/default/Header'
+import Sidebar from '@/components/global/default/Sidebar'
 import Footer from '@/components/global/Footer'
 import auth from '~/middleware/auth'
 import firstLogin from '~/middleware/firstLogin'
+import login from '~/middleware/login'
+await login()
 if (!cookies.get('token')) auth()
 firstLogin()
 </script>
@@ -24,6 +28,7 @@ firstLogin()
   height: 100vh;
   overflow-y: auto;
   background-color: $ov-gray-bg;
+  padding-left: 68px;
   &__pages {
     padding-top: 100px;
   }

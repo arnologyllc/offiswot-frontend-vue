@@ -32,7 +32,7 @@
           v-if="!error && !timer"
           href=""
           class="dialog-footer__action"
-          @click.prevent="pinStore.forgotPin({ email: email })"
+          @click.prevent="onSubmit"
           >Resend Email</a
         >
         <span v-if="error" class="later"> Please try again later. </span>
@@ -46,7 +46,7 @@ import { storeToRefs } from 'pinia'
 import { onMounted, watch } from 'vue'
 import usePINStore from '@/stores/pin'
 const pinStore = usePINStore()
-const { changePinData, changePinFailureData } = storeToRefs(pinStore)
+const { forgotPinData, forgotPinFailureData } = storeToRefs(pinStore)
 
 const props = defineProps({
   dialogVisible: {
@@ -68,19 +68,14 @@ const dialogWidth = ref('560px')
 const timer = ref(59)
 const error = ref(null)
 
-watch(changePinData, (v) => {
-  if (v) {
-    timer.value = 59
-    const ID = setInterval(() => {
-      if (timer.value) timer.value--
-    }, 1000)
-    setTimeout(() => {
-      clearInterval(ID)
-    }, 60000)
-  }
-})
+watch(forgotPinData, (v) => {})
 
-watch(changePinFailureData, (v) => {
+const onSubmit = () => {
+  timer._value = 59
+  pinStore.forgotPin({ email: props.email })
+}
+
+watch(forgotPinFailureData, (v) => {
   if (!v) {
     error.value = `You have exceeded the maximum number of reset password requests.`
   }
@@ -95,13 +90,9 @@ onMounted(() => {
       dialogWidth.value = '315px'
     } else dialogWidth.value = '560px'
   })
-  timer.value = 59
-  const ID = setInterval(() => {
+  setInterval(() => {
     if (timer.value) timer.value--
   }, 1000)
-  setTimeout(() => {
-    clearInterval(ID)
-  }, 60000)
 })
 </script>
 

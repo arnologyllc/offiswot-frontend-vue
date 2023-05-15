@@ -23,7 +23,7 @@ const useProfileStore = defineStore('profile', {
     getProfile() {
       const { $myFetch } = useNuxtApp()
       this.profileLoading = true
-      $myFetch('user-profile')
+      $myFetch('user-profile', { retry: 5 })
         .then((data) => {
           this.profileSuccessData = data
         })
@@ -40,9 +40,9 @@ const useProfileStore = defineStore('profile', {
         })
     },
 
-    getWorkSpaces() {
+    async getWorkSpaces() {
       const { $myFetch } = useNuxtApp()
-      $myFetch('workspaces')
+      await $myFetch('workspaces', { retry: 5 })
         .then((data) => {
           this.workspacesSuccessData = data
           return data
@@ -92,13 +92,13 @@ const useProfileStore = defineStore('profile', {
         })
         .catch((e) => {
           try {
-            JSON.parse(e.response.data)
+            JSON.parse(e.data)
           } catch {
-            this.editFailureData = e.response.data
+            this.editFailureData = e.data
             this.isLoadingSubmit = false
             return
           }
-          this.editFailureData = JSON.parse(e.response.data)
+          this.editFailureData = JSON.parse(e.data)
         })
         .finally(() => {
           this.isLoadingSubmit = false
@@ -118,13 +118,13 @@ const useProfileStore = defineStore('profile', {
           })
           .catch((e) => {
             try {
-              JSON.parse(e.response.data)
+              JSON.parse(e.data)
             } catch {
-              this.deleteFailureData = e.response.data
+              this.deleteFailureData = e.data
               this.isLoadingSubmit = false
               return
             }
-            this.deleteFailureData = JSON.parse(e.response.data)
+            this.deleteFailureData = JSON.parse(e.data)
           })
           .finally(() => {
             this.isLoadingSubmit = false
@@ -145,13 +145,13 @@ const useProfileStore = defineStore('profile', {
           })
           .catch((e) => {
             try {
-              JSON.parse(e.response.data)
+              JSON.parse(e.data)
             } catch {
-              this.deactivateFailureData = e.response.data
+              this.deactivateFailureData = e.data
               this.isLoadingSubmit = false
               return
             }
-            this.deactivateFailureData = JSON.parse(e.response.data)
+            this.deactivateFailureData = JSON.parse(e.data)
           })
           .finally(() => {
             this.isLoadingSubmit = false

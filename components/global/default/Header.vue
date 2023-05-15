@@ -38,19 +38,16 @@
         >
           <el-button-group>
             <el-button
-              :disabled="!selectedWorkspaceId"
               :class="{ active: $route.path.includes('/staff') }"
               @click="navigateTo(`/workspace/staff/${selectedWorkspaceId}`)"
               >Staff</el-button
             >
             <el-button
-              :disabled="!selectedWorkspaceId"
               :class="{ active: $route.path.includes('/projects') }"
               @click="navigateTo(`/workspace/projects/${selectedWorkspaceId}`)"
               >Projects</el-button
             >
             <el-button
-              :disabled="!selectedWorkspaceId"
               :class="{ active: $route.path.includes('/tasks') }"
               @click="navigateTo(`/workspace/tasks/${selectedWorkspaceId}`)"
               >Tasks</el-button
@@ -69,21 +66,6 @@
         >
           <el-icon><Setting /></el-icon>
         </el-button>
-        <el-dropdown class="main__user-actions">
-          <div class="main__user-actions--activator">
-            <img
-              :src="avatarUrl"
-              alt="Avatar"
-              class="main__user-actions--avatar"
-            />
-            <i class="el-icon-caret-bottom"></i>
-          </div>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item @click="onLogout">Logout</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
       </div>
     </div>
   </nav>
@@ -96,45 +78,19 @@ import $cookies from 'js-cookie'
 import { storeToRefs } from 'pinia'
 import { Bell, Setting } from '@element-plus/icons-vue'
 import useProfileStore from '@/stores/profile'
-import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
 
 const profileStore = useProfileStore()
-const { profileSuccessData, editProfileData, workspacesSuccessData } =
-  storeToRefs(profileStore)
-const { $myFetch } = useNuxtApp()
-const config = useRuntimeConfig()
+const { workspacesSuccessData } = storeToRefs(profileStore)
 
 const workSpaces = ref(null)
-const profile = ref(null)
-const selectedWorkspaceId = ref(null)
 const $route = useRoute()
-const avatarUrl = ref(defaultAvatar)
-
-const getAvatar = (v) => {
-  profile.value = v
-  if (v.user.avatar) {
-    avatarUrl.value = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
-  }
-}
-
-watch(profileSuccessData, (v) => {
-  profile.value = v
-  if (v.user.avatar) {
-    avatarUrl.value = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
-  }
-})
-
-watch(editProfileData, (v) => {
-  if (v.user.avatar) {
-    avatarUrl.value = `${v.avatarPath}/${v.user.avatar}`
-  }
-})
+const selectedWorkspaceId = ref(+$route.params.id)
 
 watch(workspacesSuccessData, (v) => {
   workSpaces.value = v
 })
 
-watch(() => {
+watch($route.params.id, () => {
   if ($route.path.includes('/workspace')) {
     selectedWorkspaceId.value = +$route.params.id
   }
@@ -145,27 +101,14 @@ watch(selectedWorkspaceId, () => {
 })
 
 onMounted(async () => {
-  if (!profileSuccessData.value) {
-    profileStore.getProfile()
-  } else {
-    getAvatar(profileSuccessData.value)
-  }
-  if (!workspacesSuccessData.value) {
-    await profileStore.getWorkSpaces()
-  } else {
-    workSpaces.value = workspacesSuccessData.value
+  if ($cookies.get('login_pin_token')) {
+    if (!workspacesSuccessData.value) {
+      await profileStore.getWorkSpaces()
+    } else {
+      workSpaces.value = workspacesSuccessData.value
+    }
   }
 })
-
-const onLogout = async () => {
-  await $myFetch('logout', {
-    method: 'post',
-  })
-  $cookies.remove('token')
-  $cookies.remove('first_login')
-  $cookies.remove('settings_pin_token')
-  navigateTo('/login')
-}
 </script>
 
 <style scoped lang="scss">

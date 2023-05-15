@@ -137,7 +137,7 @@
           </el-input>
           <template #error>
             <div
-              v-if="errors.password.isShow && isWeb()"
+              v-if="!payload.password && errors.password.isShow && isWeb()"
               class="el-form-item__error"
             >
               <span v-html="errors.password.value"></span>
@@ -260,9 +260,11 @@ import ConfirmModal from '@/components/shared/OvConfirmPasswordChangeModal.vue'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import useAuthStore from '~/stores/auth'
+import useProfileStore from '~/stores/profile'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
 import settingsToken from '~/middleware/settingsToken'
+import loginToken from '~/middleware/loginToken'
 import auth from '~/middleware/auth'
 definePageMeta({ layout: 'default' })
 
@@ -275,6 +277,9 @@ const {
   forgotErrorData,
 } = storeToRefs(authStore)
 
+const profileStore = useProfileStore()
+const { profileSuccessData } = storeToRefs(profileStore)
+
 const instance = getCurrentInstance()
 const $router = useRouter()
 
@@ -285,7 +290,7 @@ const showPassword = ref(false)
 const showPasswordConfirmation = ref(false)
 
 const validatePass = (rule, value, callback) => {
-  if (value.length === 0) {
+  if (!value) {
     callback(new Error('This field is required'))
   }
   const strength = updatePasswordStrength(value)
@@ -385,12 +390,17 @@ watch(forgotErrorData, (v) => {
 
 watch(forgotSuccessData, (v) => {
   if (v) {
+    payload.value.email = profileSuccessData.value?.user.email
     isOpenEmailDialog.value = true
   }
 })
 
 onMounted(() => {
   auth()
+  if (profileSuccessData.value?.user.email) {
+    payload.value.email = profileSuccessData.value?.user.email
+  }
+  isOpenPINDialog.value = loginToken()
   isOpenPINDialog.value = settingsToken()
   window.addEventListener('resize', handleResize)
 })
@@ -458,12 +468,12 @@ const updatePasswordStrength = (password) => {
   if (
     identicalRegex.test(password) &&
     (password?.length > 15 ||
-      !words.some((elem) => password.toLowerCase().includes(elem)))
+      !words.some((elem) => password?.toLowerCase().includes(elem)))
   ) {
     if (
       strongRegex.test(password) &&
       (password?.length > 25 ||
-        !words.some((elem) => password.toLowerCase().includes(elem)))
+        !words.some((elem) => password?.toLowerCase().includes(elem)))
     ) {
       return 'Strong'
     } else if (mediumRegex.test(password)) {

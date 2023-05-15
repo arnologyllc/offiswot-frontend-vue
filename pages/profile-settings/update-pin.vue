@@ -226,9 +226,10 @@
 
 <script setup>
 import { getCurrentInstance, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import usePINStore from '~/stores/pin'
+import useProfileStore from '~/stores/profile'
 
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import ConfirmModal from '@/components/shared/OvConfirmPINChangeModal.vue'
@@ -236,10 +237,12 @@ import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
 import settingsToken from '~/middleware/settingsToken'
+import loginToken from '~/middleware/loginToken'
 import auth from '~/middleware/auth'
 definePageMeta({ layout: 'default' })
 
 const pinStore = usePINStore()
+const profileStore = useProfileStore()
 const {
   resetPinFailureData,
   resetPinData,
@@ -247,9 +250,9 @@ const {
   forgotPinData,
   isLoadingSubmit,
 } = storeToRefs(pinStore)
+const { profileSuccessData } = storeToRefs(profileStore)
 
 const instance = getCurrentInstance()
-const $route = useRoute()
 const $router = useRouter()
 
 const validateRepeatPIN = (rule, value, callback) => {
@@ -370,9 +373,10 @@ watch(forgotPinData, (v) => {
 })
 onMounted(() => {
   auth()
+  isOpenPINDialog.value = loginToken()
   isOpenPINDialog.value = settingsToken()
-  if ($route.query.email) {
-    payload.value.email = $route.query.email
+  if (profileSuccessData.value?.user.email) {
+    payload.value.email = profileSuccessData.value?.user.email
   }
   window.addEventListener('resize', handleResize(instance))
 })
@@ -380,6 +384,7 @@ const onSubmit = () => {
   pinStore.resetPin(payload.value)
 }
 const onForgot = () => {
+  payload.value.email = profileSuccessData.value?.user.email
   isOpenEmailDialog.value = true
   pinStore.forgotPin()
 }

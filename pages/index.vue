@@ -66,10 +66,10 @@ import auth from '~/middleware/auth'
 definePageMeta({ layout: 'default' })
 
 const isOpenPINDialog = ref(null)
-isOpenPINDialog.value = loginToken()
 
 onMounted(() => {
   auth()
+  isOpenPINDialog.value = loginToken()
 })
 </script>
 

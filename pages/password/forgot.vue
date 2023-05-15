@@ -93,12 +93,15 @@ import LoginButtons from '@/components/auth/LoginButtons.vue'
 import ConfirmModal from '@/components/shared/OvConfirmPasswordChangeModal.vue'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import useAuthStore from '@/stores/auth'
+import useProfileStore from '@/stores/profile'
 definePageMeta({ layout: 'auth' })
 
 const instance = getCurrentInstance()
 const authStore = useAuthStore()
+const profileStore = useProfileStore()
 const { forgotSuccessData, forgotErrorData, forgotLoading } =
   storeToRefs(authStore)
+const { profileSuccessData } = storeToRefs(profileStore)
 const payload = ref({
   email: null,
 })
@@ -107,7 +110,7 @@ const rules = {
     { required: true, message: 'Email is required', trigger: 'blur' },
     {
       type: 'email',
-      message: 'Please input correct email address',
+      message: 'Email is not valid',
       trigger: 'blur',
     },
   ],
@@ -172,6 +175,7 @@ const clearError = () => {
   errors.value.global.value = ''
 }
 watch(forgotSuccessData, (v) => {
+  payload.value.email = profileSuccessData.value?.user.email
   isOpenEmailDialog.value = true
 })
 
@@ -190,6 +194,9 @@ watch(forgotErrorData, (v) => {
 })
 
 onMounted(() => {
+  if (profileSuccessData.value?.user.email) {
+    payload.value.email = profileSuccessData.value?.user.email
+  }
   window.addEventListener('resize', handleResize)
 })
 </script>

@@ -10,7 +10,7 @@
       @submit.prevent="onSubmit"
     >
       <el-row>
-        <el-col :span="12">
+        <el-col :span="24">
           <div class="main__title" @click="$router.push('/profile')">
             <img
               src="@/assets/images/icons/chevron-dark-icon.svg"
@@ -40,7 +40,7 @@
               accept="image/*"
               :on-success="onAvatarUpload"
             >
-              <el-button size="small">Upload picture</el-button>
+              <el-button>Upload picture</el-button>
             </el-upload>
           </el-form-item>
         </el-col>
@@ -50,8 +50,7 @@
               v-model="payload.date_of_birth"
               class="main__form--input date-picker"
               type="date"
-              format="yyyy-MM-dd"
-              value-format="yyyy-MM-dd"
+              value-format="YYYY-MM-DD"
               placeholder="Date of birth"
             >
             </el-date-picker>
@@ -110,9 +109,10 @@
               class="main__form--phone-number"
               default-country-code="AM"
               no-example
+              no-validation
+              :no-country-selector="isCountrySelector"
               countries-height="48"
               border-radius="0"
-              size="14px"
               width="320px"
             />
           </el-form-item>
@@ -229,13 +229,15 @@
 
 <script setup>
 import { storeToRefs } from 'pinia'
-import { onMounted } from 'vue'
+import { getCurrentInstance, onMounted } from 'vue'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import auth from '~/middleware/auth'
 import settingsToken from '~/middleware/settingsToken'
+import loginToken from '~/middleware/loginToken'
 import useProfileStore from '@/stores/profile'
+const instance = getCurrentInstance()
 
 const profileStore = useProfileStore()
 const {
@@ -310,6 +312,8 @@ const config = useRuntimeConfig()
 const setProfileData = (v) => {
   if (v.user.avatar) {
     avatarUrl.value = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
+  } else {
+    avatarUrl.value = defaultAvatar
   }
   for (const i in payload.value) {
     payload.value[i] = v.user[i]
@@ -319,10 +323,19 @@ const setProfileData = (v) => {
   }
 }
 
+const isCountrySelector = ref(true)
+
+const handleResize = () => {
+  isCountrySelector.value = window.innerWidth < 400
+  instance.update()
+}
+
 watch(editProfileData, (v) => {
   setProfileData(v)
   if (v.user.avatar) {
     avatarUrl.value = `${v.avatarPath}/${v.user.avatar}`
+  } else {
+    avatarUrl.value = defaultAvatar
   }
 })
 
@@ -336,7 +349,12 @@ onMounted(() => {
   } else {
     setProfileData(profileSuccessData.value)
   }
+  isOpenPINDialog.value = loginToken()
   isOpenPINDialog.value = settingsToken()
+
+  window.addEventListener('resize', handleResize)
+
+  isCountrySelector.value = window.innerWidth < 400
 })
 
 const onAvatarUpload = (e, file) => {
@@ -526,7 +544,6 @@ const onSubmit = () => {
         top: calc(50% - 7px);
         width: 12px;
         right: 11px;
-        background-image: url('~/assets/images/icons/arrow-down-icon.svg');
         background-size: 100% 100%;
         background-repeat: no-repeat;
         svg {
@@ -598,5 +615,11 @@ const onSubmit = () => {
 .m-select {
   width: 100px !important;
   font-size: 14px !important;
+}
+
+@media (max-width: 770px) {
+  .main {
+    padding-left: 0;
+  }
 }
 </style>

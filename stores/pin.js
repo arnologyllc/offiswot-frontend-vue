@@ -38,11 +38,11 @@ const usePinStore = defineStore('pin', {
         })
         .catch((e) => {
           try {
-            JSON.parse(e.response.data)
+            JSON.parse(e.data)
           } catch {
-            this.setPinFailureData = e.response.data
+            this.setPinFailureData = e.data
           }
-          this.setPinFailureData = JSON.parse(e.response.data)
+          this.setPinFailureData = JSON.parse(e.data)
         })
         .finally(() => {
           this.isLoadingSubmit = false
@@ -88,11 +88,11 @@ const usePinStore = defineStore('pin', {
         })
         .catch((e) => {
           try {
-            JSON.parse(e.response.data)
+            JSON.parse(e.data)
           } catch {
-            this.forgotPinFailureData = e.response.data
+            this.forgotPinFailureData = e.data
           }
-          this.forgotPinFailureData = JSON.parse(e.response.data)
+          this.forgotPinFailureData = JSON.parse(e.data)
         })
         .finally(() => {
           this.isLoadingSubmit = false
@@ -115,11 +115,11 @@ const usePinStore = defineStore('pin', {
         })
         .catch((e) => {
           try {
-            JSON.parse(e.response.data)
+            JSON.parse(e.data)
           } catch {
-            this.changePinFailureData = e.response.data
+            this.changePinFailureData = e.data
           }
-          this.changePinFailureData = JSON.parse(e.response.data)
+          this.changePinFailureData = JSON.parse(e.data)
         })
         .finally(() => {
           this.isLoadingSubmit = false

@@ -34,11 +34,11 @@ const useWorkspaceStore = defineStore('workspace', {
         })
         .catch((e) => {
           try {
-            JSON.parse(e.response.data)
+            JSON.parse(e.data)
           } catch {
-            this.industriesError = e.response.data
+            this.industriesError = e.data
           }
-          this.industriesError = JSON.parse(e.response.data)
+          this.industriesError = JSON.parse(e.data)
         })
         .finally(() => {
           this.isLoadingIndustries = false
@@ -78,11 +78,11 @@ const useWorkspaceStore = defineStore('workspace', {
         })
         .catch((e) => {
           try {
-            JSON.parse(e.response.data)
+            JSON.parse(e.data)
           } catch {
-            this.getMembersError = e.response.data
+            this.getMembersError = e.data
           }
-          this.getMembersError = JSON.parse(e.response.data)
+          this.getMembersError = JSON.parse(e.data)
         })
         .finally(() => {
           this.isLoadingIndustries = false
@@ -98,11 +98,11 @@ const useWorkspaceStore = defineStore('workspace', {
         })
         .catch((e) => {
           try {
-            JSON.parse(e.response.data)
+            JSON.parse(e.data)
           } catch {
-            this.getSeatsError = e.response.data
+            this.getSeatsError = e.data
           }
-          this.getSeatsError = JSON.parse(e.response.data)
+          this.getSeatsError = JSON.parse(e.data)
         })
         .finally(() => {
           this.isLoadingIndustries = false
@@ -121,11 +121,11 @@ const useWorkspaceStore = defineStore('workspace', {
         })
         .catch((e) => {
           try {
-            JSON.parse(e.response.data)
+            JSON.parse(e.data)
           } catch {
-            this.setSeatsError = e.response.data
+            this.setSeatsError = e.data
           }
-          this.setSeatsError = JSON.parse(e.response.data)
+          this.setSeatsError = JSON.parse(e.data)
         })
         .finally(() => {
           this.isLoadingSubmit = false
