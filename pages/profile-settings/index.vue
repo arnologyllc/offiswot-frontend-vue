@@ -112,13 +112,16 @@ onMounted(() => {
 <style lang="scss" scoped>
 .container_account {
   width: 100%;
-  margin: 0 auto;
+  background-color: $ov-background;
+  padding-bottom: 186px;
+  border-radius: 20px 0 0 20px;
+  padding: 37px 0 82px 0;
 }
 .account {
-  width: 80%;
   margin: 0 auto 60px;
   height: 500px;
   border-left: 1px solid #d0c9d6;
+  padding-right: 20px;
 
   &__title {
     display: flex;

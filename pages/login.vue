@@ -298,13 +298,13 @@ onMounted(() => {
 const onSubmit = () => {
   instance.refs.loginForm.validate((valid) => {
     if (valid) {
-      if (
-        nuxtStorage.localStorage
-          .getData('accounts')
-          ?.some((elem) => elem.email === payload.value.email)
-      ) {
+      const users = nuxtStorage.localStorage
+        .getData('accounts')
+        ?.filter((elem) => Date.parse(elem.token_expires) > new Date())
+      if (users?.some((elem) => elem.email === payload.value.email)) {
         errors.value.global.value = 'Account already logined'
       } else {
+        nuxtStorage.localStorage.setData('accounts', users)
         authStore.loginUser(payload.value)
       }
     } else {

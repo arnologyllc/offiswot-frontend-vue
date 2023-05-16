@@ -245,7 +245,7 @@ watch(setPinData, (v) => {
 onMounted(() => {
   auth()
   if (profileStore.profileSuccessData.value?.user.email) {
-    payload.value.email = $route.value.query.email
+    payload.value.email = profileSuccessData.value?.user.email
   }
   window.addEventListener('resize', handleResize)
 })
@@ -294,12 +294,13 @@ const focusElement = (elem) => {
 
 <style scoped lang="scss">
 .main {
-  width: 100%;
   display: flex;
   position: relative;
   height: 100%;
-  padding: 100px 0 150px 18%;
   width: 100%;
+  background-color: $ov-background;
+  border-radius: 20px 0 0 20px;
+  padding: 37px 0 82px 50px;
 
   &__form {
     width: 390px;
@@ -323,7 +324,7 @@ const focusElement = (elem) => {
   height: 48px;
   padding: 0;
   border-radius: 6px;
-  margin-top: 270px;
+  margin-top: 200px;
   span {
     display: flex;
     align-items: center;
@@ -352,37 +353,22 @@ const focusElement = (elem) => {
   background: rgba(0, 0, 0, 0.66);
 }
 
-@media (max-width: 990px) {
+@media (max-width: 485px) {
   .main {
-    margin: 0 auto 150px;
-    padding: 0;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 450px) {
-  .main {
-    margin: 0 auto 150px;
-    padding: 0;
-    justify-content: center;
-  }
-  .main__form {
-    &--box {
-      text-align: center;
-    }
-  }
-}
-
-@media (max-width: 407px) {
-  .main {
-    margin: 0 auto 150px;
-    padding: 0;
-    width: 300px;
-    justify-content: center;
-  }
-  .main__form {
-    &--box {
-      text-align: center;
+    padding-left: 0;
+    &__form {
+      padding: 0 10px;
+      margin: 0 auto;
+      &--box {
+        text-align: center;
+      }
+      &--title {
+        font-size: 20px;
+        text-align: center;
+      }
+      &--subtitle {
+        text-align: center;
+      }
     }
   }
 }

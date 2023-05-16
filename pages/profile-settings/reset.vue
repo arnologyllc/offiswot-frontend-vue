@@ -498,8 +498,9 @@ const getColor = () => {
   display: flex;
   position: relative;
   height: 100%;
-  padding: 0 0 150px 170px;
-  width: 100%;
+  background-color: $ov-background;
+  border-radius: 20px 0 0 20px;
+  padding: 37px 0 82px 50px;
 
   &__form {
     width: 390px;
@@ -542,16 +543,6 @@ const getColor = () => {
           background-color: inherit;
         }
       }
-    }
-  }
-}
-
-@media (min-width: 407px) {
-  .main {
-    justify-content: flex-start;
-    &__form {
-      padding-left: 65px;
-      border-left: 1px solid #d0c9d6;
     }
   }
 }
@@ -606,37 +597,22 @@ const getColor = () => {
   background: rgba(0, 0, 0, 0.66);
 }
 
-@media (max-width: 990px) {
+@media (max-width: 485px) {
   .main {
-    margin: 0 auto 150px;
-    padding: 0;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 450px) {
-  .main {
-    margin: 0 auto 150px;
-    padding: 0;
-    justify-content: center;
-  }
-  .main__form {
-    &--box {
-      text-align: center;
-    }
-  }
-}
-
-@media (max-width: 407px) {
-  .main {
-    margin: 0 auto 150px;
-    padding: 0;
-    width: 300px;
-    justify-content: center;
-  }
-  .main__form {
-    &--box {
-      text-align: center;
+    padding-left: 0;
+    &__form {
+      padding: 0 10px;
+      margin: 0 auto;
+      &--box {
+        text-align: center;
+      }
+      &--title {
+        font-size: 20px;
+        text-align: center;
+      }
+      &--subtitle {
+        text-align: center;
+      }
     }
   }
 }

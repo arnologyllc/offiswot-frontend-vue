@@ -11,15 +11,21 @@
     >
       <el-row>
         <el-col :span="24">
-          <div class="main__title" @click="$router.push('/profile')">
-            <img
-              src="@/assets/images/icons/chevron-dark-icon.svg"
-              class="go-back__icon"
-              alt=""
-            />
-            <span :span="24" class="main__title__span"
-              >Complete your profile</span
-            >
+          <div :span="24" class="main__title">
+            <div class="main__title__div">
+              <img
+                src="@/assets/images/icons/chevron-dark-icon.svg"
+                class="go-back__icon"
+                alt=""
+                @click="$router.push('/profile')"
+              />
+              <span class="main__title__span" @click="$router.push('/profile')">
+                Edit your profile
+              </span>
+            </div>
+            <span class="main__subtitle__span">
+              You can manage different accounts from one place
+            </span>
           </div>
         </el-col>
       </el-row>
@@ -196,17 +202,7 @@
         </el-col>
       </el-row>
       <el-row class="main__form--actions">
-        <el-col :span="12">
-          <div class="go-back__box" @click="navigateTo('/profile')">
-            <img
-              src="@/assets/images/icons/chevron-dark-icon.svg"
-              class="go-back__icon"
-              alt=""
-            />
-            <span class="go-back__text">Back</span>
-          </div>
-        </el-col>
-        <el-col :span="12" class="submit-button__box">
+        <el-col :span="24" class="submit-button__box">
           <el-button
             class="submit-button"
             native-type="submit"
@@ -310,13 +306,14 @@ const avatarUrl = ref(defaultAvatar)
 const config = useRuntimeConfig()
 
 const setProfileData = (v) => {
-  if (v.user.avatar) {
+  console.log(v)
+  if (v?.user.avatar) {
     avatarUrl.value = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
   } else {
     avatarUrl.value = defaultAvatar
   }
   for (const i in payload.value) {
-    payload.value[i] = v.user[i]
+    payload.value[i] = v?.user[i]
   }
   if (payload.value.phone_number) {
     payload.value.phone_number = payload.value.phone_number.toString()
@@ -370,15 +367,30 @@ const onSubmit = () => {
 <style scoped lang="scss">
 .main {
   min-height: calc(100vh - 286px);
-  padding: 0 0 87px 143px;
+  padding: 0;
+  background-color: #f5f7fb !important;
+  padding-top: 50px;
+  padding-bottom: 50px;
   &__title {
     font-size: 20px;
     font-weight: 600;
     color: $ov-text--title;
     margin-bottom: 41px;
-    display: flex;
-    gap: 20px;
-    cursor: pointer;
+    &__div {
+      display: flex;
+      gap: 20px;
+    }
+    &__span {
+      cursor: pointer;
+    }
+  }
+  &__subtitle {
+    &__span {
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 17px;
+      color: #717a7f;
+    }
   }
   &__form {
     min-height: calc(100vh - 286px);
@@ -608,7 +620,7 @@ const onSubmit = () => {
     }
     &__box {
       display: flex;
-      justify-content: flex-end;
+      justify-content: flex-start;
     }
   }
 }

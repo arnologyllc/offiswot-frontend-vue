@@ -20,7 +20,7 @@
           </template>
         </el-select>
 
-        <div v-else class="main__logo">
+        <!-- <div v-else class="main__logo">
           <img
             src="@/assets/images/icons/logo.svg"
             alt=""
@@ -30,7 +30,7 @@
             <span class="main__logo--titleStart">ffi</span>
             <span class="main__logo--titleEnd">swot</span>
           </div>
-        </div>
+        </div> -->
 
         <div
           v-if="$route.path.includes('/workspace')"
@@ -114,7 +114,7 @@ onMounted(async () => {
 <style scoped lang="scss">
 .main {
   width: 100%;
-  height: 80px;
+  height: 42px;
   padding: 0 24px;
   background: white;
   display: flex;
@@ -122,7 +122,9 @@ onMounted(async () => {
 
   position: fixed;
   z-index: 10;
-
+  background: #f5f7fb;
+  box-shadow: 0px 2px 13px rgba(0, 0, 0, 0.16);
+  border-radius: 0px 0px 0px 20px !important;
   &__inner {
     width: 100%;
     display: flex;
@@ -168,6 +170,7 @@ onMounted(async () => {
     width: 234px;
     .el-input__wrapper {
       box-shadow: none !important;
+      height: 40px;
     }
     .el-input__inner {
       font-weight: 600;
@@ -193,8 +196,8 @@ onMounted(async () => {
       }
     }
     &--prefix {
-      width: 30px;
-      height: 30px;
+      width: 24px;
+      height: 24px;
       margin-top: 5px;
       border-radius: 12px;
       object-fit: cover;
@@ -249,6 +252,7 @@ onMounted(async () => {
   &__actions {
     width: 24px;
     height: 24px;
+    background-color: inherit;
     i {
       color: black;
       width: 24px;
@@ -263,7 +267,6 @@ onMounted(async () => {
       }
     }
     &:hover {
-      background-color: inherit;
       i {
         color: $ov-primary;
       }

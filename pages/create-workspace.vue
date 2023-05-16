@@ -8,7 +8,14 @@
       :model="payload"
       @submit.prevent="onSubmit"
     >
-      <div class="main__title">Create workspace</div>
+      <div class="main__form--title">
+        <img
+          src="@/assets/images/icons/chevron-left.svg"
+          alt="chevron-left"
+          @click="$router.go(-1)"
+        />
+        <div class="main__title">Create workspace</div>
+      </div>
       <div class="main__subtitle">Please fill the forms to register</div>
       <div
         v-if="errors.global.value"
@@ -72,11 +79,6 @@
       </el-form-item>
       <el-form-item class="main__form--footer">
         <div class="main__form--actions">
-          <el-button
-            class="main__form--actions__text-btn"
-            @click="$router.push('/profile')"
-            >Cancel</el-button
-          >
           <el-button
             native-type="submit"
             :loading="isLoadingSubmit"
@@ -244,13 +246,25 @@ const clearError = () => {
   display: flex;
   position: relative;
   height: 100%;
-  padding: 0 0 150px 170px;
-
+  background-color: $ov-background;
+  border-radius: 20px 0 0 20px;
+  padding: 37px 0 82px 50px;
+  &__form--title {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 29px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 16px;
+    color: #0d1c2e;
+  }
   &__title {
     font-size: 20px;
     font-weight: 600;
     color: $ov-text--title;
-    margin-bottom: 4px;
+    cursor: auto;
   }
   &__subtitle {
     font-size: 14px;
@@ -343,48 +357,6 @@ const clearError = () => {
   }
 }
 
-@media (min-width: 490px) {
-  .main {
-    justify-content: flex-start;
-    margin: 0 0 150px 170px;
-    &__form {
-      padding-left: 65px;
-      border-left: 1px solid #d0c9d6;
-      width: 480px;
-      &--input {
-        width: 390px;
-      }
-      &--footer {
-        margin-top: 250px;
-      }
-    }
-  }
-}
-
-@media (max-width: 490px) {
-  .main {
-    margin: 0 auto 150px;
-    padding: 0;
-    width: 300px;
-    justify-content: center;
-    &__form {
-      border: none;
-      padding: 0 auto;
-      &--input {
-        width: 300px;
-      }
-      &--actions {
-        display: flex;
-        flex-direction: column-reverse;
-      }
-
-      &--footer {
-        margin-top: 80px;
-      }
-    }
-  }
-}
-
 .el-input__suffix {
   display: flex !important;
 }
@@ -395,11 +367,23 @@ const clearError = () => {
   margin-bottom: 27px;
 }
 
-@media (max-width: 990px) {
+@media (max-width: 485px) {
   .main {
-    margin: 0 auto 150px;
-    padding: 0;
-    justify-content: center;
+    padding-left: 0;
+    &__form {
+      padding: 0 10px;
+      margin: 0 auto;
+      &--box {
+        text-align: center;
+      }
+      &--title {
+        font-size: 20px;
+        text-align: center;
+      }
+      &--subtitle {
+        text-align: center;
+      }
+    }
   }
 }
 

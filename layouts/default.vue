@@ -30,11 +30,14 @@ firstLogin()
   background-color: $ov-gray-bg;
   padding-left: 68px;
   &__pages {
-    padding-top: 100px;
+    padding-top: 8px;
+    padding-bottom: 8px !important;
+    object-fit: cover;
   }
   .main {
     display: flex;
     position: relative;
+    border-radius: 20px 0 0 20px;
 
     &__form {
       &--title {

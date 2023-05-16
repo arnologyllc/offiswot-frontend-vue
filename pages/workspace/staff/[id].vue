@@ -76,10 +76,11 @@ const setCurrentComponent = (name) => {
 <style scoped lang="scss">
 .main-dash {
   margin: 0 auto;
-  width: calc(100% - 146px);
-  height: calc(100vh - 80px);
-  padding: 16px 66px 16px 21px;
-  margin-top: -100px;
+  width: 100%;
+  height: calc(100vh - 58px);
+  padding: 16px 66px 0 21px;
+  background-color: #f5f7fb;
+  border-radius: 20px 0 0 20px;
 
   &__header {
     display: flex;
