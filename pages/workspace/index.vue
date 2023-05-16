@@ -118,8 +118,9 @@ onMounted(() => {
 <style scoped lang="scss">
 .main {
   height: calc(100vh - 80px);
+  width: 100%;
   display: flex;
-
+  background-color: #f5f7fb;
   &__sidebar {
     padding: 30.5px 20.3px;
     width: 146px;

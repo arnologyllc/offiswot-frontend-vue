@@ -16,5 +16,7 @@ module.exports = {
     'vue/multi-word-component-names': 0,
     'vue/no-v-html': 'off',
     'vue/no-mutating-props': 'off',
+    'vue/valid-attribute-name': 'off',
+    'no-unused-vars': 'off',
   },
 }

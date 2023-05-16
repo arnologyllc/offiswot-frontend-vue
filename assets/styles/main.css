@@ -7,6 +7,10 @@
   font-family: 'Montserrat', sans-serif;
 }
 
+.default-layout {
+  background: linear-gradient(180.87deg, #2c3a9f 6.42%, #299ba0 97.68%);
+}
+
 .m-phone-number-input__select {
   width: 100px !important;
   height: 48px;

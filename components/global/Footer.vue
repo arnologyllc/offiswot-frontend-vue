@@ -76,9 +76,9 @@ const footerLinks = ref([
 <style scoped lang="scss">
 .footer {
   width: 100%;
-  margin-top: 100px !important;
   padding: 45px 96px 22px 96px;
   margin-top: auto;
+  border-radius: 20px 0 0 0;
   background: linear-gradient(270deg, #4156f6 0%, #0cb1b9 113.37%);
 
   &__content {
@@ -188,9 +188,18 @@ const footerLinks = ref([
     }
   }
 }
-@media (max-width: 375px) {
+@media (max-width: 400px) {
   .footer {
-    padding: 45px 0 22px 40px;
+    padding: 45px 0 22px 10px;
+    margin: 0 auto;
+    &__grid-item {
+      &--link a {
+        font-size: 10px;
+      }
+      &--heading {
+        font-size: 14px;
+      }
+    }
   }
 }
 </style>

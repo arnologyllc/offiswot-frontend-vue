@@ -267,9 +267,9 @@ const onAvatarUpload = (e, file) => {
 .main {
   background-color: $ov-background;
   padding-bottom: 186px;
+  width: 100%;
+  border-radius: 20px 0 0 20px;
   &__user-container {
-    max-width: 1200px;
-    margin: 0 auto;
     padding: 37px 0 82px 0;
     width: 100%;
   }
@@ -356,6 +356,7 @@ const onAvatarUpload = (e, file) => {
   position: relative;
   padding: 30px 74px 0 74px;
   border-top: 1px solid $ov-border;
+  width: 100%;
   &__header {
     display: flex;
     justify-content: space-between;

@@ -105,6 +105,8 @@ const getAvatar = (v) => {
   } else {
     accounts.value[currentAccountID].avatarUrl = `${defaultAvatar}`
   }
+
+  nuxtStorage.localStorage.setData('accounts', accounts.value, 30, 'd')
 }
 
 watch(profileSuccessData, (v) => {
@@ -117,6 +119,7 @@ watch(profileSuccessData, (v) => {
   } else {
     accounts.value[currentAccountID].avatarUrl = `${defaultAvatar}`
   }
+  nuxtStorage.localStorage.setData('accounts', accounts.value, 30, 'd')
 })
 
 watch(editFailureData, (v) => {
@@ -138,11 +141,15 @@ watch(profileFailureData, (v) => {
 })
 
 watch(editProfileData, (v) => {
-  if (v.user.avatar) {
-    avatarUrl.value = `${v.avatarPath}/${v.user.avatar}`
+  const currentAccountID = $cookies.get('currentAccountID')
+  if (v?.user.avatar) {
+    accounts.value[
+      currentAccountID
+    ].avatarUrl = `${v.avatarPath}/${v.user.avatar}`
   } else {
-    avatarUrl.value = defaultAvatar
+    accounts.value[currentAccountID].avatarUrl = `${defaultAvatar}`
   }
+  nuxtStorage.localStorage.setData('accounts', accounts.value, 30, 'd')
 })
 
 onMounted(() => {
@@ -163,10 +170,31 @@ const hoveringEnd = () => {
 }
 
 const changeAccount = async (userID) => {
+  if (!userID) return
   profileStore.$reset()
   pinStore.$reset()
   authStore.$reset()
   workspaceStore.$reset()
+
+  if (
+    (Date.parse(accounts.value[userID].token_expires) - Date.now()) / 86400000 <
+    0
+  ) {
+    accounts.value.splice(userID, 1)
+    nuxtStorage.localStorage.setData('accounts', accounts.value, 30, 'd')
+    if (accounts.value[0]) {
+      changeAccount(0)
+    } else {
+      Object.keys($cookies.get()).forEach(function (cookieName) {
+        $cookies.remove(cookieName, neededAttributes)
+      })
+      $router.go()
+    }
+    // NOTIFY ABOUT TOKEN
+
+    return
+  }
+
   $cookies.set('token', accounts.value[userID].token, {
     expires:
       (Date.parse(accounts.value[userID].token_expires) - Date.now()) /
@@ -211,14 +239,17 @@ const addAccount = () => {
 
 const onLogout = async (userID) => {
   const initAccountValue = accounts.value.filter((elem) => elem.ID !== userID)
-  profileStore.$reset()
-  pinStore.$reset()
-  authStore.$reset()
-  workspaceStore.$reset()
+
   changeAccount(userID)
   await $myFetch('logout', {
     method: 'post',
   })
+
+  profileStore.$reset()
+  pinStore.$reset()
+  authStore.$reset()
+  workspaceStore.$reset()
+
   if (initAccountValue[0]) {
     $cookies.set('token', initAccountValue[0].token, {
       expires:
@@ -238,8 +269,9 @@ const onLogout = async (userID) => {
     $cookies.set('currentAccountID', 0)
     profileStore.getProfile()
     await profileStore.getWorkSpaces()
-    $router.go()
+    accounts.value = initAccountValue
     nuxtStorage.localStorage.setData('accounts', initAccountValue, 30, 'd')
+    $router.go()
   } else {
     $cookies.remove('token')
     $cookies.remove('first_login')
@@ -247,6 +279,7 @@ const onLogout = async (userID) => {
     $cookies.remove('login_pin_token')
 
     nuxtStorage.localStorage.setData('accounts', initAccountValue, 30, 'd')
+    accounts.value = initAccountValue
     navigateTo('/login')
   }
 }
@@ -259,7 +292,7 @@ const currentUser = (id) => {
 <style scoped lang="scss">
 .main {
   position: fixed !important;
-  background: linear-gradient(179.97deg, #23329d -0.86%, #1e767b 103.09%);
+  background: inherit;
   left: 0;
   height: 100vh;
   display: flex;
@@ -269,6 +302,7 @@ const currentUser = (id) => {
   width: 68px;
   padding: 17px 14px;
   float: left;
+  border-radius: 0 !important;
   &__user {
     &-actions {
       padding: 14px;
