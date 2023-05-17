@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import $cookies from 'js-cookie'
 
 const useProfileStore = defineStore('profile', {
   state: () => {
@@ -21,40 +22,44 @@ const useProfileStore = defineStore('profile', {
   },
   actions: {
     getProfile() {
-      const { $myFetch } = useNuxtApp()
-      this.profileLoading = true
-      $myFetch('user-profile', { retry: 5 })
-        .then((data) => {
-          this.profileSuccessData = data
-        })
-        .catch((e) => {
-          try {
-            JSON.parse(e.data)
-          } catch {
-            this.profileFailureData = e.data
-          }
-          this.profileFailureData = JSON.parse(e.data)
-        })
-        .finally(() => {
-          this.profileLoading = false
-        })
+      if ($cookies.get('token')) {
+        const { $myFetch } = useNuxtApp()
+        this.profileLoading = true
+        $myFetch('user-profile', { retry: 5 })
+          .then((data) => {
+            this.profileSuccessData = data
+          })
+          .catch((e) => {
+            try {
+              JSON.parse(e.data)
+            } catch {
+              this.profileFailureData = e.data
+            }
+            this.profileFailureData = JSON.parse(e.data)
+          })
+          .finally(() => {
+            this.profileLoading = false
+          })
+      }
     },
 
     async getWorkSpaces() {
-      const { $myFetch } = useNuxtApp()
-      await $myFetch('workspaces', { retry: 5 })
-        .then((data) => {
-          this.workspacesSuccessData = data
-          return data
-        })
-        .catch((e) => {
-          try {
-            JSON.parse(e.data)
-          } catch {
-            return e.data
-          }
-          return JSON.parse(e.data)
-        })
+      if ($cookies.get('token')) {
+        const { $myFetch } = useNuxtApp()
+        await $myFetch('workspaces', { retry: 5 })
+          .then((data) => {
+            this.workspacesSuccessData = data
+            return data
+          })
+          .catch((e) => {
+            try {
+              JSON.parse(e.data)
+            } catch {
+              return e.data
+            }
+            return JSON.parse(e.data)
+          })
+      }
     },
 
     editProfile(payload) {

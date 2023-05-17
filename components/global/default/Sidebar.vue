@@ -1,29 +1,14 @@
 <template>
   <nav class="main">
     <div v-if="accounts" class="main__top">
-      <el-dropdown
-        v-for="item in accounts"
-        :key="item.ID"
-        class="main__user-actions"
-      >
-        <div
-          class="main__user-actions--user"
-          :class="currentUser(item.ID)"
-          @click="changeAccount(item.ID)"
-        >
-          <img
-            :src="item.avatarUrl ? item.avatarUrl : defaultAvatar"
-            alt="Avatar"
-            class="main__user-actions--avatar"
-          />
+      <el-dropdown v-for="item in accounts" :key="item.ID" class="main__user-actions">
+        <div class="main__user-actions--user" :class="currentUser(item.ID)" @click="changeAccount(item.ID)">
+          <img :src="item.avatarUrl ? item.avatarUrl : defaultAvatar" alt="Avatar" class="main__user-actions--avatar" />
           <i class="el-icon-caret-bottom"></i>
         </div>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item
-              class="main__user-actions--add_element"
-              @click="onLogout(item.ID)"
-            >
+            <el-dropdown-item class="main__user-actions--add_element" @click="onLogout(item.ID)">
               <span>Logout</span>
             </el-dropdown-item>
           </el-dropdown-menu>
@@ -38,23 +23,12 @@
         <template #dropdown>
           <el-dropdown-menu class="main__user-actions--add_actions">
             <el-dropdown-item class="main__user-actions--add_element">
-              <span
-                :class="isHovered"
-                @click="addAccount"
-                @mouseover="hoveringStart"
-                @mouseout="hoveringEnd"
-              >
+              <span :class="isHovered" @click="addAccount" @mouseover="hoveringStart" @mouseout="hoveringEnd">
                 Add account
               </span>
             </el-dropdown-item>
             <el-dropdown-item class="main__user-actions--add_element">
-              <span
-                :class="isHovered"
-                @mouseover="hoveringStart"
-                @mouseout="hoveringEnd"
-              >
-                Add workspace
-              </span>
+              <span :class="isHovered" @mouseover="hoveringStart" @mouseout="hoveringEnd"> Add workspace </span>
             </el-dropdown-item>
           </el-dropdown-menu>
         </template>
@@ -78,12 +52,7 @@ const profileStore = useProfileStore()
 const pinStore = usePinStore()
 const authStore = useAuthStore()
 const workspaceStore = useWorkspaceStore()
-const {
-  profileSuccessData,
-  profileFailureData,
-  editProfileData,
-  editFailureData,
-} = storeToRefs(profileStore)
+const { profileSuccessData, profileFailureData, editProfileData, editFailureData } = storeToRefs(profileStore)
 const { $myFetch } = useNuxtApp()
 const config = useRuntimeConfig()
 const avatarUrl = ref(defaultAvatar)
@@ -98,9 +67,7 @@ const getAvatar = (v) => {
 
   profile.value = v
   if (v?.user.avatar) {
-    accounts.value[
-      currentAccountID
-    ].avatarUrl = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
+    accounts.value[currentAccountID].avatarUrl = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
   } else {
     accounts.value[currentAccountID].avatarUrl = `${defaultAvatar}`
   }
@@ -113,9 +80,7 @@ watch(profileSuccessData, (v) => {
   const currentAccountID = $cookies.get('currentAccountID')
   profile.value = v
   if (v?.user.avatar) {
-    accounts.value[
-      currentAccountID
-    ].avatarUrl = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
+    accounts.value[currentAccountID].avatarUrl = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
   } else {
     accounts.value[currentAccountID].avatarUrl = `${defaultAvatar}`
   }
@@ -145,9 +110,7 @@ watch(profileFailureData, (v) => {
 watch(editProfileData, (v) => {
   const currentAccountID = $cookies.get('currentAccountID')
   if (v?.user.avatar) {
-    accounts.value[
-      currentAccountID
-    ].avatarUrl = `${v.avatarPath}/${v.user.avatar}`
+    accounts.value[currentAccountID].avatarUrl = `${v.avatarPath}/${v.user.avatar}`
   } else {
     accounts.value[currentAccountID].avatarUrl = `${defaultAvatar}`
   }
@@ -183,10 +146,7 @@ const changeAccount = async (userID) => {
   authStore.$reset()
   workspaceStore.$reset()
 
-  if (
-    (Date.parse(accounts.value[userID].token_expires) - Date.now()) / 86400000 <
-    0
-  ) {
+  if ((Date.parse(accounts.value[userID].token_expires) - Date.now()) / 86400000 < 0) {
     accounts.value.splice(userID, 1)
     if (process.client) {
       localStorage.setItem('accounts', JSON.stringify(accounts.value))
@@ -203,25 +163,16 @@ const changeAccount = async (userID) => {
 
     return
   }
-
   $cookies.set('token', accounts.value[userID].token, {
-    expires:
-      (Date.parse(accounts.value[userID].token_expires) - Date.now()) /
-      86400000,
+    expires: (Date.parse(accounts.value[userID].token_expires) - Date.now()) / 86400000,
   })
 
   $cookies.set('first_login', accounts.value[userID].first_login)
   if (accounts.value[userID].settings_pin_token)
-    $cookies.set(
-      'settings_pin_token',
-      accounts.value[userID].settings_pin_token
-    )
+    $cookies.set('settings_pin_token', accounts.value[userID].settings_pin_token)
   if (accounts.value[userID].login_pin_token)
     $cookies.set('login_pin_token', accounts.value[userID].login_pin_token, {
-      expires:
-        (Date.parse(accounts.value[userID].login_pin_token_expires) -
-          new Date()) /
-        86400000,
+      expires: (Date.parse(accounts.value[userID].login_pin_token_expires) - new Date()) / 86400000,
     })
   accounts.value.sort((a, b) => {
     if (a.ID === userID) {
@@ -262,29 +213,28 @@ const onLogout = async (userID) => {
   workspaceStore.$reset()
 
   if (initAccountValue[0]) {
-    $cookies.set('token', initAccountValue[0].token, {
-      expires:
-        (Date.parse(initAccountValue[0].token_expires) - Date.now()) / 86400000,
-    })
-    if (initAccountValue[0].first_login === true)
-      $cookies.set('first_login', initAccountValue[0].first_login)
-    if (initAccountValue[0].settings_pin_token)
-      $cookies.set('settings_pin_token', initAccountValue[0].settings_pin_token)
-    if (initAccountValue[0].login_pin_token)
-      $cookies.set('login_pin_token', initAccountValue[0].login_pin_token, {
-        expires:
-          (Date.parse(initAccountValue[0].login_pin_token_expires) -
-            new Date()) /
-          86400000,
+    if (Date.parse(initAccountValue[0].token_expires) - Date.now() > 0) {
+      $cookies.set('token', initAccountValue[0].token, {
+        expires: (Date.parse(initAccountValue[0].token_expires) - Date.now()) / 86400000,
       })
-    $cookies.set('currentAccountID', 0)
-    profileStore.getProfile()
-    await profileStore.getWorkSpaces()
-    accounts.value = initAccountValue
-    if (process.client) {
-      localStorage.setItem('accounts', JSON.stringify(initAccountValue))
+      if (initAccountValue[0].first_login === true) $cookies.set('first_login', initAccountValue[0].first_login)
+      if (initAccountValue[0].settings_pin_token)
+        $cookies.set('settings_pin_token', initAccountValue[0].settings_pin_token)
+      if (initAccountValue[0].login_pin_token)
+        $cookies.set('login_pin_token', initAccountValue[0].login_pin_token, {
+          expires: (Date.parse(initAccountValue[0].login_pin_token_expires) - new Date()) / 86400000,
+        })
+      $cookies.set('currentAccountID', 0)
+      profileStore.getProfile()
+      await profileStore.getWorkSpaces()
+      accounts.value = initAccountValue
+      if (process.client) {
+        localStorage.setItem('accounts', JSON.stringify(initAccountValue))
+      }
+      $router.go()
+    } else {
+      initAccountValue.shift()
     }
-    $router.go()
   } else {
     $cookies.remove('token')
     $cookies.remove('first_login')
@@ -326,11 +276,7 @@ const currentUser = (id) => {
         justify-content: center;
         width: 46px;
         height: 46px;
-        background: linear-gradient(
-          51.28deg,
-          rgba(48, 110, 154, 0.5) -1.56%,
-          #94cef9 118.35%
-        );
+        background: linear-gradient(51.28deg, rgba(48, 110, 154, 0.5) -1.56%, #94cef9 118.35%);
         border-radius: 26px;
       }
       &--avatar {

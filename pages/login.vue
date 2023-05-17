@@ -11,10 +11,7 @@
         :rules="rules"
         @submit.prevent="onSubmit"
       >
-        <div
-          v-if="errors.global.value"
-          class="el-form-item__global-error-container"
-        >
+        <div v-if="errors.global.value" class="el-form-item__global-error-container">
           <div class="el-form-item__global-error">
             <img src="@/assets/images/icons/error.svg" alt="" />
             <span>{{ errors.global.value }}</span>
@@ -43,24 +40,15 @@
                 @mouseout="hideError('email')"
                 @click="showErrorClick('email')"
               />
-              <div
-                v-if="payload.email"
-                style="position: relative"
-                @click="focusElement('email')"
-              >
-                <span for="email" class="custom_placeholder">
-                  Email or username
-                </span>
+              <div v-if="payload.email" style="position: relative" @click="focusElement('email')">
+                <span for="email" class="custom_placeholder"> Email or username </span>
               </div>
 
               <div></div>
             </template>
           </el-input>
           <template #error>
-            <div
-              v-if="errors.email.isShow && isWeb()"
-              class="el-form-item__error"
-            >
+            <div v-if="errors.email.isShow && isWeb()" class="el-form-item__error">
               <span>{{ errors.email.value }}</span>
             </div>
             <div></div>
@@ -77,20 +65,11 @@
             @blur="validateField('password')"
           >
             <template #prefix>
-              <img
-                src="@/assets/images/icons/lock-icon.svg"
-                alt="password_icon"
-              />
+              <img src="@/assets/images/icons/lock-icon.svg" alt="password_icon" />
             </template>
             <template #suffix>
-              <div
-                v-if="payload.password"
-                style="position: relative"
-                @click="focusElement('password')"
-              >
-                <span for="password" class="custom_placeholder">
-                  Password
-                </span>
+              <div v-if="payload.password" style="position: relative" @click="focusElement('password')">
+                <span for="password" class="custom_placeholder"> Password </span>
               </div>
               <img
                 :class="errors.password.value ? 'eye_icon' : ''"
@@ -111,10 +90,7 @@
           </el-input>
 
           <template #error>
-            <div
-              v-if="errors.password.isShow && isWeb()"
-              class="el-form-item__error"
-            >
+            <div v-if="errors.password.isShow && isWeb()" class="el-form-item__error">
               <span v-html="errors.password.value"></span>
             </div>
             <div></div>
@@ -123,9 +99,7 @@
             <el-checkbox v-model="payload.remember_me" class="remember-checkbox"
               ><span style="font-weight: 400">Remember me</span></el-checkbox
             >
-            <el-button text @click="navigateTo('/password/forgot')"
-              >Forgot Password?</el-button
-            >
+            <el-button text @click="navigateTo('/password/forgot')">Forgot Password?</el-button>
           </div>
         </el-form-item>
         <login-buttons
@@ -235,9 +209,7 @@ watch(loginSuccessData, (v) => {
   $cookies.remove('addAccount')
   if (process.client) {
     accounts.value =
-      localStorage.getItem('accounts') !== 'undefined'
-        ? JSON.parse(localStorage.getItem('accounts'))
-        : []
+      localStorage.getItem('accounts') !== 'undefined' ? JSON.parse(localStorage.getItem('accounts')) : []
   }
 
   const [accessToken, isFirstLogin] = [v.access_token, v.is_first_login]
