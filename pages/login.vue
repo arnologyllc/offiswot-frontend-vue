@@ -304,9 +304,12 @@ const onSubmit = () => {
   instance.refs.loginForm.validate((valid) => {
     if (process.client) {
       if (valid) {
-        const users = JSON.parse(localStorage.getItem('accounts'))?.filter(
-          (elem) => Date.parse(elem.token_expires) > new Date()
-        )
+        const users =
+          localStorage.getItem('accounts') !== 'undefined'
+            ? JSON.parse(localStorage.getItem('accounts'))?.filter(
+                (elem) => Date.parse(elem.token_expires) > new Date()
+              )
+            : []
         if (users?.some((elem) => elem.email === payload.value.email)) {
           errors.value.global.value = 'Account already logined'
         } else {
