@@ -98,7 +98,6 @@ import { getCurrentInstance, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import $cookies from 'js-cookie'
-import nuxtStorage from 'nuxt-storage'
 import ConfirmModal from '@/components/shared/OvConfirmPINChangeModal.vue'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
@@ -161,24 +160,26 @@ const isOpenEmailDialog = ref(false)
 
 watch(checkPinData, ({ data: v }) => {
   const userID = $cookies.get('currentAccountID')
-  const initAccountValue = nuxtStorage.localStorage.getData('accounts')
-  if (
-    !$cookies.get('login_pin_token') &&
-    $cookies.get('login_pin_token') !== v.login_pin_token
-  ) {
-    const loginPinTokenExpires = new Date()
-    loginPinTokenExpires.setDate(loginPinTokenExpires.getDate() + 30)
-    $cookies.set('login_pin_token', v.login_pin_token, {
-      expires: (Date.parse(loginPinTokenExpires) - new Date()) / 86400000,
-    })
-    initAccountValue[userID].login_pin_token = v.login_pin_token
-    initAccountValue[userID].login_pin_token_expires = loginPinTokenExpires
-  }
-  instance.emit('loginToken', $cookies.get('login_pin_token'))
-  $cookies.set('settings_pin_token', v.settings_pin_token, 0)
-  initAccountValue[userID].settings_pin_token = v.settings_pin_token
+  if (process.client) {
+    const initAccountValue = JSON.parse(localStorage.getItem('accounts'))
+    if (
+      !$cookies.get('login_pin_token') &&
+      $cookies.get('login_pin_token') !== v.login_pin_token
+    ) {
+      const loginPinTokenExpires = new Date()
+      loginPinTokenExpires.setDate(loginPinTokenExpires.getDate() + 30)
+      $cookies.set('login_pin_token', v.login_pin_token, {
+        expires: (Date.parse(loginPinTokenExpires) - new Date()) / 86400000,
+      })
+      initAccountValue[userID].login_pin_token = v.login_pin_token
+      initAccountValue[userID].login_pin_token_expires = loginPinTokenExpires
+    }
+    instance.emit('loginToken', $cookies.get('login_pin_token'))
+    $cookies.set('settings_pin_token', v.settings_pin_token, 0)
+    initAccountValue[userID].settings_pin_token = v.settings_pin_token
 
-  nuxtStorage.localStorage.setData('accounts', initAccountValue, 30, 'd')
+    localStorage.setItem('accounts', JSON.stringify(initAccountValue))
+  }
   instance.emit('close')
   $router.go()
 })
@@ -238,8 +239,8 @@ onMounted(() => {
 const onSubmit = () => {
   instance.refs.pinForm.validate((valid) => {
     if (valid) {
-      pinStore.checkPin(payload._value)
-    } else if (payload._value.pin) {
+      pinStore.checkPin(payload.value)
+    } else if (payload.value.pin) {
       errors.value.global.value = 'PIN must be between 4 and 6 digits'
     } else {
       errors.value.global.value = 'This field is required'
