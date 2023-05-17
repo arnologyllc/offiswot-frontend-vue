@@ -3,7 +3,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
 
   if (process.client) {
     const accounts =
-      localStorage.getItem('accounts') !== 'undefined'
+      localStorage.getItem('accounts') !== 'undefined' && localStorage.getItem('accounts') !== null
         ? JSON.parse(localStorage.getItem('accounts'))?.filter((elem) => Date.parse(elem.token_expires) > new Date())
         : []
     localStorage.setItem('accounts', JSON.stringify(accounts))
