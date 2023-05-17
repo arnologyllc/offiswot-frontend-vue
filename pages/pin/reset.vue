@@ -2,9 +2,7 @@
   <div class="main">
     <div class="main__form">
       <div class="main__form--title">Reset PIN</div>
-      <div class="main__form--subtitle">
-        Enter a new PIN below to change your PIN.
-      </div>
+      <div class="main__form--subtitle">Enter a new PIN below to change your PIN.</div>
       <el-form
         ref="resetForm"
         class="main__form--box"
@@ -13,9 +11,11 @@
         :rules="rules"
         @submit.prevent="onSubmit"
       >
-        <div v-if="errors.global.value" class="el-form-item__global-error">
-          <img src="@/assets/images/icons/error.svg" alt="" />
-          <span>{{ errors.global.value }}</span>
+        <div v-if="errors.global.value" class="el-form-item__global-error-container">
+          <div class="el-form-item__global-error">
+            <img src="@/assets/images/icons/error.svg" alt="" />
+            <span>{{ errors.global.value }}</span>
+          </div>
         </div>
         <el-form-item prop="pin" class="password-form-item">
           <el-input
@@ -25,14 +25,11 @@
             :type="showPIN ? 'text' : 'password'"
             class="main__form--box__input"
             placeholder="Enter PIN"
-            @change="validateField('pin')"
+            @blur="validateField('pin')"
+            @input="validateField('pin')"
           >
             <template #suffix>
-              <div
-                v-if="payload.pin"
-                style="position: relative"
-                @click="focusElement('pin')"
-              >
+              <div v-if="payload.pin" style="position: relative" @click="focusElement('pin')">
                 <span for="pin" class="custom_placeholder"> PIN </span>
               </div>
               <img
@@ -54,10 +51,7 @@
           </el-input>
 
           <template #error>
-            <div
-              v-if="errors.pin.isShow && isWeb()"
-              class="el-form-item__error"
-            >
+            <div v-if="errors.pin.isShow && isWeb()" class="el-form-item__error">
               <span v-html="errors.pin.value"></span>
             </div>
             <div></div>
@@ -74,14 +68,8 @@
             @blur="validateField('pin_confirmation')"
           >
             <template #suffix>
-              <div
-                v-if="payload.pin_confirmation"
-                style="position: relative"
-                @click="focusElement('pin_confirmation')"
-              >
-                <span for="password" class="custom_placeholder">
-                  PIN Confirmation
-                </span>
+              <div v-if="payload.pin_confirmation" style="position: relative" @click="focusElement('pin_confirmation')">
+                <span for="password" class="custom_placeholder"> PIN Confirmation </span>
               </div>
               <img
                 :class="errors.pin_confirmation.value ? 'eye_icon' : ''"
@@ -102,23 +90,14 @@
           </el-input>
 
           <template #error>
-            <div
-              v-if="errors.pin_confirmation.isShow && isWeb()"
-              class="el-form-item__error"
-            >
+            <div v-if="errors.pin_confirmation.isShow && isWeb()" class="el-form-item__error">
               <span v-html="errors.pin_confirmation.value"></span>
             </div>
             <div></div>
           </template>
         </el-form-item>
-        <el-button
-          class="submit-button"
-          native-type="submit"
-          :loading="isLoadingSubmit"
-        >
-          <span class="submit-button__text">{{
-            isLoadingSubmit ? '' : 'Save'
-          }}</span>
+        <el-button class="submit-button" native-type="submit" :loading="isLoadingSubmit">
+          <span class="submit-button__text">{{ isLoadingSubmit ? '' : 'Save' }}</span>
         </el-button>
 
         <error-massage
@@ -151,8 +130,7 @@ import auth from '~/middleware/auth'
 definePageMeta({ layout: 'default' })
 
 const pinStore = usePINStore()
-const { changePinData, changePinFailureData, isLoadingSubmit } =
-  storeToRefs(pinStore)
+const { changePinData, changePinFailureData, isLoadingSubmit } = storeToRefs(pinStore)
 
 const instance = getCurrentInstance()
 const $route = useRoute()
@@ -211,7 +189,7 @@ const rules = ref({
     },
     {
       validator: validatePIN,
-      trigger: 'blur',
+      trigger: 'input',
     },
   ],
   pin_confirmation: [
