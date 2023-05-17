@@ -37,7 +37,6 @@
     "libphonenumber-js": "^1.10.30",
     "maz-ui": "^3.9.0",
     "moment": "^2.29.4",
-    "nuxt-storage": "^1.2.2",
     "ofetch": "^1.0.1",
     "pinia": "^2.0.36",
     "postcss": "^8.4.23",

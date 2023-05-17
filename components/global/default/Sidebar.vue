@@ -1,9 +1,9 @@
 <template>
   <nav class="main">
-    <div class="main__top">
+    <div v-if="accounts" class="main__top">
       <el-dropdown
         v-for="item in accounts"
-        :key="item.id"
+        :key="item.ID"
         class="main__user-actions"
       >
         <div
@@ -68,7 +68,6 @@ import { onMounted, watch, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import $cookies from 'js-cookie'
 import { storeToRefs } from 'pinia'
-import nuxtStorage from 'nuxt-storage'
 import useProfileStore from '@/stores/profile'
 import usePinStore from '@/stores/pin'
 import useAuthStore from '@/stores/auth'
@@ -92,7 +91,7 @@ const avatarUrl = ref(defaultAvatar)
 const profile = ref(null)
 const $router = useRouter()
 const isHovered = ref(false)
-const accounts = ref(nuxtStorage.localStorage.getData('accounts'))
+const accounts = ref(false)
 
 const getAvatar = (v) => {
   const currentAccountID = $cookies.get('currentAccountID')
@@ -105,8 +104,9 @@ const getAvatar = (v) => {
   } else {
     accounts.value[currentAccountID].avatarUrl = `${defaultAvatar}`
   }
-
-  nuxtStorage.localStorage.setData('accounts', accounts.value, 30, 'd')
+  if (process.client) {
+    localStorage.setItem('accounts', JSON.stringify(accounts.value))
+  }
 }
 
 watch(profileSuccessData, (v) => {
@@ -119,7 +119,9 @@ watch(profileSuccessData, (v) => {
   } else {
     accounts.value[currentAccountID].avatarUrl = `${defaultAvatar}`
   }
-  nuxtStorage.localStorage.setData('accounts', accounts.value, 30, 'd')
+  if (process.client) {
+    localStorage.setItem('accounts', JSON.stringify(accounts.value))
+  }
 })
 
 watch(editFailureData, (v) => {
@@ -149,10 +151,15 @@ watch(editProfileData, (v) => {
   } else {
     accounts.value[currentAccountID].avatarUrl = `${defaultAvatar}`
   }
-  nuxtStorage.localStorage.setData('accounts', accounts.value, 30, 'd')
+  if (process.client) {
+    localStorage.setItem('accounts', JSON.stringify(accounts.value))
+  }
 })
 
 onMounted(() => {
+  if (process.client) {
+    accounts.value = JSON.parse(localStorage.getItem('accounts'))
+  }
   if ($cookies.get('login_pin_token')) {
     if (!profileSuccessData.value) {
       profileStore.getProfile()
@@ -181,7 +188,9 @@ const changeAccount = async (userID) => {
     0
   ) {
     accounts.value.splice(userID, 1)
-    nuxtStorage.localStorage.setData('accounts', accounts.value, 30, 'd')
+    if (process.client) {
+      localStorage.setItem('accounts', JSON.stringify(accounts.value))
+    }
     if (accounts.value[0]) {
       changeAccount(0)
     } else {
@@ -223,7 +232,9 @@ const changeAccount = async (userID) => {
     return 0
   })
   accounts.value.forEach((elem, index) => (elem.ID = index))
-  nuxtStorage.localStorage.setData('accounts', accounts.value, 30, 'd')
+  if (process.client) {
+    localStorage.setItem('accounts', JSON.stringify(accounts.value))
+  }
 
   $cookies.set('currentAccountID', 0)
 
@@ -270,15 +281,18 @@ const onLogout = async (userID) => {
     profileStore.getProfile()
     await profileStore.getWorkSpaces()
     accounts.value = initAccountValue
-    nuxtStorage.localStorage.setData('accounts', initAccountValue, 30, 'd')
+    if (process.client) {
+      localStorage.setItem('accounts', JSON.stringify(initAccountValue))
+    }
     $router.go()
   } else {
     $cookies.remove('token')
     $cookies.remove('first_login')
     $cookies.remove('settings_pin_token')
     $cookies.remove('login_pin_token')
-
-    nuxtStorage.localStorage.setData('accounts', initAccountValue, 30, 'd')
+    if (process.client) {
+      localStorage.setItem('accounts', JSON.stringify(initAccountValue))
+    }
     accounts.value = initAccountValue
     navigateTo('/login')
   }

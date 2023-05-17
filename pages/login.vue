@@ -161,7 +161,6 @@
 import { getCurrentInstance, onMounted } from 'vue'
 import $cookies from 'js-cookie'
 import { storeToRefs } from 'pinia'
-import nuxtStorage from 'nuxt-storage'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
 import ConfirmEmail from '@/components/shared/OvConfirmEmailModal.vue'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
@@ -177,6 +176,7 @@ const { loginSuccessData, loginErrorData } = storeToRefs(authStore)
 const instance = getCurrentInstance()
 const showPassword = ref(false)
 const isOpenEmailDialog = ref(false)
+const accounts = ref(false)
 
 const accountTokens = ref({
   ID: null,
@@ -233,10 +233,13 @@ watch(loginSuccessData, (v) => {
   $cookies.remove('settings_pin_token')
   $cookies.remove('login_pin_token')
   $cookies.remove('addAccount')
+  if (process.client) {
+    accounts.value =
+      localStorage.getItem('accounts') !== 'undefined'
+        ? JSON.parse(localStorage.getItem('accounts'))
+        : []
+  }
 
-  const accounts = nuxtStorage.localStorage.getData('accounts')
-    ? nuxtStorage.localStorage.getData('accounts')
-    : []
   const [accessToken, isFirstLogin] = [v.access_token, v.is_first_login]
   const expirationDate = payload.value.remember_me ? null : 1 / 24
 
@@ -253,9 +256,11 @@ watch(loginSuccessData, (v) => {
   accountTokens.value.email = v.user.email
   accountTokens.value.token = accessToken
   accountTokens.value.first_login = isFirstLogin
-  accounts.unshift(accountTokens.value)
-  accounts.forEach((elem, index) => (elem.ID = index))
-  nuxtStorage.localStorage.setData('accounts', accounts, 30, 'd')
+  accounts.value.unshift(accountTokens.value)
+  accounts.value.forEach((elem, index) => (elem.ID = index))
+  if (process.client) {
+    localStorage.setItem('accounts', JSON.stringify(accounts.value))
+  }
   $cookies.set('currentAccountID', 0)
   if (isFirstLogin) {
     navigateTo('/pin')
@@ -297,19 +302,21 @@ onMounted(() => {
 
 const onSubmit = () => {
   instance.refs.loginForm.validate((valid) => {
-    if (valid) {
-      const users = nuxtStorage.localStorage
-        .getData('accounts')
-        ?.filter((elem) => Date.parse(elem.token_expires) > new Date())
-      if (users?.some((elem) => elem.email === payload.value.email)) {
-        errors.value.global.value = 'Account already logined'
+    if (process.client) {
+      if (valid) {
+        const users = JSON.parse(localStorage.getItem('accounts'))?.filter(
+          (elem) => Date.parse(elem.token_expires) > new Date()
+        )
+        if (users?.some((elem) => elem.email === payload.value.email)) {
+          errors.value.global.value = 'Account already logined'
+        } else {
+          localStorage.setItem('accounts', JSON.stringify(users))
+          authStore.loginUser(payload.value)
+        }
       } else {
-        nuxtStorage.localStorage.setData('accounts', users)
-        authStore.loginUser(payload.value)
+        errors.value.global.value = 'Please fill empty areas'
+        return false
       }
-    } else {
-      errors.value.global.value = 'Please fill empty areas'
-      return false
     }
   })
 }
