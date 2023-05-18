@@ -2,9 +2,7 @@
   <div class="main">
     <div class="main__form">
       <div class="main__form--title">Forgot password</div>
-      <div class="main__form--subtitle">
-        Please fill the forms to get a reset password email.
-      </div>
+      <div class="main__form--subtitle">Please fill the forms to get a reset password email.</div>
       <el-form
         ref="forgotForm"
         class="main__form--box"
@@ -13,10 +11,7 @@
         :rules="rules"
         @submit.prevent="onSubmit"
       >
-        <div
-          v-if="errors.global.value"
-          class="el-form-item__global-error-container"
-        >
+        <div v-if="errors.global.value" class="el-form-item__global-error-container">
           <div class="el-form-item__global-error">
             <img src="@/assets/images/icons/error.svg" alt="" />
             <span>{{ errors.global.value }}</span>
@@ -35,11 +30,7 @@
             </template>
 
             <template #suffix>
-              <div
-                v-if="payload.email"
-                style="position: relative"
-                @click="focusElement('email')"
-              >
+              <div v-if="payload.email" style="position: relative" @click="focusElement('email')">
                 <span for="email" class="custom_placeholder"> Email</span>
               </div>
               <img
@@ -54,20 +45,13 @@
             </template>
           </el-input>
           <template #error>
-            <div
-              v-if="errors.email.isShow && isWeb()"
-              class="el-form-item__error"
-            >
+            <div v-if="errors.email.isShow && isWeb()" class="el-form-item__error">
               <span>{{ errors.email.value }}</span>
             </div>
             <div></div>
           </template>
         </el-form-item>
-        <login-buttons
-          login-title="Next"
-          :login-loading="forgotLoading"
-          :show-social="false"
-        ></login-buttons>
+        <login-buttons login-title="Next" :login-loading="forgotLoading" :show-social="false"></login-buttons>
       </el-form>
     </div>
 
@@ -99,8 +83,7 @@ definePageMeta({ layout: 'auth' })
 const instance = getCurrentInstance()
 const authStore = useAuthStore()
 const profileStore = useProfileStore()
-const { forgotSuccessData, forgotErrorData, forgotLoading } =
-  storeToRefs(authStore)
+const { forgotSuccessData, forgotErrorData, forgotLoading } = storeToRefs(authStore)
 const { profileSuccessData } = storeToRefs(profileStore)
 const payload = ref({
   email: null,
@@ -175,7 +158,6 @@ const clearError = () => {
   errors.value.global.value = ''
 }
 watch(forgotSuccessData, (v) => {
-  payload.value.email = profileSuccessData.value?.user.email
   isOpenEmailDialog.value = true
 })
 
@@ -194,9 +176,6 @@ watch(forgotErrorData, (v) => {
 })
 
 onMounted(() => {
-  if (profileSuccessData.value?.user.email) {
-    payload.value.email = profileSuccessData.value?.user.email
-  }
   window.addEventListener('resize', handleResize)
 })
 </script>

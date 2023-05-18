@@ -12,10 +12,7 @@
         :rules="rules"
         @submit.prevent="onSubmit"
       >
-        <div
-          v-if="errors.global.value"
-          class="el-form-item__global-error-container"
-        >
+        <div v-if="errors.global.value" class="el-form-item__global-error-container">
           <div class="el-form-item__global-error">
             <img src="@/assets/images/icons/error.svg" alt="" />
             <span>{{ errors.global.value }}</span>
@@ -32,17 +29,10 @@
             @blur="validateField('email')"
           >
             <template #prefix>
-              <img
-                src="@/assets/images/icons/email-icon.svg"
-                alt="email_icon"
-              />
+              <img src="@/assets/images/icons/email-icon.svg" alt="email_icon" />
             </template>
             <template #suffix>
-              <div
-                v-if="payload.email"
-                style="position: relative"
-                @click="focusElement('email')"
-              >
+              <div v-if="payload.email" style="position: relative" @click="focusElement('email')">
                 <span for="email" class="custom_placeholder"> Email </span>
               </div>
               <img
@@ -58,10 +48,7 @@
           </el-input>
 
           <template #error>
-            <div
-              v-if="errors.email.isShow && isWeb()"
-              class="el-form-item__error"
-            >
+            <div v-if="errors.email.isShow && isWeb()" class="el-form-item__error">
               <span>{{ errors.email.value }}</span>
             </div>
             <div></div>
@@ -82,16 +69,8 @@
             </template>
 
             <template #suffix>
-              <div
-                v-if="payload.username"
-                style="position: relative"
-                @click="focusElement('username')"
-              >
-                <span
-                  for="username"
-                  class="custom_placeholder"
-                  :class="payload.username ? 'active' : ''"
-                >
+              <div v-if="payload.username" style="position: relative" @click="focusElement('username')">
+                <span for="username" class="custom_placeholder" :class="payload.username ? 'active' : ''">
                   Username
                 </span>
               </div>
@@ -103,25 +82,15 @@
                   @click="showErrorClick('username')"
                 >
                   <img
-                    v-if="
-                      errors.username.status === 'Medium' && payload.username
-                    "
+                    v-if="errors.username.status === 'Medium' && payload.username"
                     src="@/assets/images/icons/warning.svg"
                     alt=""
                   />
-                  <img
-                    v-else-if="errors.username.value"
-                    src="@/assets/images/icons/error.svg"
-                    alt=""
-                  />
+                  <img v-else-if="errors.username.value" src="@/assets/images/icons/error.svg" alt="" />
                 </div>
               </template>
               <div
-                v-if="
-                  errors.username.status === 'Medium' &&
-                  errors.username.isShow &&
-                  isWeb()
-                "
+                v-if="errors.username.status === 'Medium' && errors.username.isShow && isWeb()"
                 class="el-form-item__error strength warning"
               >
                 <span v-html="errors.username.value"></span>
@@ -130,10 +99,7 @@
             </template>
           </el-input>
           <template #error>
-            <div
-              v-if="errors.username.isShow && isWeb()"
-              class="el-form-item__error"
-            >
+            <div v-if="errors.username.isShow && isWeb()" class="el-form-item__error">
               <span v-html="errors.username.value"></span>
             </div>
             <div></div>
@@ -150,20 +116,11 @@
             @blur="validateField('password')"
           >
             <template #prefix>
-              <img
-                src="@/assets/images/icons/lock-icon.svg"
-                alt="password_icon"
-              />
+              <img src="@/assets/images/icons/lock-icon.svg" alt="password_icon" />
             </template>
             <template #suffix>
-              <div
-                v-if="payload.password"
-                style="position: relative"
-                @click="focusElement('password')"
-              >
-                <span for="password" class="custom_placeholder">
-                  Password
-                </span>
+              <div v-if="payload.password" style="position: relative" @click="focusElement('password')">
+                <span for="password" class="custom_placeholder"> Password </span>
               </div>
               <img
                 :class="errors.password.value ? 'eye_icon' : ''"
@@ -179,16 +136,12 @@
                   @click="showErrorClick('password')"
                 >
                   <img
-                    v-if="
-                      errors.password.status === 'Medium' && payload.password
-                    "
+                    v-if="errors.password.status === 'Medium' && payload.password"
                     src="@/assets/images/icons/warning.svg"
                     alt=""
                   />
                   <img
-                    v-else-if="
-                      errors.password.status === 'Strong' && payload.password
-                    "
+                    v-else-if="errors.password.status === 'Strong' && payload.password"
                     src="@/assets/images/icons/good.svg"
                     alt=""
                   />
@@ -197,11 +150,7 @@
               </template>
             </template>
           </el-input>
-          <div
-            v-if="errors.password.isShow && isWeb()"
-            :class="getColor()"
-            class="el-form-item__error strength"
-          >
+          <div v-if="errors.password.isShow && isWeb()" :class="getColor()" class="el-form-item__error strength">
             <span v-html="errors.password.value"></span>
           </div>
           <template #error>
@@ -218,10 +167,7 @@
             @blur="validateField('password_confirmation')"
           >
             <template #prefix>
-              <img
-                src="@/assets/images/icons/lock-icon.svg"
-                alt="password_icon"
-              />
+              <img src="@/assets/images/icons/lock-icon.svg" alt="password_icon" />
             </template>
             <template #suffix>
               <div
@@ -229,9 +175,7 @@
                 style="position: relative"
                 @click="focusElement('password_confirmation')"
               >
-                <span for="password_confirmation" class="custom_placeholder">
-                  Confirm Password
-                </span>
+                <span for="password_confirmation" class="custom_placeholder"> Confirm Password </span>
               </div>
               <img
                 :class="errors.password_confirmation.value ? 'eye_icon' : ''"
@@ -253,10 +197,7 @@
             </template>
           </el-input>
           <template #error>
-            <div
-              v-if="errors.password_confirmation.isShow && isWeb()"
-              class="el-form-item__error"
-            >
+            <div v-if="errors.password_confirmation.isShow && isWeb()" class="el-form-item__error">
               <span v-html="errors.password_confirmation.value"></span>
             </div>
             <div></div>
@@ -290,11 +231,7 @@
       v-if="errors.username.isShow && !isWeb()"
       :dialog-visible="errors.username.isShow && !isWeb()"
       :error-text="errors.username.value"
-      :text-color="
-        errors.username.status === 'Medium' && payload.username
-          ? 'warning'
-          : 'weak'
-      "
+      :text-color="errors.username.status === 'Medium' && payload.username ? 'warning' : 'weak'"
       @visible="errors.username.isShow = false"
     ></error-massage>
 
@@ -495,22 +432,15 @@ const focusElement = (elem) => {
 }
 
 const validateField = (fieldName) => {
-  instance.refs.registerForm.validateField(
-    fieldName,
-    (isValid, catchedError) => {
-      if (
-        (errors.value[fieldName].status !== 'Medium' &&
-          fieldName === 'username') ||
-        fieldName !== 'username'
-      ) {
-        if (!isValid) {
-          errors.value[fieldName].value = catchedError[fieldName][0].message
-        } else if (fieldName !== 'password') {
-          errors.value[fieldName].value = ''
-        }
+  instance.refs.registerForm.validateField(fieldName, (isValid, catchedError) => {
+    if ((errors.value[fieldName].status !== 'Medium' && fieldName === 'username') || fieldName !== 'username') {
+      if (!isValid) {
+        errors.value[fieldName].value = catchedError[fieldName][0].message
+      } else if (fieldName !== 'password') {
+        errors.value[fieldName].value = ''
       }
     }
-  )
+  })
 }
 
 const showErrorClick = (fieldName) => {
@@ -551,13 +481,11 @@ const updatePasswordStrength = (password) => {
 
   if (
     identicalRegex.test(password) &&
-    (password?.length > 15 ||
-      !words.some((elem) => password?.toLowerCase().includes(elem)))
+    (password?.length > 15 || !words.some((elem) => password?.toLowerCase().includes(elem)))
   ) {
     if (
       strongRegex.test(password) &&
-      (password?.length > 25 ||
-        !words.some((elem) => password.toLowerCase().includes(elem)))
+      (password?.length > 25 || !words.some((elem) => password.toLowerCase().includes(elem)))
     ) {
       return 'Strong'
     } else if (mediumRegex.test(password)) {
@@ -568,11 +496,7 @@ const updatePasswordStrength = (password) => {
 }
 
 const getColor = () => {
-  return errors.value.password.status === 'Medium'
-    ? 'warning'
-    : errors.value.password.status === 'Strong'
-    ? 'done'
-    : ''
+  return errors.value.password.status === 'Medium' ? 'warning' : errors.value.password.status === 'Strong' ? 'done' : ''
 }
 
 watch(registerSuccessData, (v) => {

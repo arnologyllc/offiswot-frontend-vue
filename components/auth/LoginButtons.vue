@@ -2,36 +2,22 @@
   <div class="submit-buttons-container">
     <el-form-item class="submit-form-item">
       <div class="submit-button__outer">
-        <el-button
-          class="submit-button"
-          native-type="submit"
-          :loading="props.loginLoading"
-        >
+        <el-button class="submit-button" native-type="submit" :loading="props.loginLoading">
           <span class="submit-button__text">
             {{ !props.loginLoading ? props.loginTitle : '' }}
           </span>
-          <img
-            src="@/assets/images/icons/chevron-icon.svg"
-            alt="arrow"
-            class="arrow_position"
-          />
+          <img src="@/assets/images/icons/chevron-icon.svg" alt="arrow" class="arrow_position" />
         </el-button>
       </div>
     </el-form-item>
     <el-form-item v-if="props.showSocial">
       <div class="or-text">or</div>
     </el-form-item>
-    <el-form-item
-      v-if="props.showSocial"
-      class="submit-form-item"
-      style="width: 100%"
-    >
+    <el-form-item v-if="props.showSocial" class="submit-form-item" style="width: 100%">
       <el-button class="google-sign-button">
         <div class="google-sign-button__inner">
           <img src="@/assets/images/icons/google-icon.svg" alt="G" />
-          <span class="google-sign-button__inner--text">{{
-            props.socialTitle
-          }}</span>
+          <span class="google-sign-button__inner--text">{{ props.socialTitle }}</span>
         </div>
       </el-button>
     </el-form-item>

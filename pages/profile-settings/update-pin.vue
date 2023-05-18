@@ -2,16 +2,10 @@
   <div class="main">
     <div class="main__form">
       <div class="main__form--title">
-        <img
-          src="@/assets/images/icons/chevron-left.svg"
-          alt="chevron-left"
-          @click="$router.go(-1)"
-        />
+        <img src="@/assets/images/icons/chevron-left.svg" alt="chevron-left" @click="$router.go(-1)" />
         <span>Reset PIN</span>
       </div>
-      <div class="main__form--subtitle">
-        Fill in the fields to change your PIN.
-      </div>
+      <div class="main__form--subtitle">Fill in the fields to change your PIN.</div>
 
       <el-form
         ref="pinForm"
@@ -21,10 +15,7 @@
         :rules="rules"
         @submit.prevent="onSubmit"
       >
-        <div
-          v-if="errors.global.value"
-          class="el-form-item__global-error-container"
-        >
+        <div v-if="errors.global.value" class="el-form-item__global-error-container">
           <div class="el-form-item__global-error">
             <img src="@/assets/images/icons/error.svg" alt="" />
             <span>{{ errors.global.value }}</span>
@@ -42,11 +33,7 @@
             @blur="validateField('previous')"
           >
             <template #suffix>
-              <div
-                v-if="payload.previous"
-                style="position: relative"
-                @click="focusElement('previous')"
-              >
+              <div v-if="payload.previous" style="position: relative" @click="focusElement('previous')">
                 <span for="previous" class="custom_placeholder"> Old PIN </span>
               </div>
               <img
@@ -68,10 +55,7 @@
           </el-input>
 
           <template #error>
-            <div
-              v-if="errors.previous.isShow && isWeb()"
-              class="el-form-item__error"
-            >
+            <div v-if="errors.previous.isShow && isWeb()" class="el-form-item__error">
               <span v-html="errors.previous.value"></span>
             </div>
             <div></div>
@@ -88,11 +72,7 @@
             @blur="validateField('pin')"
           >
             <template #suffix>
-              <div
-                v-if="payload.pin"
-                style="position: relative"
-                @click="focusElement('pin')"
-              >
+              <div v-if="payload.pin" style="position: relative" @click="focusElement('pin')">
                 <span for="pin" class="custom_placeholder"> New PIN </span>
               </div>
               <img
@@ -114,10 +94,7 @@
           </el-input>
 
           <template #error>
-            <div
-              v-if="errors.pin.isShow && isWeb()"
-              class="el-form-item__error"
-            >
+            <div v-if="errors.pin.isShow && isWeb()" class="el-form-item__error">
               <span v-html="errors.pin.value"></span>
             </div>
             <div></div>
@@ -134,14 +111,8 @@
             @blur="validateField('pin_confirmation')"
           >
             <template #suffix>
-              <div
-                v-if="payload.pin_confirmation"
-                style="position: relative"
-                @click="focusElement('pin_confirmation')"
-              >
-                <span for="password" class="custom_placeholder">
-                  Repeat PIN
-                </span>
+              <div v-if="payload.pin_confirmation" style="position: relative" @click="focusElement('pin_confirmation')">
+                <span for="password" class="custom_placeholder"> Repeat PIN </span>
               </div>
               <img
                 :class="errors.pin_confirmation.value ? 'eye_icon' : ''"
@@ -162,28 +133,17 @@
           </el-input>
 
           <template #error>
-            <div
-              v-if="errors.pin_confirmation.isShow && isWeb()"
-              class="el-form-item__error"
-            >
+            <div v-if="errors.pin_confirmation.isShow && isWeb()" class="el-form-item__error">
               <span v-html="errors.pin_confirmation.value"></span>
             </div>
             <div></div>
           </template>
         </el-form-item>
         <div class="forgot-password">
-          <el-button style="font-size: 14px; font-weight: 400" @click="onForgot"
-            >Forgot PIN?</el-button
-          >
+          <el-button style="font-size: 14px; font-weight: 400" @click="onForgot">Forgot PIN?</el-button>
         </div>
-        <el-button
-          class="submit-button"
-          native-type="submit"
-          :loading="isLoadingSubmit"
-        >
-          <span class="submit-button__text">{{
-            isLoadingSubmit ? '' : 'Save'
-          }}</span>
+        <el-button class="submit-button" native-type="submit" :loading="isLoadingSubmit">
+          <span class="submit-button__text">{{ isLoadingSubmit ? '' : 'Save' }}</span>
         </el-button>
 
         <error-massage
@@ -243,13 +203,8 @@ definePageMeta({ layout: 'default' })
 
 const pinStore = usePINStore()
 const profileStore = useProfileStore()
-const {
-  resetPinFailureData,
-  resetPinData,
-  forgotPinFailureData,
-  forgotPinData,
-  isLoadingSubmit,
-} = storeToRefs(pinStore)
+const { resetPinFailureData, resetPinData, forgotPinFailureData, forgotPinData, isLoadingSubmit } =
+  storeToRefs(pinStore)
 const { profileSuccessData } = storeToRefs(profileStore)
 
 const instance = getCurrentInstance()
@@ -385,7 +340,6 @@ const onSubmit = () => {
 }
 const onForgot = () => {
   payload.value.email = profileSuccessData.value?.user.email
-  isOpenEmailDialog.value = true
   pinStore.forgotPin()
 }
 

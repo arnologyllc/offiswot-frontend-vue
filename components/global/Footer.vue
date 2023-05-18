@@ -1,18 +1,10 @@
 <template>
   <div class="footer">
     <div class="footer__content">
-      <div
-        v-for="(item, index) in footerLinks"
-        :key="`grid-item_${index}`"
-        class="footer__grid-item"
-      >
+      <div v-for="(item, index) in footerLinks" :key="`grid-item_${index}`" class="footer__grid-item">
         <div class="footer__grid-item--heading">{{ item.name }}</div>
         <div :class="{ grid: item.type }">
-          <div
-            v-for="(link, i) in item.items"
-            :key="`grid-item-link_${i}`"
-            class="footer__grid-item--link"
-          >
+          <div v-for="(link, i) in item.items" :key="`grid-item-link_${i}`" class="footer__grid-item--link">
             <a v-if="!item.type" href="#">{{ link.title }}</a>
             <div v-else class="footer__grid-item--link__image">
               <img :src="link.title" :alt="item.title" />
@@ -37,38 +29,20 @@ import liIcon from '~/assets/images/icons/li-icon.svg'
 const footerLinks = ref([
   {
     name: 'Resources',
-    items: [
-      { title: 'Documentation' },
-      { title: 'Terms & Conditions' },
-      { title: 'Privacy Policy' },
-      { title: 'FAQ' },
-    ],
+    items: [{ title: 'Documentation' }, { title: 'Terms & Conditions' }, { title: 'Privacy Policy' }, { title: 'FAQ' }],
   },
   {
     name: 'Pricing',
-    items: [
-      { title: 'Free trial' },
-      { title: 'Pricing' },
-      { title: 'Premium Plan' },
-    ],
+    items: [{ title: 'Free trial' }, { title: 'Pricing' }, { title: 'Premium Plan' }],
   },
   {
     name: 'Company',
-    items: [
-      { title: 'About Us' },
-      { title: 'Careers' },
-      { title: 'Contact Us' },
-    ],
+    items: [{ title: 'About Us' }, { title: 'Careers' }, { title: 'Contact Us' }],
   },
   {
     name: 'Social',
     type: 'icon',
-    items: [
-      { title: fbIcon },
-      { title: instaIcon },
-      { title: twitterIcon },
-      { title: liIcon },
-    ],
+    items: [{ title: fbIcon }, { title: instaIcon }, { title: twitterIcon }, { title: liIcon }],
   },
 ])
 </script>
@@ -117,8 +91,7 @@ const footerLinks = ref([
       &__image {
         cursor: pointer;
         & img:hover {
-          filter: invert(48%) sepia(9%) saturate(333%) hue-rotate(157deg)
-            brightness(95%) contrast(88%);
+          filter: invert(48%) sepia(9%) saturate(333%) hue-rotate(157deg) brightness(95%) contrast(88%);
         }
       }
     }

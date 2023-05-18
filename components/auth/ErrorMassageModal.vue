@@ -11,11 +11,7 @@
       <span :class="textColor" v-html="errorText"></span>
     </div>
     <template #footer>
-      <img
-        class="close_btn"
-        src="@/assets/images/icons/modal-close-icon.svg"
-        @click="closeModal"
-      />
+      <img class="close_btn" src="@/assets/images/icons/modal-close-icon.svg" @click="closeModal" />
     </template>
   </el-dialog>
 </template>

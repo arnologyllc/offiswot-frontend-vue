@@ -1,29 +1,16 @@
 <template>
   <div class="main-dash">
-    <div
-      class="main-dash__header"
-      :class="{ 'edit-mode': !dragOptions.disabled }"
-    >
+    <div class="main-dash__header" :class="{ 'edit-mode': !dragOptions.disabled }">
       <div class="main-dash__header--left">
         <el-button-group class="main-dash__header--button-group">
-          <el-button
-            round
-            :class="{ active: currentComponent === 'desk' }"
-            @click="setCurrentComponent('desk')"
+          <el-button round :class="{ active: currentComponent === 'desk' }" @click="setCurrentComponent('desk')"
             >Desk</el-button
           >
-          <el-button
-            round
-            :class="{ active: currentComponent === 'list' }"
-            @click="setCurrentComponent('list')"
+          <el-button round :class="{ active: currentComponent === 'list' }" @click="setCurrentComponent('list')"
             >List</el-button
           >
         </el-button-group>
-        <el-button
-          class="main-dash__header--edit-button"
-          circle
-          @click="dragOptions.disabled = false"
-        >
+        <el-button class="main-dash__header--edit-button" circle @click="dragOptions.disabled = false">
           <img src="@/assets/images/icons/edit-icon.svg" alt="/" />
         </el-button>
       </div>
@@ -31,15 +18,11 @@
         <el-button class="main-dash__header--meetings" round>
           <div class="main-dash__header--meetings__left">
             <img src="@/assets/images/icons/clock-icon.svg" alt="(-)" />
-            <div class="main-dash__header--meetings__left--title">
-              Meeting in 30 minutes
-            </div>
+            <div class="main-dash__header--meetings__left--title">Meeting in 30 minutes</div>
           </div>
           <div class="main-dash__header--meetings__right">+ 2 more</div>
         </el-button>
-        <el-button class="main-dash__header--create-meeting"
-          >+ Create meeting</el-button
-        >
+        <el-button class="main-dash__header--create-meeting">+ Create meeting</el-button>
       </div>
     </div>
     <div class="main-dash__content">
@@ -120,11 +103,7 @@ const setCurrentComponent = (name) => {
         align-items: center;
         justify-content: center;
         &.active {
-          background: linear-gradient(
-            246.28deg,
-            #4156f6 -13.83%,
-            #0cb1b9 107.63%
-          );
+          background: linear-gradient(246.28deg, #4156f6 -13.83%, #0cb1b9 107.63%);
           color: white;
         }
       }

@@ -1,15 +1,8 @@
 <template>
   <div class="desk">
-    <div
-      class="desk__main"
-      :class="{ 'edit-mode': !props.dragOptions.disabled }"
-    >
+    <div class="desk__main" :class="{ 'edit-mode': !props.dragOptions.disabled }">
       <div>
-        <div
-          v-for="(item, i) in tablesList"
-          :key="`row_${i}`"
-          class="desk__row"
-        >
+        <div v-for="(item, i) in tablesList" :key="`row_${i}`" class="desk__row">
           <div v-for="(col, idx) in item" :key="`col_${idx}`">
             <draggable
               class="desk__row--col"
@@ -33,9 +26,7 @@
                       class="left-box"
                       :class="{ top: index === 0 || index === 3 }"
                       :style="{
-                        border: `3px solid ${
-                          currentProfession(element.professionId).color
-                        }`,
+                        border: `3px solid ${currentProfession(element.professionId).color}`,
                       }"
                     >
                       <div class="left-box__left">
@@ -55,23 +46,14 @@
                         </div>
                       </div>
                       <div class="left-box__right">
-                        <div
-                          v-if="!dragOptions.disabled"
-                          class="close"
-                          @click="handleDeleteUser(i, idx, index)"
-                        >
-                          <img
-                            src="@/assets/images/icons/close-circle-icon.svg"
-                            alt="(x)"
-                          />
+                        <div v-if="!dragOptions.disabled" class="close" @click="handleDeleteUser(i, idx, index)">
+                          <img src="@/assets/images/icons/close-circle-icon.svg" alt="(x)" />
                         </div>
                         <el-badge v-if="element.online" is-dot class="badge">
                           <img
                             :src="element.user.avatar"
                             :style="{
-                              border: `1px solid ${
-                                currentProfession(element.professionId).color
-                              }`,
+                              border: `1px solid ${currentProfession(element.professionId).color}`,
                             }"
                             alt=""
                           />
@@ -80,9 +62,7 @@
                           v-else
                           :src="element.user.avatar"
                           :style="{
-                            border: `1px solid ${
-                              currentProfession(element.professionId).color
-                            }`,
+                            border: `1px solid ${currentProfession(element.professionId).color}`,
                           }"
                           alt=""
                         />
@@ -90,9 +70,7 @@
                       <div
                         class="left-box__triangle"
                         :style="{
-                          'border-top': `15px solid ${
-                            currentProfession(element.professionId).color
-                          }`,
+                          'border-top': `15px solid ${currentProfession(element.professionId).color}`,
                         }"
                       >
                         <div class="left-box__triangle--inner"></div>
@@ -103,9 +81,7 @@
                       class="right-box"
                       :class="{ top: index === 1 || index === 2 }"
                       :style="{
-                        border: `3px solid ${
-                          currentProfession(element.professionId).color
-                        }`,
+                        border: `3px solid ${currentProfession(element.professionId).color}`,
                       }"
                     >
                       <div class="right-box__left">
@@ -125,23 +101,14 @@
                         </div>
                       </div>
                       <div class="right-box__right">
-                        <div
-                          v-if="!dragOptions.disabled"
-                          class="close"
-                          @click="handleDeleteUser(i, idx, index)"
-                        >
-                          <img
-                            src="@/assets/images/icons/close-circle-icon.svg"
-                            alt="(x)"
-                          />
+                        <div v-if="!dragOptions.disabled" class="close" @click="handleDeleteUser(i, idx, index)">
+                          <img src="@/assets/images/icons/close-circle-icon.svg" alt="(x)" />
                         </div>
                         <el-badge v-if="element.online" is-dot class="badge">
                           <img
                             :src="element.user.avatar"
                             :style="{
-                              border: `1px solid ${
-                                currentProfession(element.professionId).color
-                              }`,
+                              border: `1px solid ${currentProfession(element.professionId).color}`,
                             }"
                             alt=""
                           />
@@ -150,9 +117,7 @@
                           v-else
                           :src="element.user.avatar"
                           :style="{
-                            border: `1px solid ${
-                              currentProfession(element.professionId).color
-                            }`,
+                            border: `1px solid ${currentProfession(element.professionId).color}`,
                           }"
                           alt=""
                         />
@@ -160,61 +125,33 @@
                       <div
                         class="right-box__triangle"
                         :style="{
-                          'border-top': `15px solid ${
-                            currentProfession(element.professionId).color
-                          }`,
+                          'border-top': `15px solid ${currentProfession(element.professionId).color}`,
                         }"
                       >
                         <div class="right-box__triangle--inner"></div>
                       </div>
                     </div>
                   </div>
-                  <img
-                    :src="tableIcons[index].src"
-                    :class="{ 'edit-mode': !dragOptions.disabled }"
-                    alt="t"
-                  />
+                  <img :src="tableIcons[index].src" :class="{ 'edit-mode': !dragOptions.disabled }" alt="t" />
                 </div>
               </template>
             </draggable>
           </div>
-          <el-button
-            v-if="!dragOptions.disabled && i === 0"
-            class="desk__main--add-col horizontal"
-            @click="onAddCol"
-          >
+          <el-button v-if="!dragOptions.disabled && i === 0" class="desk__main--add-col horizontal" @click="onAddCol">
             + More Seats
           </el-button>
         </div>
       </div>
-      <el-button
-        v-if="!dragOptions.disabled"
-        class="desk__main--add-col"
-        @click="onAddRow"
-      >
-        + More Seats
-      </el-button>
+      <el-button v-if="!dragOptions.disabled" class="desk__main--add-col" @click="onAddRow"> + More Seats </el-button>
     </div>
     <div v-if="dragOptions.disabled" class="desk__hint">
-      <div
-        v-for="(item, index) in hints"
-        :key="`hint_${index}`"
-        class="desk__hint--item"
-      >
-        <div
-          class="desk__hint--circle"
-          :style="{ background: item.color }"
-        ></div>
+      <div v-for="(item, index) in hints" :key="`hint_${index}`" class="desk__hint--item">
+        <div class="desk__hint--circle" :style="{ background: item.color }"></div>
         <span>{{ item.name }}</span>
       </div>
     </div>
     <div v-else class="desk__edit-footer">
-      <el-button
-        class="desk__edit-footer--invite"
-        @click="isOpenInviteModal = true"
-      >
-        Invite Member
-      </el-button>
+      <el-button class="desk__edit-footer--invite" @click="isOpenInviteModal = true"> Invite Member </el-button>
       <draggable
         v-if="availableMembers.length"
         :list="availableMembers"
@@ -246,31 +183,13 @@
         </template>
       </draggable>
       <div v-else class="desk__edit-footer--members__outer"></div>
-      <el-button class="desk__edit-footer--save" @click="$emit('save')">
-        Save
-      </el-button>
+      <el-button class="desk__edit-footer--save" @click="$emit('save')"> Save </el-button>
     </div>
     <div v-if="!dragOptions.disabled" class="tutorial-box">
-      <img
-        src="@/assets/images/drag-tutorial/tutorial-cursor.svg"
-        alt="^"
-        class="tutorial-box__cursor"
-      />
-      <img
-        src="@/assets/images/drag-tutorial/tutorial-top-arrow.svg"
-        alt="|"
-        class="tutorial-box__top-line"
-      />
-      <img
-        src="@/assets/images/drag-tutorial/tutorial-user.svg"
-        alt="User"
-        class="tutorial-box__user"
-      />
-      <img
-        src="@/assets/images/drag-tutorial/tutorial-bottom-line.svg"
-        alt="|"
-        class="tutorial-box__bottom-line"
-      />
+      <img src="@/assets/images/drag-tutorial/tutorial-cursor.svg" alt="^" class="tutorial-box__cursor" />
+      <img src="@/assets/images/drag-tutorial/tutorial-top-arrow.svg" alt="|" class="tutorial-box__top-line" />
+      <img src="@/assets/images/drag-tutorial/tutorial-user.svg" alt="User" class="tutorial-box__user" />
+      <img src="@/assets/images/drag-tutorial/tutorial-bottom-line.svg" alt="|" class="tutorial-box__bottom-line" />
     </div>
 
     <OvInviteMemberModal
@@ -361,9 +280,7 @@ const setAvailableMembers = () => {
       })
     })
   })
-  availableMembers.value = usersList.value.filter(
-    (el) => !arr.find((elem) => elem.user.user_id === el.user.user_id)
-  )
+  availableMembers.value = usersList.value.filter((el) => !arr.find((elem) => elem.user.user_id === el.user.user_id))
 }
 
 const handleDeleteUser = (index, subIndex, deleteIndex) => {
@@ -400,7 +317,6 @@ const onAddRow = () => {
   setLastTableId()
 }
 const onAddCol = () => {
-  console.log(tablesList.value)
   tablesList.value.forEach((row, index) => {
     lastTableId.value += index + 2
     row.push([
@@ -431,19 +347,12 @@ const handleDragEnd = (index, subIndex) => {
   const _items = Object.assign([], tablesList.value)
   _items.forEach((el) => {
     el.forEach((col) => {
-      if (
-        col[col.indexOf(futureItem.value)] &&
-        movingItem.value.id !== futureItem.value.id
-      ) {
+      if (col[col.indexOf(futureItem.value)] && movingItem.value.id !== futureItem.value.id) {
         col.splice(col.indexOf(futureItem.value), 1, movingItem.value)
       }
     })
   })
-  tablesList.value[index][subIndex].splice(
-    movingIndex.value,
-    1,
-    futureItem.value
-  )
+  tablesList.value[index][subIndex].splice(movingIndex.value, 1, futureItem.value)
   tablesList.value = _items
 
   setTimeout(() => {
@@ -488,11 +397,7 @@ const handleFooterDragEnd = () => {
     availableMembers.value = _items
   } else {
     if (footerFutureItem.value.user) {
-      availableMembers.value.splice(
-        footerMovingIndex.value,
-        1,
-        footerFutureItem.value
-      )
+      availableMembers.value.splice(footerMovingIndex.value, 1, footerFutureItem.value)
     } else {
       availableMembers.value.splice(footerMovingIndex.value, 1)
     }
@@ -575,7 +480,9 @@ const handleFooterDragEnd = () => {
           height: 65px;
           -o-object-fit: cover;
           object-fit: none;
-
+          &:hover {
+            opacity: 1;
+          }
           &.edit-mode {
             opacity: 0.5;
             &:hover {
@@ -738,6 +645,7 @@ const handleFooterDragEnd = () => {
       display: flex;
       align-items: center;
       gap: 0 20px;
+      cursor: pointer;
       &__outer {
         width: calc(100% - 397px);
         display: flex;

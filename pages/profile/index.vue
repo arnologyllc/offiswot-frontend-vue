@@ -295,11 +295,6 @@ const handleResize = () => {
 
 watch(editProfileData, (v) => {
   setProfileData(v)
-  if (v.user.avatar) {
-    avatarUrl.value = `${v.avatarPath}/${v.user.avatar}`
-  } else {
-    avatarUrl.value = defaultAvatar
-  }
 })
 
 watch(profileFailureData, (v) => {})
@@ -335,7 +330,7 @@ const onSubmit = () => {
 
 <style scoped lang="scss">
 .main {
-  min-height: calc(100vh - 286px);
+  min-height: calc(100vh - 170px);
   padding: 0;
   background-color: #f5f7fb !important;
   padding-top: 50px;
@@ -362,7 +357,7 @@ const onSubmit = () => {
     }
   }
   &__form {
-    min-height: calc(100vh - 286px);
+    min-height: calc(100vh - 170px);
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -393,6 +388,7 @@ const onSubmit = () => {
         height: 119px;
         border-radius: 20px;
         object-fit: cover;
+        background-color: #999;
       }
     }
     &--info {

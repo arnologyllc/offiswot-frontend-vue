@@ -18,5 +18,6 @@ module.exports = {
     'vue/no-mutating-props': 'off',
     'vue/valid-attribute-name': 'off',
     'no-unused-vars': 'off',
+    'vue/require-explicit-emits': 'off',
   },
 }

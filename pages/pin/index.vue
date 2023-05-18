@@ -2,9 +2,7 @@
   <div class="main">
     <div class="main__form">
       <div class="main__form--title">Set PIN</div>
-      <div class="main__form--subtitle">
-        Fill in the fields to set your PIN.
-      </div>
+      <div class="main__form--subtitle">Fill in the fields to set your PIN.</div>
       <el-form
         ref="pinForm"
         class="main__form--box"
@@ -13,9 +11,11 @@
         :rules="rules"
         @submit.prevent="onSubmit"
       >
-        <div v-if="errors.global.value" class="el-form-item__global-error">
-          <img src="@/assets/images/icons/error.svg" alt="" />
-          <span>{{ errors.global.value }}</span>
+        <div v-if="errors.global.value" class="el-form-item__global-error-container">
+          <div class="el-form-item__global-error">
+            <img src="@/assets/images/icons/error.svg" alt="" />
+            <span>{{ errors.global.value }}</span>
+          </div>
         </div>
         <el-form-item prop="pin" class="password-form-item">
           <el-input
@@ -28,11 +28,7 @@
             @blur="validateField('pin')"
           >
             <template #suffix>
-              <div
-                v-if="payload.pin"
-                style="position: relative"
-                @click="focusElement('pin')"
-              >
+              <div v-if="payload.pin" style="position: relative" @click="focusElement('pin')">
                 <span for="pin" class="custom_placeholder"> PIN </span>
               </div>
               <img
@@ -54,10 +50,7 @@
           </el-input>
 
           <template #error>
-            <div
-              v-if="errors.pin.isShow && isWeb()"
-              class="el-form-item__error"
-            >
+            <div v-if="errors.pin.isShow && isWeb()" class="el-form-item__error">
               <span v-html="errors.pin.value"></span>
             </div>
             <div></div>
@@ -74,14 +67,8 @@
             @blur="validateField('pin_confirmation')"
           >
             <template #suffix>
-              <div
-                v-if="payload.pin_confirmation"
-                style="position: relative"
-                @click="focusElement('pin_confirmation')"
-              >
-                <span for="password" class="custom_placeholder">
-                  PIN Confirmation
-                </span>
+              <div v-if="payload.pin_confirmation" style="position: relative" @click="focusElement('pin_confirmation')">
+                <span for="password" class="custom_placeholder"> PIN Confirmation </span>
               </div>
               <img
                 :class="errors.pin_confirmation.value ? 'eye_icon' : ''"
@@ -102,20 +89,13 @@
           </el-input>
 
           <template #error>
-            <div
-              v-if="errors.pin_confirmation.isShow && isWeb()"
-              class="el-form-item__error"
-            >
+            <div v-if="errors.pin_confirmation.isShow && isWeb()" class="el-form-item__error">
               <span v-html="errors.pin_confirmation.value"></span>
             </div>
             <div></div>
           </template>
         </el-form-item>
-        <el-button
-          class="submit-button"
-          native-type="submit"
-          :loading="isLoadingSubmit"
-        >
+        <el-button class="submit-button" native-type="submit" :loading="isLoadingSubmit">
           <span class="submit-button__text">Save</span>
         </el-button>
 
@@ -148,6 +128,7 @@ import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
 import auth from '~/middleware/auth'
 definePageMeta({ layout: 'default' })
+const accounts = ref(false)
 
 const pinStore = usePINStore()
 const profileStore = useProfileStore()
@@ -235,17 +216,34 @@ watch(setPinFailureData, (v) => {
       errors.value.global.value = v[i]
     }
   }
+  if (errors.value.global.value === 'You have already created a pin.') {
+    setTimeout(() => {
+      if (process.client) {
+        accounts.value[0].first_login = false
+        localStorage.setItem('accounts', JSON.stringify(accounts.value))
+      }
+      $cookies.remove('first_login')
+      navigateTo('/')
+    }, 2000)
+  }
 })
 
 watch(setPinData, (v) => {
+  if (process.client) {
+    accounts.value[0].first_login = null
+    localStorage.setItem('accounts', JSON.stringify(accounts.value))
+  }
   $cookies.remove('first_login')
   navigateTo('/')
 })
 
 onMounted(() => {
   auth()
-  if (profileStore.profileSuccessData.value?.user.email) {
-    payload.value.email = profileSuccessData.value?.user.email
+  if (process.client) {
+    accounts.value = JSON.parse(localStorage.getItem('accounts'))
+  }
+  if (profileStore.profileSuccessData?.value?.user.email) {
+    payload.value.email = profileSuccessData?.value?.user.email
   }
   window.addEventListener('resize', handleResize)
 })

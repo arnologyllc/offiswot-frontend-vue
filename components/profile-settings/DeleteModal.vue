@@ -18,38 +18,21 @@
             <div>your account?</div>
           </div>
           <div class="content__body">
-            <div class="content__body-title">
-              This can not be undone. By deleting this account you agree that:
+            <div class="content__body-title">This can not be undone. By deleting this account you agree that:</div>
+            <div class="content__body-subtitle">
+              <img src="@/assets/images/icons/active.svg" alt="active" />
+              <p>No one will be able to use this username ever, including yourself.</p>
             </div>
             <div class="content__body-subtitle">
               <img src="@/assets/images/icons/active.svg" alt="active" />
-              <p>
-                No one will be able to use this username ever, including
-                yourself.
-              </p>
+              <p>All of your workspaces will be permanently deleted, including chats, files and other data.</p>
             </div>
             <div class="content__body-subtitle">
               <img src="@/assets/images/icons/active.svg" alt="active" />
-              <p>
-                All of your workspaces will be permanently deleted, including
-                chats, files and other data.
-              </p>
-            </div>
-            <div class="content__body-subtitle">
-              <img src="@/assets/images/icons/active.svg" alt="active" />
-              <p>
-                You will be removed from the workspaces that you have been
-                member of. It will be unrecoverable.
-              </p>
+              <p>You will be removed from the workspaces that you have been member of. It will be unrecoverable.</p>
             </div>
           </div>
-          <el-button
-            type="danger"
-            class="btn content__button"
-            plain
-            @click="agreeModal"
-            >I AGREE</el-button
-          >
+          <el-button type="danger" class="btn content__button" plain @click="agreeModal">I AGREE</el-button>
         </div>
       </span>
       <span v-if="modalStep === 1">
@@ -57,9 +40,7 @@
           <div class="content__icon">
             <img src="@/assets/images/icons/delete.svg" alt="delete-profile" />
           </div>
-          <div class="content__question question">
-            Please choose why you want to delete you
-          </div>
+          <div class="content__question question">Please choose why you want to delete you</div>
           <div class="content__body">
             <div class="content__body-checkboxes">
               <el-checkbox
@@ -74,25 +55,14 @@
               />
             </div>
           </div>
-          <el-button
-            type="danger"
-            class="btn content__button"
-            plain
-            @click="agreeModal"
-            >I AGREE</el-button
-          >
+          <el-button type="danger" class="btn content__button" plain @click="agreeModal">I AGREE</el-button>
         </div>
       </span>
       <span v-if="modalStep === 2" class="dialog__pin">
         <div class="dialog__pin-icon">
           <img src="@/assets/images/icons/delete.svg" alt="delete-profile" />
         </div>
-        <el-form
-          class="dialog__form"
-          :rules="rules"
-          :model="payload"
-          @submit.prevent="onSubmit"
-        >
+        <el-form class="dialog__form" :rules="rules" :model="payload" @submit.prevent="onSubmit">
           <h4>Please Enter your PIN.</h4>
           <el-form-item prop="pin">
             <el-input
@@ -112,30 +82,15 @@
             </el-input>
           </el-form-item>
           <h5>Press OKAY to delete your account.</h5>
-          <el-button
-            type="danger"
-            class="dialog__pin-button btn"
-            plain
-            native-type="submit"
-            >I AGREE</el-button
-          >
+          <el-button type="danger" class="dialog__pin-button btn" plain native-type="submit">I AGREE</el-button>
         </el-form>
       </span>
       <span v-if="modalStep === 3" class="dialog__success">
         <div class="modal__content">
-          <img
-            src="@/assets/images/icons/confirm-icon.svg"
-            alt="confirm-icon"
-          />
+          <img src="@/assets/images/icons/confirm-icon.svg" alt="confirm-icon" />
           <h5>All done!</h5>
         </div>
-        <el-button
-          type="danger"
-          class="modal__content-button"
-          plain
-          @click="closeModal"
-          >OKAY</el-button
-        >
+        <el-button type="danger" class="modal__content-button" plain @click="closeModal">OKAY</el-button>
       </span>
     </template>
   </el-dialog>

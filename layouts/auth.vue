@@ -1,18 +1,11 @@
 <template>
   <div class="main-layout-aut__outer">
     <Header />
-    <div
-      class="main-layout-auth"
-      :class="checkPage() === '/expired' ? '' : 'main-layout-auth__background'"
-    >
+    <div class="main-layout-auth" :class="checkPage() === '/expired' ? '' : 'main-layout-auth__background'">
       <slot />
       <div v-if="checkPage === '/expired'" class="go-back">
         <el-button @click="$router.go(-1)">
-          <img
-            src="@/assets/images/icons/chevron-dark-icon.svg"
-            class="go-back__icon"
-            alt=""
-          />
+          <img src="@/assets/images/icons/chevron-dark-icon.svg" class="go-back__icon" alt="" />
           <span class="go-back__text">Back</span>
         </el-button>
       </div>
@@ -41,7 +34,7 @@ const checkPage = () => {
   background-position: right;
   background-attachment: fixed;
   width: 100%;
-  min-height: calc(100vh - 286px);
+  min-height: calc(100vh - 170px);
   overflow-y: auto;
   position: relative;
   &__background {
@@ -145,7 +138,7 @@ const checkPage = () => {
     background: #f5f7fb;
     padding: 0;
     .main {
-      margin: 100px auto 0;
+      margin: 180px auto 0;
       width: max-content;
       .form-item__label {
         background: #f5f7fb;

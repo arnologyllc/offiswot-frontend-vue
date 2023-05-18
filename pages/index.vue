@@ -83,24 +83,29 @@
               v-for="(item, i) in responseWorkspaces?.myWorkspaces"
               :key="`workspace_${i}`"
               class="user-workspaces__container"
-              :class="{ small: isWithWorkspaces }"
+              @click="openWorkspace(item.id)"
             >
-              <div class="user-workspaces__workspace-name">
-                {{ item.name }}
+              <div class="user-workspaces__element">
+                <img class="user-workspaces__picture" :src="avatarUrl" alt="user_avatar" />
+                <div class="user-workspaces__element--title">
+                  <div class="user-workspaces__workspace-name">
+                    {{ item.name }}
+                  </div>
+                  <div class="user-workspaces__workspace-specific">
+                    {{ item.name }}
+                  </div>
+                </div>
               </div>
               <div class="user-workspaces__buttons">
-                <el-button class="user-workspaces__create-btn" @click="openWorkspace(item.id)">
+                <el-button class="user-workspaces__element-create-btn">
                   <span>Open</span>
-                </el-button>
-                <el-button class="user-workspaces__icon-btn">
-                  <img src="@/assets/images/icons/edit-icon.svg" alt="edit_icon" />
                 </el-button>
               </div>
             </div>
           </div>
-          <div v-else-if="!isWithWorkspaces" class="user-workspaces__container">
+          <div v-else-if="!isWithWorkspaces" class="user-workspaces__container--text">
             <el-button
-              class="user-workspaces__create-btn"
+              class="user-workspaces__text-create-btn"
               style="position: absolute"
               @click="navigateTo('/create-workspace')"
             >
@@ -247,7 +252,7 @@ const formattedTextFtn = () => {
 }
 .account {
   height: max-content;
-  min-height: calc(100vh - 326px);
+  min-height: calc(100vh - 170px);
   border-left: 1px solid #d0c9d6;
   &__search {
     height: 36px;
@@ -275,6 +280,7 @@ const formattedTextFtn = () => {
     width: 45px;
     height: 45px;
     border-radius: 12px;
+    object-fit: cover;
   }
   &__title {
     font-weight: 600;
@@ -337,7 +343,6 @@ const formattedTextFtn = () => {
 
 @media (max-width: 543px) {
   .account {
-    height: 790px;
     &__body {
       justify-content: center;
     }
@@ -357,25 +362,7 @@ const formattedTextFtn = () => {
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
-  &__header {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-  }
-  &__body {
-    width: 100%;
-  }
-  &__header-bottom {
-    margin-top: 40px;
-  }
-  &__title {
-    font-size: 14px;
-    color: $ov-text--subtitle;
-    font-weight: 600;
-    line-height: 17px;
-    text-transform: uppercase;
-  }
-  &__container {
+  &__container--text {
     width: 100%;
     font-size: 16px;
     margin-top: 11px;
@@ -390,11 +377,70 @@ const formattedTextFtn = () => {
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
     border-radius: 16px;
   }
+  &__picture {
+    width: 48px;
+    height: 48px;
+    border: 1px solid #ecebed;
+    border-radius: 16px;
+    object-fit: cover;
+  }
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+  &__body {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  &__header-bottom {
+    margin-top: 40px;
+  }
+  &__title {
+    display: flex;
+    font-size: 14px;
+    color: $ov-text--subtitle;
+    align-items: center;
+    font-weight: 600;
+    line-height: 17px;
+    text-transform: uppercase;
+  }
+  &__container {
+    max-width: 495px;
+    min-width: 220px;
+    width: 100%;
+    height: 64px;
+    flex-direction: row;
+    align-items: center;
+    font-size: 16px;
+    margin-top: 11px;
+    padding: 12px 12px 12px 8px;
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    background: #ffffff;
+    box-shadow: 0px 7px 64px rgba(0, 0, 0, 0.07);
+    border-radius: 8px;
+  }
+  &__element {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
   &__workspace-name {
-    font-size: 18px;
-    color: #fff;
-    font-weight: 700;
-    line-height: 22px;
+    font-size: 14px;
+    line-height: 17px;
+    font-weight: 600;
+    color: #0d1c2e;
+  }
+  &__workspace-specific {
+    font-weight: 400;
+    font-size: 11px;
+    line-height: 13px;
+    letter-spacing: 0.07px;
+    color: #d0c9d6;
   }
   &__container-text {
     width: 100%;
@@ -406,21 +452,36 @@ const formattedTextFtn = () => {
   }
   &__buttons {
     display: flex;
-    align-items: center;
+    justify-content: flex-end;
     width: 100%;
     max-width: 200px;
   }
-  &__create-btn {
-    top: 82px;
-    right: 103px;
+  &__text-create-btn {
+    top: 75px;
+    right: 20px;
     width: 100%;
-    max-width: 200px;
+    max-width: 137px;
     height: 40px;
     border-radius: 6px;
     color: $ov-primary;
     font-size: 16px;
     font-weight: 600;
     background-color: #fff;
+  }
+  &__element-create-btn {
+    width: 100%;
+    max-width: 100px;
+    height: 40px;
+    background: $ov-primary;
+    border-radius: 6px;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 22px;
+    text-align: center;
+    text-transform: uppercase;
+
+    color: #ffffff;
   }
   &__icon-btn {
     width: 48px;
@@ -439,27 +500,21 @@ const formattedTextFtn = () => {
     background-color: inherit;
   }
 }
-.small {
-  min-height: 88px;
-  background: linear-gradient(90.09deg, #bd7ae3 2.21%, $ov-primary 98.06%);
-  flex-direction: row;
-  align-items: center;
-}
+
 @media (max-width: 475px) {
   .user-workspaces {
     padding: 18px 32px 0 32px;
-    &__create-btn {
+    &__text-create-btn {
       min-width: 110px;
       height: 37px;
       float: right;
       margin-bottom: 20px;
       margin-left: 8px;
       top: 65px;
-      right: 50px;
+      right: 10px;
     }
   }
 }
-
 @media (max-width: 1000px) {
   .account__subtitle,
   .account__body--block-subtitle {
@@ -486,8 +541,8 @@ const formattedTextFtn = () => {
 
 @media (max-width: 730px) {
   .user-workspaces {
-    &__create-btn {
-      right: 92px;
+    &__text-create-btn {
+      right: 10px;
       max-width: 130px;
     }
   }
@@ -518,33 +573,39 @@ const formattedTextFtn = () => {
     width: 25px;
     height: 25px;
   }
-}
-
-@media (max-width: 535px) {
   .user-workspaces {
-    &__container {
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-    &__buttons {
-      justify-content: center;
-      align-items: center;
-    }
-    &__create-btn {
-      margin: 0;
-      top: 65px;
-      right: 85px;
+    &__element--title {
+      display: none;
     }
   }
 }
 
-@media (max-width: 475px) {
+@media (max-width: 535px) {
   .user-workspaces {
-    &__create-btn {
-      top: 55px;
-      right: 40px;
-      max-width: 70px;
+    &__text-container {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    &__text-create-btn {
+      margin: 0;
+    }
+  }
+}
+@media (max-width: 510px) {
+  .user-workspaces {
+    &__text-create-btn {
+      right: calc(100% - 50%);
+    }
+    &__container--text {
+      flex-direction: column;
+      align-items: center;
+    }
+    &__container-text {
+      text-align: center;
+    }
+    &__text-create-btn {
+      position: static !important;
     }
   }
   .account__body--element {

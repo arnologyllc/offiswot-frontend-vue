@@ -19,9 +19,7 @@
     <div class="title__image">
       <img src="@/assets/images/icons/access-check.svg" alt="" />
     </div>
-    <span class="title__text">
-      Please enter your PIN in order to access account management section.
-    </span>
+    <span class="title__text"> Please enter your PIN in order to access account management section. </span>
     <el-form
       ref="pinForm"
       class="main__form--box"
@@ -31,10 +29,7 @@
       :rules="rules"
       @submit.prevent="onSubmit"
     >
-      <div
-        v-if="errors.global.value"
-        class="el-form-item__global-error-container"
-      >
+      <div v-if="errors.global.value" class="el-form-item__global-error-container">
         <div class="el-form-item__global-error">
           <img src="@/assets/images/icons/error.svg" alt="" />
           <span>{{ errors.global.value }}</span>
@@ -52,34 +47,18 @@
           @blur="validateField('pin')"
         >
           <template #suffix>
-            <div
-              v-if="payload.pin"
-              style="position: relative"
-              @click="focusElement('pin')"
-            >
+            <div v-if="payload.pin" style="position: relative" @click="focusElement('pin')">
               <span for="pin" class="custom_placeholder"> Enter PIN </span>
             </div>
-            <img
-              :src="showPIN ? hideEyeIcon : showEyeIcon"
-              alt="eye_icon"
-              @click="showPIN = !showPIN"
-            />
+            <img :src="showPIN ? hideEyeIcon : showEyeIcon" alt="eye_icon" @click="showPIN = !showPIN" />
           </template>
         </el-input>
       </el-form-item>
       <div class="forgot-password">
-        <el-button style="font-size: 14px; font-weight: 400" @click="onForgot"
-          >Forgot PIN?</el-button
-        >
+        <el-button style="font-size: 14px; font-weight: 400" @click="onForgot">Forgot PIN?</el-button>
       </div>
-      <el-button
-        class="submit-button"
-        native-type="submit"
-        :loading="isLoadingSubmit"
-      >
-        <span class="submit-button__text">{{
-          isLoadingSubmit ? '' : 'NEXT'
-        }}</span>
+      <el-button class="submit-button" native-type="submit" :loading="isLoadingSubmit">
+        <span class="submit-button__text">{{ isLoadingSubmit ? '' : 'NEXT' }}</span>
       </el-button>
     </el-form>
 
@@ -111,13 +90,8 @@ const instance = getCurrentInstance()
 const $route = useRoute()
 const $router = useRouter()
 const pinStore = usePinStore()
-const {
-  checkPinData,
-  checkPinFailureData,
-  forgotPinData,
-  forgotPinFailureData,
-  isLoadingSubmit,
-} = storeToRefs(pinStore)
+const { checkPinData, checkPinFailureData, forgotPinData, forgotPinFailureData, isLoadingSubmit } =
+  storeToRefs(pinStore)
 
 const { profileSuccessData } = storeToRefs(profileStore)
 const props = defineProps({
@@ -162,10 +136,7 @@ watch(checkPinData, ({ data: v }) => {
   const userID = $cookies.get('currentAccountID')
   if (process.client) {
     const initAccountValue = JSON.parse(localStorage.getItem('accounts'))
-    if (
-      !$cookies.get('login_pin_token') &&
-      $cookies.get('login_pin_token') !== v.login_pin_token
-    ) {
+    if (!$cookies.get('login_pin_token') && $cookies.get('login_pin_token') !== v.login_pin_token) {
       const loginPinTokenExpires = new Date()
       loginPinTokenExpires.setDate(loginPinTokenExpires.getDate() + 30)
       $cookies.set('login_pin_token', v.login_pin_token, {
@@ -253,7 +224,6 @@ const focusElement = (elem) => {
 }
 
 const onForgot = () => {
-  isOpenEmailDialog.value = true
   pinStore.forgotPin()
 }
 

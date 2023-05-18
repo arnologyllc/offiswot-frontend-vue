@@ -1,11 +1,12 @@
 <template>
   <div class="default-layout">
     <Sidebar />
-    <Header />
-    <div class="default-layout__pages">
-      <slot />
+    <div class="default-body">
+      <Header />
+      <div class="default-layout__pages">
+        <slot />
+      </div>
     </div>
-    <Footer v-if="!$route.path.includes('/workspace')" />
   </div>
 </template>
 
@@ -28,16 +29,15 @@ firstLogin()
   height: 100vh;
   overflow-y: auto;
   background-color: $ov-gray-bg;
-  padding-left: 68px;
+  display: flex;
+
   &__pages {
     padding-top: 8px;
-    padding-bottom: 8px !important;
     object-fit: cover;
   }
   .main {
     display: flex;
     position: relative;
-    border-radius: 20px 0 0 20px;
 
     &__form {
       &--title {
@@ -114,5 +114,8 @@ firstLogin()
       width: 9.5px;
     }
   }
+}
+.default-body {
+  width: 100%;
 }
 </style>

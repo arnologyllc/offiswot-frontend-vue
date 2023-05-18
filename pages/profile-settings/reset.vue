@@ -2,16 +2,10 @@
   <div class="main">
     <div class="main__form">
       <div class="main__form--title">
-        <img
-          src="@/assets/images/icons/chevron-left.svg"
-          alt="chevron-left"
-          @click="$router.go(-1)"
-        />
+        <img src="@/assets/images/icons/chevron-left.svg" alt="chevron-left" @click="$router.go(-1)" />
         <span>Reset password</span>
       </div>
-      <div class="main__form--subtitle">
-        Fill in the fields to change your password.
-      </div>
+      <div class="main__form--subtitle">Fill in the fields to change your password.</div>
 
       <el-form
         ref="passwordForm"
@@ -21,10 +15,7 @@
         :rules="rules"
         @submit.prevent="onSubmit"
       >
-        <div
-          v-if="errors.global.value"
-          class="el-form-item__global-error-container"
-        >
+        <div v-if="errors.global.value" class="el-form-item__global-error-container">
           <div class="el-form-item__global-error">
             <img src="@/assets/images/icons/error.svg" alt="" />
             <span>{{ errors.global.value }}</span>
@@ -42,14 +33,8 @@
             @blur="validateField('old_password')"
           >
             <template #suffix>
-              <div
-                v-if="payload.old_password"
-                style="position: relative"
-                @click="focusElement('old_password')"
-              >
-                <span for="old_password" class="custom_placeholder">
-                  Old Password
-                </span>
+              <div v-if="payload.old_password" style="position: relative" @click="focusElement('old_password')">
+                <span for="old_password" class="custom_placeholder"> Old Password </span>
               </div>
               <img
                 :class="errors.old_password.value ? 'eye_icon' : ''"
@@ -70,10 +55,7 @@
           </el-input>
 
           <template #error>
-            <div
-              v-if="errors.old_password.isShow && isWeb()"
-              class="el-form-item__error"
-            >
+            <div v-if="errors.old_password.isShow && isWeb()" class="el-form-item__error">
               <span v-html="errors.old_password.value"></span>
             </div>
             <div></div>
@@ -90,14 +72,8 @@
             @blur="validateField('password')"
           >
             <template #suffix>
-              <div
-                v-if="payload.password"
-                style="position: relative"
-                @click="focusElement('password')"
-              >
-                <span for="password" class="custom_placeholder">
-                  New password
-                </span>
+              <div v-if="payload.password" style="position: relative" @click="focusElement('password')">
+                <span for="password" class="custom_placeholder"> New password </span>
               </div>
               <img
                 :class="errors.password.value ? 'eye_icon' : ''"
@@ -118,9 +94,7 @@
                   alt=""
                 />
                 <img
-                  v-else-if="
-                    errors.password.status === 'Strong' && payload.password
-                  "
+                  v-else-if="errors.password.status === 'Strong' && payload.password"
                   src="@/assets/images/icons/good.svg"
                   alt=""
                 />
@@ -136,10 +110,7 @@
             </template>
           </el-input>
           <template #error>
-            <div
-              v-if="!payload.password && errors.password.isShow && isWeb()"
-              class="el-form-item__error"
-            >
+            <div v-if="!payload.password && errors.password.isShow && isWeb()" class="el-form-item__error">
               <span v-html="errors.password.value"></span>
             </div>
             <div></div>
@@ -161,9 +132,7 @@
                 style="position: relative"
                 @click="focusElement('password_confirmation')"
               >
-                <span for="password" class="custom_placeholder">
-                  Repeat Password
-                </span>
+                <span for="password" class="custom_placeholder"> Repeat Password </span>
               </div>
               <img
                 :class="errors.password_confirmation.value ? 'eye_icon' : ''"
@@ -184,28 +153,17 @@
           </el-input>
 
           <template #error>
-            <div
-              v-if="errors.password_confirmation.isShow && isWeb()"
-              class="el-form-item__error"
-            >
+            <div v-if="errors.password_confirmation.isShow && isWeb()" class="el-form-item__error">
               <span v-html="errors.password_confirmation.value"></span>
             </div>
             <div></div>
           </template>
         </el-form-item>
         <div class="forgot-password">
-          <el-button style="font-size: 14px; font-weight: 400" @click="onForgot"
-            >Forgot Password?</el-button
-          >
+          <el-button style="font-size: 14px; font-weight: 400" @click="onForgot">Forgot Password?</el-button>
         </div>
-        <el-button
-          class="submit-button"
-          native-type="submit"
-          :loading="resetLoading"
-        >
-          <span class="submit-button__text">{{
-            resetLoading ? '' : 'Save'
-          }}</span>
+        <el-button class="submit-button" native-type="submit" :loading="resetLoading">
+          <span class="submit-button__text">{{ resetLoading ? '' : 'Save' }}</span>
         </el-button>
 
         <error-massage
@@ -269,13 +227,7 @@ import auth from '~/middleware/auth'
 definePageMeta({ layout: 'default' })
 
 const authStore = useAuthStore()
-const {
-  resetSuccessData,
-  resetErrorData,
-  resetLoading,
-  forgotSuccessData,
-  forgotErrorData,
-} = storeToRefs(authStore)
+const { resetSuccessData, resetErrorData, resetLoading, forgotSuccessData, forgotErrorData } = storeToRefs(authStore)
 
 const profileStore = useProfileStore()
 const { profileSuccessData } = storeToRefs(profileStore)
@@ -417,16 +369,13 @@ const focusElement = (elem) => {
 }
 
 const validateField = (fieldName) => {
-  instance.refs.passwordForm.validateField(
-    fieldName,
-    (isValid, catchedError) => {
-      if (!isValid) {
-        errors.value[fieldName].value = catchedError[fieldName][0].message
-      } else if (fieldName !== 'password') {
-        errors.value[fieldName].value = ''
-      }
+  instance.refs.passwordForm.validateField(fieldName, (isValid, catchedError) => {
+    if (!isValid) {
+      errors.value[fieldName].value = catchedError[fieldName][0].message
+    } else if (fieldName !== 'password') {
+      errors.value[fieldName].value = ''
     }
-  )
+  })
 }
 
 const showErrorClick = (fieldName) => {
@@ -467,13 +416,11 @@ const updatePasswordStrength = (password) => {
 
   if (
     identicalRegex.test(password) &&
-    (password?.length > 15 ||
-      !words.some((elem) => password?.toLowerCase().includes(elem)))
+    (password?.length > 15 || !words.some((elem) => password?.toLowerCase().includes(elem)))
   ) {
     if (
       strongRegex.test(password) &&
-      (password?.length > 25 ||
-        !words.some((elem) => password?.toLowerCase().includes(elem)))
+      (password?.length > 25 || !words.some((elem) => password?.toLowerCase().includes(elem)))
     ) {
       return 'Strong'
     } else if (mediumRegex.test(password)) {
@@ -484,11 +431,7 @@ const updatePasswordStrength = (password) => {
 }
 
 const getColor = () => {
-  return errors.value.password.status === 'Medium'
-    ? 'warning'
-    : errors.value.password.status === 'Strong'
-    ? 'done'
-    : ''
+  return errors.value.password.status === 'Medium' ? 'warning' : errors.value.password.status === 'Strong' ? 'done' : ''
 }
 </script>
 
