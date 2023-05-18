@@ -6,12 +6,7 @@ import usePinStore from '@/stores/pin'
 export default defineNuxtPlugin(({ $pinia }) => {
   return {
     provide: {
-      store: [
-        useAuthStore($pinia),
-        useProfileStore($pinia),
-        useWorkspaceStore($pinia),
-        usePinStore($pinia),
-      ],
+      store: [useAuthStore($pinia), useProfileStore($pinia), useWorkspaceStore($pinia), usePinStore($pinia)],
     },
   }
 })

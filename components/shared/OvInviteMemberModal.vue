@@ -1,11 +1,5 @@
 <template>
-  <el-dialog
-    v-model="props.dialogVisible"
-    :width="dialogWidth"
-    show-close
-    top="30vh"
-    @close="$emit('close')"
-  >
+  <el-dialog v-model="props.dialogVisible" :width="dialogWidth" show-close top="30vh" @close="$emit('close')">
     <div class="dialog__title">
       {{ showSecondPage ? 'Workspace Rules' : 'Invite member' }}
     </div>
@@ -43,11 +37,7 @@
           </template>
         </el-autocomplete>
         <div class="dialog__chips-box">
-          <div
-            v-for="(item, index) in selectedEmails"
-            :key="`email_${index}`"
-            class="dialog__chip"
-          >
+          <div v-for="(item, index) in selectedEmails" :key="`email_${index}`" class="dialog__chip">
             <div class="dialog__chip--text">{{ item.value }}</div>
             <div class="dialog__chip--icon" @click="removeChip(item)">
               <i class="el-icon-close"></i>
@@ -55,31 +45,24 @@
           </div>
         </div>
         <div class="dialog__invite">
-          <el-button class="dialog__invite--btn" @click="goNextPage">
-            INVITE
-          </el-button>
+          <el-button class="dialog__invite--btn" @click="goNextPage"> INVITE </el-button>
         </div>
       </el-form>
     </div>
     <div v-else class="dialog__second-page">
-      <div class="dialog__second-page--title">
-        What info must your workspace members provide to join?
-      </div>
+      <div class="dialog__second-page--title">What info must your workspace members provide to join?</div>
       <div class="dialog__second-page--checkobox-container">
         <el-checkbox-group v-model="checkList">
           <div class="dialog__second-page--checkbox">
-            <div
-              v-for="(item, index) in checkboxItems"
-              :key="`checkbox_${index}`"
-            >
+            <div v-for="(item, index) in checkboxItems" :key="`checkbox_${index}`">
               <el-checkbox :label="item"></el-checkbox>
             </div>
           </div>
         </el-checkbox-group>
       </div>
       <div class="dialog__second-page--small-text">
-        You will be able to edit requried information abour memebers of the
-        workspace in settings (click <a href="">here</a>).
+        You will be able to edit requried information abour memebers of the workspace in settings (click
+        <a href="">here</a>).
       </div>
       <div class="dialog__second-page--submit-box">
         <el-button class="dialog__invite--btn"> SUBMIT </el-button>
@@ -162,10 +145,7 @@ const handleSelect = (item) => {
 
 const querySearch = (queryString, cb) => {
   const allEmails = emails.value
-  const results =
-    queryString && !error.value.value
-      ? allEmails.filter(createFilter(queryString))
-      : []
+  const results = queryString && !error.value.value ? allEmails.filter(createFilter(queryString)) : []
   cb(results)
 }
 
@@ -176,9 +156,7 @@ const createFilter = (queryString) => {
 }
 
 const removeChip = (item) => {
-  selectedEmails.value = selectedEmails.value.filter(
-    (el) => el.value !== item.value
-  )
+  selectedEmails.value = selectedEmails.value.filter((el) => el.value !== item.value)
   emails.value.push(item)
 }
 

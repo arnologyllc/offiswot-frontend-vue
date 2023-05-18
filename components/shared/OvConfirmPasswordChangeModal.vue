@@ -16,26 +16,15 @@
       </div>
     </template>
     <span class="title">
-      <span>
-        In order to reset your password check your email and follow the
-        instructions.
-      </span>
+      <span> In order to reset your password check your email and follow the instructions. </span>
     </span>
     <span v-if="error" class="error">
       {{ error }}
     </span>
     <template #footer
       ><span class="dialog-footer">
-        <span v-if="timer && !error"
-          >0:{{ timer > 9 ? timer : `0${timer}` }}</span
-        >
-        <a
-          v-if="!error && !timer"
-          href=""
-          class="dialog-footer__action"
-          @click.prevent="onSubmit"
-          >Resend Email</a
-        >
+        <span v-if="timer && !error">0:{{ timer > 9 ? timer : `0${timer}` }}</span>
+        <a v-if="!error && !timer" href="" class="dialog-footer__action" @click.prevent="onSubmit">Resend Email</a>
         <span v-if="error" class="later"> Please try again later. </span>
       </span></template
     >
@@ -67,14 +56,13 @@ const error = ref(null)
 watch(forgotSuccessData, (v) => {})
 
 watch(forgotErrorData, (v) => {
-  if (!v) {
+  if (v) {
     error.value = `You have exceeded the maximum number of reset password requests.`
   }
 })
 
 const onSubmit = () => {
   timer._value = 59
-  console.log(props)
   authStore.forgotPassword({ email: props.email })
 }
 

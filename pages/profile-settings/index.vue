@@ -5,60 +5,38 @@
         <div class="account">
           <div>
             <div class="account__title">
-              <img
-                src="@/assets/images/icons/chevron-left.svg"
-                alt="chevron-left"
-                @click="$router.go(-1)"
-              />
+              <img src="@/assets/images/icons/chevron-left.svg" alt="chevron-left" @click="$router.go(-1)" />
               <span>Security</span>
             </div>
             <div class="account__body">
-              <div
-                class="account__body-block"
-                @click="navigateTo('/profile-settings/reset')"
-              >
+              <div class="account__body-block" @click="navigateTo('/profile-settings/reset')">
                 <div class="">
                   <div class="reset">Reset password</div>
-                  <div class="reset_text">
-                    You can change your password here.
-                  </div>
+                  <div class="reset_text">You can change your password here.</div>
                 </div>
                 <div>
-                  <img
-                    src="@/assets/images/icons/chevron-right.svg"
-                    alt="chevron-right"
-                  />
+                  <img src="@/assets/images/icons/chevron-right.svg" alt="chevron-right" />
                 </div>
               </div>
-              <div
-                class="account__body-block"
-                @click="navigateTo('/profile-settings/update-pin')"
-              >
+              <div class="account__body-block" @click="navigateTo('/profile-settings/update-pin')">
                 <div>
                   <div class="reset">Reset PIN</div>
                   <div class="reset_text">You can change your PIN here.</div>
                 </div>
                 <div>
-                  <img
-                    src="@/assets/images/icons/chevron-right.svg"
-                    alt="chevron-right"
-                  />
+                  <img src="@/assets/images/icons/chevron-right.svg" alt="chevron-right" />
                 </div>
               </div>
               <div class="account__body-block" @click="dialogVisible = true">
                 <div>
                   <div class="deactivate">Deactivate my account</div>
-                  <div class="reset_text">
-                    You can deactivate your account up to 3 months.
-                  </div>
+                  <div class="reset_text">You can deactivate your account up to 3 months.</div>
                 </div>
               </div>
               <div class="account__body-block" @click="showModal = true">
                 <div class="">
                   <div class="delete">Delete my account</div>
-                  <div class="reset_text">
-                    You can permanently delete you account.
-                  </div>
+                  <div class="reset_text">You can permanently delete you account.</div>
                 </div>
               </div>
             </div>
@@ -66,17 +44,9 @@
         </div>
       </div>
     </div>
-    <deactivate-modal
-      v-if="dialogVisible"
-      :dialog-visible="dialogVisible"
-      @visible="dialogVisible = false"
-    >
+    <deactivate-modal v-if="dialogVisible" :dialog-visible="dialogVisible" @visible="dialogVisible = false">
     </deactivate-modal>
-    <delete-modal
-      v-if="showModal"
-      :dialog-visible="showModal"
-      @visible="showModal = false"
-    ></delete-modal>
+    <delete-modal v-if="showModal" :dialog-visible="showModal" @visible="showModal = false"></delete-modal>
     <check-modal
       v-if="isOpenPINDialog"
       :dialog-visible="isOpenPINDialog"

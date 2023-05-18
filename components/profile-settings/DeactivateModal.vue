@@ -11,10 +11,7 @@
       <span v-if="modalStep === 0">
         <div class="dialog-footer">
           <div class="dialog-footer-icon">
-            <img
-              src="@/assets/images/icons/remove.svg"
-              alt="deactivate-profile"
-            />
+            <img src="@/assets/images/icons/remove.svg" alt="deactivate-profile" />
           </div>
           <div class="dialog-footer-question">
             <div>Are you sure you want to</div>
@@ -23,26 +20,18 @@
           </div>
           <div class="dialog-footer-title">
             <h4>
-              Deactivating your account will disable your profile and will
-              remove your name and photo from all workspaces.
+              Deactivating your account will disable your profile and will remove your name and photo from all
+              workspaces.
             </h4>
             <div class="dialog-footer-subtitle">
               <p>
-                You can reactivate your profile in login page by trying to login
-                with your current email or username within 3 months after
-                deactivation. After that the account will be permanently
-                deleted. Check account
+                You can reactivate your profile in login page by trying to login with your current email or username
+                within 3 months after deactivation. After that the account will be permanently deleted. Check account
                 <span> deactivation and account deletion policy.</span>
               </p>
             </div>
           </div>
-          <el-button
-            type="danger"
-            class="dialog-footer-button"
-            plain
-            @click="agreeModal"
-            >I AGREE</el-button
-          >
+          <el-button type="danger" class="dialog-footer-button" plain @click="agreeModal">I AGREE</el-button>
         </div>
       </span>
       <span v-if="modalStep === 1" class="dialog__pin">
@@ -69,14 +58,7 @@
             </el-input>
           </el-form-item>
           <h5>Press OKAY to delete your account.</h5>
-          <el-button
-            type="danger"
-            class="dialog__pin-button"
-            plain
-            @click="onSubmit"
-          >
-            I AGREE
-          </el-button>
+          <el-button type="danger" class="dialog__pin-button" plain @click="onSubmit"> I AGREE </el-button>
         </el-form>
       </span>
     </template>
@@ -91,8 +73,7 @@ import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
 const instance = getCurrentInstance()
 
 const profileStore = useProfileStore()
-const { deactivateFailureData, deactivateProfileData } =
-  storeToRefs(profileStore)
+const { deactivateFailureData, deactivateProfileData } = storeToRefs(profileStore)
 
 const props = defineProps({
   dialogVisible: {

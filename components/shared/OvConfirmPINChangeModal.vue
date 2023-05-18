@@ -16,25 +16,14 @@
         <div class="title__text">Check your email</div>
       </div>
     </template>
-    <span class="title"
-      >In order to reset your PIN check your email and follow the
-      instructions.</span
-    >
+    <span class="title">In order to reset your PIN check your email and follow the instructions.</span>
     <span v-if="error" class="error">
       {{ error }}
     </span>
     <template #footer>
       <span class="dialog-footer">
-        <span v-if="timer && !error"
-          >0:{{ timer > 9 ? timer : `0${timer}` }}</span
-        >
-        <a
-          v-if="!error && !timer"
-          href=""
-          class="dialog-footer__action"
-          @click.prevent="onSubmit"
-          >Resend Email</a
-        >
+        <span v-if="timer && !error">0:{{ timer > 9 ? timer : `0${timer}` }}</span>
+        <a v-if="!error && !timer" href="" class="dialog-footer__action" @click.prevent="onSubmit">Resend Email</a>
         <span v-if="error" class="later"> Please try again later. </span>
       </span>
     </template>
@@ -76,7 +65,7 @@ const onSubmit = () => {
 }
 
 watch(forgotPinFailureData, (v) => {
-  if (!v) {
+  if (v) {
     error.value = `You have exceeded the maximum number of reset password requests.`
   }
 })

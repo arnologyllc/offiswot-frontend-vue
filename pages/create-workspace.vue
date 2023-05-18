@@ -9,18 +9,11 @@
       @submit.prevent="onSubmit"
     >
       <div class="main__form--title">
-        <img
-          src="@/assets/images/icons/chevron-left.svg"
-          alt="chevron-left"
-          @click="$router.go(-1)"
-        />
-        <div class="main__title">Create workspace</div>
+        <img src="@/assets/images/icons/chevron-left.svg" alt="chevron-left" @click="$router.go(-1)" />
+        <div class="main__title">Create workspace as {{ email }}</div>
       </div>
-      <div class="main__subtitle">Please fill the forms to register</div>
-      <div
-        v-if="errors.global.value"
-        class="el-form-item__global-error-container"
-      >
+      <div class="main__subtitle">Please fill the form to create workspace.</div>
+      <div v-if="errors.global.value" class="el-form-item__global-error-container">
         <div class="el-form-item__global-error">
           <img src="@/assets/images/icons/error.svg" alt="" />
           <span>{{ errors.global.value }}</span>
@@ -35,14 +28,8 @@
           @blur="validateField('name')"
         >
           <template #suffix>
-            <div
-              v-if="payload.name"
-              style="position: relative"
-              @click="focusElement('name')"
-            >
-              <span for="name" class="custom_placeholder">
-                Workspace Name
-              </span>
+            <div v-if="payload.name" style="position: relative" @click="focusElement('name')">
+              <span for="name" class="custom_placeholder"> Workspace Name </span>
             </div>
             <img
               v-if="errors.name.value"
@@ -79,15 +66,9 @@
       </el-form-item>
       <el-form-item class="main__form--footer">
         <div class="main__form--actions">
-          <el-button
-            native-type="submit"
-            :loading="isLoadingSubmit"
-            class="submit-button"
-          >
+          <el-button native-type="submit" :loading="isLoadingSubmit" class="submit-button">
             <span>
-              <span class="submit-button__text">{{
-                isLoadingSubmit ? '' : 'Next'
-              }}</span>
+              <span class="submit-button__text">{{ isLoadingSubmit ? '' : 'Next' }}</span>
               <img src="@/assets/images/icons/chevron-icon.svg" alt="arrow" />
             </span>
           </el-button>
@@ -159,6 +140,7 @@ const errors = ref({
   },
 })
 const isOpenPINDialog = ref(false)
+const email = ref(false)
 
 watch(createWorkspaceSuccess, (v) => {
   if (v) {
@@ -180,6 +162,9 @@ watch(industriesError, (v) => {
 
 onMounted(async () => {
   auth()
+  if (process.client) {
+    email.value = JSON.parse(localStorage.getItem('accounts'))[0].email
+  }
   isOpenPINDialog.value = loginToken()
   isOpenPINDialog.value = settingsToken()
   window.addEventListener('resize', handleResize)
@@ -245,12 +230,13 @@ const clearError = () => {
   width: 100%;
   display: flex;
   position: relative;
-  height: 100%;
+  min-height: calc(100vh - 170px);
   background-color: $ov-background;
   border-radius: 20px 0 0 20px;
   padding: 37px 0 82px 50px;
   &__form--title {
     font-style: normal;
+    margin-left: -41px;
     font-weight: 600;
     font-size: 24px;
     line-height: 29px;
@@ -273,12 +259,19 @@ const clearError = () => {
   }
 
   &__form {
-    min-height: calc(100vh - 514px);
+    min-height: calc(100vh - 170px);
     display: flex;
     flex-direction: column;
     padding: 21px 45px;
-
+    .el-form-item {
+      min-width: 220px;
+      max-width: 390px;
+      width: 390px;
+    }
     &--input {
+      min-width: 220px;
+      max-width: 390px;
+      width: 390px;
       .el-input__inner {
         height: 48px;
         border-radius: 6px;
@@ -367,17 +360,52 @@ const clearError = () => {
   margin-bottom: 27px;
 }
 
-@media (max-width: 485px) {
+@media (max-width: 600px) {
   .main {
     padding-left: 0;
+    &__form--title {
+      margin-left: 0;
+    }
+
+    &__title {
+      width: min-content;
+      font-size: 20px;
+      text-align: center;
+    }
+    &__subtitle {
+      font-size: 12px;
+      margin-left: 39px;
+    }
     &__form {
       padding: 0 10px;
       margin: 0 auto;
       &--box {
         text-align: center;
       }
-      &--title {
-        font-size: 20px;
+      &--subtitle {
+        text-align: center;
+      }
+    }
+  }
+}
+
+@media (max-width: 485px) {
+  .main {
+    padding-left: 0;
+    &__title {
+      width: min-content;
+      font-size: 14px;
+      text-align: left;
+      line-height: 20px;
+    }
+    &__form {
+      padding: 0 10px;
+      margin: 0 auto;
+      .el-form-item {
+        max-width: 220px;
+        width: 220px;
+      }
+      &--box {
         text-align: center;
       }
       &--subtitle {

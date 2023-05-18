@@ -6,11 +6,7 @@
         <span>Channels</span>
       </div>
       <div class="main__sidebar--channels-list">
-        <div
-          v-for="(item, index) in collapseChannels"
-          :key="`channel_${index}`"
-          class="main__sidebar--channels"
-        >
+        <div v-for="(item, index) in collapseChannels" :key="`channel_${index}`" class="main__sidebar--channels">
           <div class="main__sidebar--channels__item">
             <div
               class="main__sidebar--channels__item--circle"
@@ -36,12 +32,7 @@
         <span>Chats</span>
       </div>
       <div class="main__sidebar--chat-list">
-        <div
-          v-for="(item, index) in chatsList"
-          :key="`user_${index}`"
-          class="main__sidebar--chat"
-          :title="item.name"
-        >
+        <div v-for="(item, index) in chatsList" :key="`user_${index}`" class="main__sidebar--chat" :title="item.name">
           <div
             class="main__sidebar--channels__item--circle"
             :style="{
@@ -99,15 +90,12 @@ const chatsList = ref([
   },
   {
     name: 'Robert Pattinson',
-    avatar:
-      'https://www.mantruckandbus.com/fileadmin/_processed_/7/1/csm_Richard_von_Braunschweig_4e4e3bd591.jpeg',
+    avatar: 'https://www.mantruckandbus.com/fileadmin/_processed_/7/1/csm_Richard_von_Braunschweig_4e4e3bd591.jpeg',
     statusColor: '#EFEFEF',
   },
 ])
 
-const collapseChannels = computed(() =>
-  channelsList.value.slice(0, showChannelsCount.value)
-)
+const collapseChannels = computed(() => channelsList.value.slice(0, showChannelsCount.value))
 
 onMounted(() => {
   isOpenPINDialog.value = loginToken()
@@ -165,11 +153,7 @@ onMounted(() => {
         &--channel {
           width: 62px;
           height: 43px;
-          background: linear-gradient(
-            90deg,
-            rgba(48, 110, 154, 0.51) -55.65%,
-            #7ab7e3 133.06%
-          );
+          background: linear-gradient(90deg, rgba(48, 110, 154, 0.51) -55.65%, #7ab7e3 133.06%);
           border-radius: 20px;
           color: #f0f0f0;
           font-weight: 600;

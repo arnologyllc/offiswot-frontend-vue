@@ -2,56 +2,26 @@
   <nav class="main">
     <div class="main__inner">
       <div class="main__left">
-        <el-select
-          v-if="$route.path.includes('/workspace')"
-          v-model="selectedWorkspaceId"
-          class="main__workspaces"
-          placeholder="Workspace"
-        >
-          <el-option
-            v-for="(item, index) in workSpaces?.myWorkspaces"
-            :key="`${index}_workspace_${item.name}`"
-            :value="item.id"
-            :label="item.name"
-          >
-          </el-option>
-          <template #prefix>
-            <img :src="avatarUrl" alt="" class="main__workspaces--prefix" />
-          </template>
-        </el-select>
-
-        <!-- <div v-else class="main__logo">
-          <img
-            src="@/assets/images/icons/logo.svg"
-            alt=""
-            class="main__logo--logo"
-          />
-          <div class="main__logo--title">
-            <span class="main__logo--titleStart">ffi</span>
-            <span class="main__logo--titleEnd">swot</span>
-          </div>
-        </div> -->
-
-        <div
-          v-if="$route.path.includes('/workspace')"
-          class="main__button-group"
-        >
+        <div v-if="$route.path.includes('/workspace')" class="main__button-group">
           <el-button-group>
             <el-button
               :class="{ active: $route.path.includes('/staff') }"
               @click="navigateTo(`/workspace/staff/${selectedWorkspaceId}`)"
-              >Staff</el-button
             >
+              <span> Staff </span>
+            </el-button>
             <el-button
               :class="{ active: $route.path.includes('/projects') }"
               @click="navigateTo(`/workspace/projects/${selectedWorkspaceId}`)"
-              >Projects</el-button
             >
+              <span> Projects </span>
+            </el-button>
             <el-button
               :class="{ active: $route.path.includes('/tasks') }"
               @click="navigateTo(`/workspace/tasks/${selectedWorkspaceId}`)"
-              >Tasks</el-button
             >
+              <span> Tasks </span>
+            </el-button>
           </el-button-group>
         </div>
       </div>
@@ -59,11 +29,7 @@
         <el-button class="main__actions">
           <el-icon><Bell /></el-icon>
         </el-button>
-        <el-button
-          v-if="!$route.path.includes('/pin')"
-          class="main__actions"
-          @click="navigateTo('/')"
-        >
+        <el-button v-if="!$route.path.includes('/pin')" class="main__actions" @click="navigateTo('/')">
           <el-icon><Setting /></el-icon>
         </el-button>
       </div>
@@ -213,16 +179,19 @@ onMounted(async () => {
         width: 112px;
         border-radius: 6px;
         text-transform: uppercase;
-        color: black;
+        background-color: inherit;
+        color: #1d1d1d;
         font-weight: 500;
+        font-size: 14px;
         &:not(.el-button:last-child) {
           margin-right: 12px;
         }
 
         &.active {
-          background: linear-gradient(225deg, #4156f6 0%, #0cb1b9 100%);
-          color: white;
-          font-weight: 600;
+          background-image: linear-gradient(180deg, #2c3a9f 0%, #2994a0 100%);
+          background-clip: text;
+          -webkit-background-clip: text;
+          color: transparent;
         }
       }
     }

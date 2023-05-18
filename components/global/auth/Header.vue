@@ -1,11 +1,7 @@
 <template>
   <nav class="main">
     <div class="main__left">
-      <img
-        src="@/assets/images/icons/logo.svg"
-        alt=""
-        class="main__left--logo"
-      />
+      <img src="@/assets/images/icons/logo.svg" alt="" class="main__left--logo" />
       <div class="main__left--title">
         <span class="main__left--titleStart">ffi</span>
         <span class="main__left--titleEnd">swot</span>
@@ -24,9 +20,7 @@ import { computed } from 'vue'
 
 const route = useRoute()
 
-const buttonText = computed(() =>
-  route.path === '/login' ? 'Sign up' : 'Sign in'
-)
+const buttonText = computed(() => (route.path === '/login' ? 'Sign up' : 'Sign in'))
 
 const onRightButtonClick = () => {
   route.path === '/login' ? navigateTo('/register') : navigateTo('/login')

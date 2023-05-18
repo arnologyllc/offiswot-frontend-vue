@@ -1,45 +1,55 @@
 <template>
   <nav class="main">
-    <div v-if="accounts" class="main__top">
-      <el-dropdown v-for="item in accounts" :key="item.ID" class="main__user-actions">
-        <div class="main__user-actions--user" :class="currentUser(item.ID)" @click="changeAccount(item.ID)">
-          <img :src="item.avatarUrl ? item.avatarUrl : defaultAvatar" alt="Avatar" class="main__user-actions--avatar" />
-          <i class="el-icon-caret-bottom"></i>
-        </div>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item class="main__user-actions--add_element" @click="onLogout(item.ID)">
-              <span>Logout</span>
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+    <div class="users">
+      <div v-if="accounts" class="main__top">
+        <el-dropdown v-for="item in accounts" :key="item.ID" class="main__user-actions" :class="currentUser(item.ID)">
+          <div class="main__user-actions--user" @click="changeAccount(item.ID)">
+            <div class="current__user-selector"></div>
+            <img
+              :src="item.avatarUrl ? item.avatarUrl : defaultAvatar"
+              alt="Avatar"
+              class="main__user-actions--avatar"
+            />
+            <i class="el-icon-caret-bottom"></i>
+          </div>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item class="main__user-actions--add_element" @click="onLogout(item.ID)">
+                <span>Logout</span>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
+      <div class="main__bottom">
+        <el-dropdown class="main__user-actions-add">
+          <div class="main__user-actions--add_button">
+            <span>+</span>
+          </div>
+          <template #dropdown>
+            <el-dropdown-menu class="main__user-actions--add_actions">
+              <el-dropdown-item class="main__user-actions--add_element">
+                <span :class="isHovered" @click="addAccount" @mouseover="hoveringStart" @mouseout="hoveringEnd">
+                  Add account
+                </span>
+              </el-dropdown-item>
+              <el-dropdown-item class="main__user-actions--add_element">
+                <span :class="isHovered" @mouseover="hoveringStart" @mouseout="hoveringEnd"> Add workspace </span>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
     </div>
-    <div class="main__bottom">
-      <el-dropdown class="main__user-actions-add">
-        <div class="main__user-actions--add_button">
-          <span>+</span>
-        </div>
-        <template #dropdown>
-          <el-dropdown-menu class="main__user-actions--add_actions">
-            <el-dropdown-item class="main__user-actions--add_element">
-              <span :class="isHovered" @click="addAccount" @mouseover="hoveringStart" @mouseout="hoveringEnd">
-                Add account
-              </span>
-            </el-dropdown-item>
-            <el-dropdown-item class="main__user-actions--add_element">
-              <span :class="isHovered" @mouseover="hoveringStart" @mouseout="hoveringEnd"> Add workspace </span>
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+    <div class="chats" :class="isOpen ? 'large' : 'small'">
+      <el-button class="chats-button" @click="open">></el-button>
     </div>
   </nav>
 </template>
 
 <script setup>
 import { onMounted, watch, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import $cookies from 'js-cookie'
 import { storeToRefs } from 'pinia'
 import useProfileStore from '@/stores/profile'
@@ -56,11 +66,14 @@ const { profileSuccessData, profileFailureData, editProfileData, editFailureData
 const { $myFetch } = useNuxtApp()
 const config = useRuntimeConfig()
 const avatarUrl = ref(defaultAvatar)
+const isOpen = ref(false)
 
 const profile = ref(null)
 const $router = useRouter()
 const isHovered = ref(false)
 const accounts = ref(false)
+const $route = useRoute()
+const currentAccountID = ref(0)
 
 const getAvatar = (v) => {
   const currentAccountID = $cookies.get('currentAccountID')
@@ -88,7 +101,6 @@ watch(profileSuccessData, (v) => {
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
   }
 })
-
 watch(editFailureData, (v) => {
   if (v?.error === "You don't have permission to access this resource") {
     $cookies.remove('login_pin_token')
@@ -140,7 +152,6 @@ const hoveringEnd = () => {
 }
 
 const changeAccount = async (userID) => {
-  if (!userID) return
   profileStore.$reset()
   pinStore.$reset()
   authStore.$reset()
@@ -163,6 +174,7 @@ const changeAccount = async (userID) => {
 
     return
   }
+
   $cookies.set('token', accounts.value[userID].token, {
     expires: (Date.parse(accounts.value[userID].token_expires) - Date.now()) / 86400000,
   })
@@ -174,20 +186,19 @@ const changeAccount = async (userID) => {
     $cookies.set('login_pin_token', accounts.value[userID].login_pin_token, {
       expires: (Date.parse(accounts.value[userID].login_pin_token_expires) - new Date()) / 86400000,
     })
-  accounts.value.sort((a, b) => {
-    if (a.ID === userID) {
-      return -1
-    } else if (b.ID === userID) {
-      return 1
-    }
-    return 0
-  })
-  accounts.value.forEach((elem, index) => (elem.ID = index))
+
   if (process.client) {
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
+
+    if (accounts.value[userID].first_login === true) {
+      navigateTo('/pin')
+    } else if ($route.path === '/pin') {
+      navigateTo('/')
+    }
   }
 
-  $cookies.set('currentAccountID', 0)
+  $cookies.set('currentAccountID', userID)
+  currentAccountID.value = userID
 
   profileStore.getProfile()
   await profileStore.getWorkSpaces()
@@ -249,35 +260,59 @@ const onLogout = async (userID) => {
 }
 
 const currentUser = (id) => {
-  return id === +$cookies.get('currentAccountID') ? 'currentUser' : false
+  return id === currentAccountID.value ? 'currentUser' : false
+}
+
+const open = () => {
+  isOpen.value = !isOpen.value
 }
 </script>
 
 <style scoped lang="scss">
 .main {
-  position: fixed !important;
-  background: inherit;
+  background: linear-gradient(179.97deg, #23329d -0.86%, #1e767b 103.09%);
   left: 0;
   height: 100vh;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  width: 68px;
-  padding: 17px 14px;
   float: left;
   border-radius: 0 !important;
+  position: sticky !important;
+  top: 0;
+  left: 0;
+  .users {
+    height: 100vh;
+    width: 68px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10px;
+  }
+  .chats {
+    height: 100vh;
+    min-width: 71px;
+    max-width: 236px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+  }
   &__user {
     &-actions {
-      padding: 14px;
+      margin: 14px;
+      border-bottom: 1px solid #f0f0f0;
+      padding-bottom: 14px;
       &--user {
         display: flex;
         align-items: center;
         justify-content: center;
         width: 46px;
         height: 46px;
-        background: linear-gradient(51.28deg, rgba(48, 110, 154, 0.5) -1.56%, #94cef9 118.35%);
         border-radius: 26px;
+        background: inherit;
+        padding: 10px;
       }
       &--avatar {
         width: 40px;
@@ -325,9 +360,45 @@ const currentUser = (id) => {
   }
 }
 
+.chats {
+  background: linear-gradient(180.87deg, #2c3a9f 6.42%, #299ba0 97.68%);
+  backdrop-filter: blur(2px);
+}
+
+.large {
+  width: 236px !important;
+}
+.small {
+  width: 71px !important;
+}
+
+.chats-button {
+  position: absolute;
+  top: 30px;
+  right: -25px;
+  border: none;
+  background: none;
+  color: white;
+  font-weight: 900;
+}
+
 .main__user-actions--add_element {
   .hovered {
     color: #d0c9d6 !important;
+  }
+}
+
+.currentUser {
+  .current__user-selector {
+    background: linear-gradient(270deg, #94cef9 -62.5%, rgba(48, 110, 154, 0.5) 275%);
+    width: 4px;
+    height: 45px;
+    border-radius: 0px 2px 2px 0px;
+    position: absolute;
+    left: -11px;
+  }
+  .main__user-actions--user {
+    background: linear-gradient(51.28deg, rgba(48, 110, 154, 0.5) -1.56%, #94cef9 118.35%);
   }
 }
 </style>
