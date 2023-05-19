@@ -19,7 +19,7 @@
                 alt=""
                 @click="navigateTo('/')"
               />
-              <span class="main__title__span" @click="$router.push('/profile')"> Edit your profile </span>
+              <span class="main__title__span" @click="navigateTo('/profile')"> Edit your profile </span>
             </div>
             <span class="main__subtitle__span"> You can manage different accounts from one place </span>
           </div>
@@ -330,11 +330,12 @@ const onSubmit = () => {
 
 <style scoped lang="scss">
 .main {
-  min-height: calc(100vh - 170px);
   padding: 0;
   background-color: #f5f7fb !important;
   padding-top: 50px;
   padding-bottom: 50px;
+  border-radius: 20px 0 0 20px;
+    min-height: calc(100vh - 50px);
   &__title {
     font-size: 20px;
     font-weight: 600;

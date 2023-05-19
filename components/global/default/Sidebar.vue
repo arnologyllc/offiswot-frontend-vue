@@ -2,24 +2,45 @@
   <nav class="main">
     <div class="users">
       <div v-if="accounts" class="main__top">
-        <el-dropdown v-for="item in accounts" :key="item.ID" class="main__user-actions" :class="currentUser(item.ID)">
-          <div class="main__user-actions--user" @click="changeAccount(item.ID)">
-            <div class="current__user-selector"></div>
+        <template v-for="item in accounts" :key="item.ID">
+          <el-dropdown
+            class="main__user-actions"
+            :class="{ currentUser: currentUser('u', item.ID), bordered: item.workspaces?.length }"
+          >
+            <div class="main__user-actions--user" @click="changeAccount(item.ID)">
+              <div class="current__user-selector"></div>
+              <img
+                :src="item.avatarUrl ? item.avatarUrl : defaultAvatar"
+                alt="Avatar"
+                class="main__user-actions--avatar"
+              />
+              <i class="el-icon-caret-bottom"></i>
+            </div>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item class="main__user-actions--add_element" @click="onLogout(item.ID)">
+                  <span>Logout</span>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+
+          <div
+            v-for="workspace in item.workspaces"
+            :key="workspace.id"
+            class="main__user-workspaces"
+            :class="currentUser('w', workspace.id)"
+          >
+            <div class="current__workspace-selector"></div>
             <img
               :src="item.avatarUrl ? item.avatarUrl : defaultAvatar"
               alt="Avatar"
-              class="main__user-actions--avatar"
+              class="main__user-workspaces--avatar"
+              :title="workspace.name"
+              @click="changeWorkspace(workspace.id)"
             />
-            <i class="el-icon-caret-bottom"></i>
           </div>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item class="main__user-actions--add_element" @click="onLogout(item.ID)">
-                <span>Logout</span>
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
+        </template>
       </div>
       <div class="main__bottom">
         <el-dropdown class="main__user-actions-add">
@@ -42,7 +63,7 @@
       </div>
     </div>
     <div class="chats" :class="isOpen ? 'large' : 'small'">
-      <el-button class="chats-button" @click="open">></el-button>
+      <el-button class="chats-button" @click="open">{{ isOpen ? '<' : '>' }}</el-button>
     </div>
   </nav>
 </template>
@@ -62,18 +83,21 @@ const profileStore = useProfileStore()
 const pinStore = usePinStore()
 const authStore = useAuthStore()
 const workspaceStore = useWorkspaceStore()
-const { profileSuccessData, profileFailureData, editProfileData, editFailureData } = storeToRefs(profileStore)
+const { profileSuccessData, profileFailureData, editProfileData, editFailureData, workspacesSuccessData } =
+  storeToRefs(profileStore)
 const { $myFetch } = useNuxtApp()
 const config = useRuntimeConfig()
 const avatarUrl = ref(defaultAvatar)
 const isOpen = ref(false)
+const instance = getCurrentInstance()
 
 const profile = ref(null)
 const $router = useRouter()
 const isHovered = ref(false)
 const accounts = ref(false)
 const $route = useRoute()
-const currentAccountID = ref(0)
+const currentAccountID = ref(+$cookies.get('currentAccountID'))
+const currentWorkspaceID = ref(false)
 
 const getAvatar = (v) => {
   const currentAccountID = $cookies.get('currentAccountID')
@@ -88,6 +112,15 @@ const getAvatar = (v) => {
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
   }
 }
+
+const setWorkspaceData = (v) => {
+  if (process.client) {
+    accounts.value = JSON.parse(localStorage.getItem('accounts'))
+    accounts.value[currentAccountID.value].workspaces = v?.myWorkspaces
+    localStorage.setItem('accounts', JSON.stringify(accounts.value))
+  }
+}
+watch(workspacesSuccessData, (v) => setWorkspaceData(v))
 
 watch(profileSuccessData, (v) => {
   const currentAccountID = $cookies.get('currentAccountID')
@@ -131,7 +164,7 @@ watch(editProfileData, (v) => {
   }
 })
 
-onMounted(() => {
+onMounted(async () => {
   if (process.client) {
     accounts.value = JSON.parse(localStorage.getItem('accounts'))
   }
@@ -141,7 +174,13 @@ onMounted(() => {
     } else {
       getAvatar(profileSuccessData.value)
     }
+    if (!workspacesSuccessData.value) {
+      await profileStore.getWorkSpaces()
+    } else {
+      setWorkspaceData(workspacesSuccessData.value)
+    }
   }
+  window.addEventListener('resize', handleResize)
 })
 
 const hoveringStart = () => {
@@ -151,7 +190,21 @@ const hoveringEnd = () => {
   isHovered.value = false
 }
 
+const handleResize = () => {
+  if (window.innerWidth < 800) {
+    isOpen.value = false
+  }
+  instance.update()
+}
+
 const changeAccount = async (userID) => {
+  currentWorkspaceID.value = -1
+  currentAccountID.value = userID
+  $cookies.set('currentAccountID', userID)
+  if (accounts.value[userID].token === $cookies.get('token')) {
+    navigateTo(`/`)
+    return
+  }
   profileStore.$reset()
   pinStore.$reset()
   authStore.$reset()
@@ -197,11 +250,20 @@ const changeAccount = async (userID) => {
     }
   }
 
-  $cookies.set('currentAccountID', userID)
-  currentAccountID.value = userID
-
   profileStore.getProfile()
   await profileStore.getWorkSpaces()
+
+  navigateTo(`/`)
+}
+
+const changeWorkspace = (userID) => {
+  currentAccountID.value = -1
+  currentWorkspaceID.value = userID
+  openWorkspace(userID)
+}
+
+const openWorkspace = (id) => {
+  navigateTo(`/workspace/staff/${id}`)
 }
 
 const addAccount = () => {
@@ -211,6 +273,7 @@ const addAccount = () => {
 }
 
 const onLogout = async (userID) => {
+  accounts.value.forEach((elem, index) => (elem.ID = index))
   const initAccountValue = accounts.value.filter((elem) => elem.ID !== userID)
 
   changeAccount(userID)
@@ -259,12 +322,21 @@ const onLogout = async (userID) => {
   }
 }
 
-const currentUser = (id) => {
-  return id === currentAccountID.value ? 'currentUser' : false
+const currentUser = (type, id) => {
+  switch (type) {
+    case 'u':
+      return id === currentAccountID.value ? 'currentUser' : false
+    default:
+      return id === +currentWorkspaceID.value ? 'currentWorkspace' : false
+  }
 }
 
 const open = () => {
-  isOpen.value = !isOpen.value
+  if (window.innerWidth > 800) {
+    isOpen.value = !isOpen.value
+  } else {
+    isOpen.value = false
+  }
 }
 </script>
 
@@ -298,11 +370,26 @@ const open = () => {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
+    transition: all 0.5s linear;
   }
   &__user {
+    &-workspaces {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 46px;
+      height: 46px;
+      margin: 5px 17px;
+      border-radius: 12px;
+      &--avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        object-fit: cover;
+      }
+    }
     &-actions {
       margin: 14px;
-      border-bottom: 1px solid #f0f0f0;
       padding-bottom: 14px;
       &--user {
         display: flex;
@@ -395,10 +482,26 @@ const open = () => {
     height: 45px;
     border-radius: 0px 2px 2px 0px;
     position: absolute;
-    left: -11px;
+    left: -7px;
   }
   .main__user-actions--user {
     background: linear-gradient(51.28deg, rgba(48, 110, 154, 0.5) -1.56%, #94cef9 118.35%);
   }
+}
+
+.currentWorkspace {
+  background: linear-gradient(51.28deg, rgba(48, 110, 154, 0.5) -1.56%, #94cef9 118.35%);
+  .current__workspace-selector {
+    background: linear-gradient(270deg, #94cef9 -62.5%, rgba(48, 110, 154, 0.5) 275%);
+    width: 4px;
+    height: 45px;
+    border-radius: 0px 2px 2px 0px;
+    position: absolute;
+    left: 0;
+  }
+}
+
+.bordered {
+  border-bottom: 1px solid #f0f0f0;
 }
 </style>

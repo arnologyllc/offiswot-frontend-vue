@@ -292,7 +292,7 @@ const focusElement = (elem) => {
   width: 100%;
   display: flex;
   position: relative;
-  height: 100%;
+  height: 100vh;
   background-color: $ov-background;
   border-radius: 20px 0 0 20px;
   padding: 37px 0 82px 50px;

@@ -6,7 +6,7 @@
           <div v-for="(col, idx) in item" :key="`col_${idx}`">
             <draggable
               class="desk__row--col"
-              :list="tablesList[i][idx]"
+              :list="col"
               :disabled="props.dragOptions.disabled"
               group="people"
               :move="handleMove"
@@ -137,12 +137,16 @@
               </template>
             </draggable>
           </div>
-          <el-button v-if="!dragOptions.disabled && i === 0" class="desk__main--add-col horizontal" @click="onAddCol">
-            + More Seats
+          <el-button v-if="!dragOptions.disabled && i === 0" class="desk__main--add-col horizontal">
+            <span @click="onAddCol">+ More Seats</span>
+            <span v-if="item.length" @click="onDeleteCol">- Delete Seats</span>
           </el-button>
         </div>
       </div>
-      <el-button v-if="!dragOptions.disabled" class="desk__main--add-col" @click="onAddRow"> + More Seats </el-button>
+      <el-button v-if="!dragOptions.disabled" class="desk__main--add-col">
+        <span @click="onAddRow">+ More Seats</span>
+        <span v-if="tablesList.length" @click="onDeleteRow">- Delete Seats</span>
+      </el-button>
     </div>
     <div v-if="dragOptions.disabled" class="desk__hint">
       <div v-for="(item, index) in hints" :key="`hint_${index}`" class="desk__hint--item">
@@ -304,7 +308,7 @@ const setLastTableId = () => {
 }
 const onAddRow = () => {
   const arr = []
-  for (const i in Array(tablesList.value[0].length).fill('')) {
+  for (const i in Array(tablesList.value[0]?.length).fill('')) {
     lastTableId.value += +i + 2
     arr.push([
       { id: lastTableId.value + +i + 2 },
@@ -316,6 +320,22 @@ const onAddRow = () => {
   tablesList.value.push(arr)
   setLastTableId()
 }
+
+const onDeleteRow = () => {
+  const arr = []
+  tablesList.value.forEach((row, index) => {
+    row.forEach((table, i) => {
+      for (const userID in table) {
+        if (table[userID].user) {
+          handleDeleteUser(index, i, userID)
+        }
+      }
+    })
+  })
+  tablesList.value.pop()
+  setLastTableId()
+}
+
 const onAddCol = () => {
   tablesList.value.forEach((row, index) => {
     lastTableId.value += index + 2
@@ -326,6 +346,16 @@ const onAddCol = () => {
       { id: lastTableId.value + index + 5 },
     ])
   })
+}
+
+const onDeleteCol = () => {
+  tablesList.value.forEach((row, index) => {
+    lastTableId.value -= index + 2
+    row.pop()
+  })
+  if (!tablesList.value[0].length) {
+    tablesList.value.pop()
+  }
 }
 
 const handleDragEnd = (index, subIndex) => {
@@ -429,6 +459,8 @@ const handleFooterDragEnd = () => {
   &__main {
     height: calc(100vh - 236px);
     border: 1px solid $ov-border--light;
+    padding-top: 15px;
+
     overflow: auto;
     overflow-x: auto;
     user-select: none;
@@ -439,11 +471,20 @@ const handleFooterDragEnd = () => {
     &--add-col {
       border: none;
       background: transparent;
+      display: flex;
+      gap: 15px;
+      height: 100%;
+      align-items: flex-start;
+      justify-content: center;
+      width: 344px;
+      cursor: default;
       &.horizontal {
+        width: 0px;
         span {
           text-orientation: upright;
           writing-mode: vertical-lr;
           letter-spacing: -2px;
+          align-items: center;
         }
       }
       span {
@@ -451,14 +492,13 @@ const handleFooterDragEnd = () => {
         text-transform: uppercase;
         font-weight: 700;
         font-size: 12px;
+        margin-left: 10px !important;
+        cursor: pointer;
       }
     }
   }
 
   &__row {
-    &:first-child {
-      padding-top: 50px;
-    }
     display: flex;
     gap: 0 50px;
     border-bottom: 1px solid $ov-border--light;
@@ -470,7 +510,7 @@ const handleFooterDragEnd = () => {
       grid-template-columns: repeat(2, 0fr);
       &__table {
         position: relative;
-        cursor: pointer;
+        cursor: grab;
         &.disabled {
           opacity: 0.5;
         }

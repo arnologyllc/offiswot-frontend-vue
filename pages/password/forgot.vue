@@ -162,14 +162,16 @@ watch(forgotSuccessData, (v) => {
 })
 
 watch(forgotErrorData, (v) => {
-  if (typeof v !== 'string') {
-    for (const i in v) {
-      if (typeof v[i] !== 'string') {
-        for (const j in v[i]) {
-          errors.value.global.value = v[i][j]
+  if (!isOpenEmailDialog.value) {
+    if (typeof v !== 'string') {
+      for (const i in v) {
+        if (typeof v[i] !== 'string') {
+          for (const j in v[i]) {
+            errors.value.global.value = v[i][j]
+          }
+        } else {
+          errors.value.global.value = v[i]
         }
-      } else {
-        errors.value.global.value = v[i]
       }
     }
   }

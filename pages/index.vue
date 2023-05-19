@@ -246,7 +246,6 @@ const formattedTextFtn = () => {
   width: 100%;
   background-color: $ov-background;
   padding-bottom: 186px;
-  width: 100%;
   border-radius: 20px 0 0 20px;
   padding: 37px 0 82px 0;
 }
@@ -254,6 +253,7 @@ const formattedTextFtn = () => {
   height: max-content;
   min-height: calc(100vh - 170px);
   border-left: 1px solid #d0c9d6;
+  overflow: auto;
   &__search {
     height: 36px;
     width: calc(100% - 90px);
