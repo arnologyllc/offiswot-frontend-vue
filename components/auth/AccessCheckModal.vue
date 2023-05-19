@@ -134,7 +134,7 @@ const showPIN = ref(false)
 const isOpenEmailDialog = ref(false)
 
 watch(checkPinData, ({ data: v }) => {
-  const userID = $cookies.get('currentAccountID')
+  const userID = $cookies.get('currentAccountID') ? $cookies.get('currentAccountID') : 0
   if (process.client) {
     const initAccountValue = JSON.parse(localStorage.getItem('accounts'))
     if (!$cookies.get('login_pin_token') && $cookies.get('login_pin_token') !== v.login_pin_token) {

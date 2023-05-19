@@ -96,17 +96,15 @@ const $router = useRouter()
 const isHovered = ref(false)
 const accounts = ref(false)
 const $route = useRoute()
-const currentAccountID = ref(+$cookies.get('currentAccountID'))
+const currentAccountID = ref($cookies.get('currentAccountID') ? +$cookies.get('currentAccountID') : 0)
 const currentWorkspaceID = ref(false)
 
 const getAvatar = (v) => {
-  const currentAccountID = $cookies.get('currentAccountID')
-
   profile.value = v
   if (v?.user.avatar) {
-    accounts.value[currentAccountID].avatarUrl = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
+    accounts.value[currentAccountID.value].avatarUrl = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
   } else {
-    accounts.value[currentAccountID].avatarUrl = `${defaultAvatar}`
+    accounts.value[currentAccountID.value].avatarUrl = `${defaultAvatar}`
   }
   if (process.client) {
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
@@ -123,12 +121,10 @@ const setWorkspaceData = (v) => {
 watch(workspacesSuccessData, (v) => setWorkspaceData(v))
 
 watch(profileSuccessData, (v) => {
-  const currentAccountID = $cookies.get('currentAccountID')
-  profile.value = v
   if (v?.user.avatar) {
-    accounts.value[currentAccountID].avatarUrl = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
+    accounts.value[currentAccountID.value].avatarUrl = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
   } else {
-    accounts.value[currentAccountID].avatarUrl = `${defaultAvatar}`
+    accounts.value[currentAccountID.value].avatarUrl = `${defaultAvatar}`
   }
   if (process.client) {
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
@@ -153,11 +149,10 @@ watch(profileFailureData, (v) => {
 })
 
 watch(editProfileData, (v) => {
-  const currentAccountID = $cookies.get('currentAccountID')
   if (v?.user.avatar) {
-    accounts.value[currentAccountID].avatarUrl = `${v.avatarPath}/${v.user.avatar}`
+    accounts.value[currentAccountID.value].avatarUrl = `${v.avatarPath}/${v.user.avatar}`
   } else {
-    accounts.value[currentAccountID].avatarUrl = `${defaultAvatar}`
+    accounts.value[currentAccountID.value].avatarUrl = `${defaultAvatar}`
   }
   if (process.client) {
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
