@@ -66,7 +66,7 @@ const onSubmit = () => {
 
 watch(forgotPinFailureData, (v) => {
   if (v) {
-    error.value = `You have exceeded the maximum number of reset password requests.`
+    error.value = `You have exceeded the maximum number of reset PIN requests.`
   }
 })
 

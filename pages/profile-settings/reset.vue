@@ -329,13 +329,15 @@ watch(resetSuccessData, (v) => {
 })
 
 watch(forgotErrorData, (v) => {
-  for (const i in v) {
-    if (typeof v[i] !== 'string') {
-      for (const j in v[i]) {
-        errors.value.global.value = v[i][j]
+  if (!isOpenEmailDialog.value) {
+    for (const i in v) {
+      if (typeof v[i] !== 'string') {
+        for (const j in v[i]) {
+          errors.value.global.value = v[i][j]
+        }
+      } else {
+        errors.value.global.value = v[i]
       }
-    } else {
-      errors.value.global.value = v[i]
     }
   }
 })
@@ -440,7 +442,7 @@ const getColor = () => {
   width: 100%;
   display: flex;
   position: relative;
-  height: 100%;
+  height: 100vh;
   background-color: $ov-background;
   border-radius: 20px 0 0 20px;
   padding: 37px 0 82px 50px;

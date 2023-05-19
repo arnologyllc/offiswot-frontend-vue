@@ -234,6 +234,7 @@ const clearError = () => {
   background-color: $ov-background;
   border-radius: 20px 0 0 20px;
   padding: 37px 0 82px 50px;
+  height: 100vh;
   &__form--title {
     font-style: normal;
     margin-left: -41px;

@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import { onMounted, watch, ref } from 'vue'
+import { onMounted, watch, ref, onUpdated } from 'vue'
 import { useRoute } from 'vue-router'
 import $cookies from 'js-cookie'
 import { storeToRefs } from 'pinia'
@@ -56,12 +56,6 @@ watch(workspacesSuccessData, (v) => {
   workSpaces.value = v
 })
 
-watch($route.params.id, () => {
-  if ($route.path.includes('/workspace')) {
-    selectedWorkspaceId.value = +$route.params.id
-  }
-})
-
 watch(selectedWorkspaceId, () => {
   navigateTo(`/workspace/staff/${selectedWorkspaceId.value}`)
 })
@@ -74,6 +68,10 @@ onMounted(async () => {
       workSpaces.value = workspacesSuccessData.value
     }
   }
+})
+
+onUpdated(() => {
+  if ($route.params.id) selectedWorkspaceId.value = +$route.params.id
 })
 </script>
 

@@ -162,6 +162,7 @@ const accountTokens = ref({
   settings_pin_token: null,
   login_pin_token: null,
   login_pin_token_expires: null,
+  workspaces: null,
 })
 
 const payload = ref({
@@ -228,12 +229,11 @@ watch(loginSuccessData, (v) => {
   accountTokens.value.email = v.user.email
   accountTokens.value.token = accessToken
   accountTokens.value.first_login = isFirstLogin
-  accounts.value.unshift(accountTokens.value)
+  accounts.value.push(accountTokens.value)
   accounts.value.forEach((elem, index) => (elem.ID = index))
   if (process.client) {
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
   }
-  $cookies.set('currentAccountID', 0)
   if (isFirstLogin) {
     navigateTo('/pin')
     $cookies.set('first_login', isFirstLogin)

@@ -86,6 +86,7 @@ onMounted(() => {
   padding-bottom: 186px;
   border-radius: 20px 0 0 20px;
   padding: 37px 0 82px 0;
+  height: 100vh;
 }
 .account {
   margin: 0 auto 60px;

@@ -208,6 +208,7 @@
         </div>
         <login-buttons
           login-title="Register"
+          :is-valid="isValid"
           :login-loading="authStore.registerLoading"
           social-title="Sign up with Google"
         ></login-buttons>
@@ -259,7 +260,7 @@
 </template>
 
 <script setup>
-import { getCurrentInstance, onMounted } from 'vue'
+import { computed, getCurrentInstance, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
 import ConfirmEmail from '@/components/shared/OvConfirmEmailModal.vue'
@@ -276,6 +277,7 @@ const instance = getCurrentInstance()
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const isOpenEmailDialog = ref(false)
+const isValid = ref(false)
 
 const payload = ref({
   email: null,
@@ -417,11 +419,10 @@ onMounted(() => {
 })
 
 const onSubmit = () => {
-  instance.refs.registerForm.validate((valid) => {
+  instance.refs.registerForm.validate((valid, ...props) => {
     if (valid) {
       authStore.registerUser(payload.value)
     } else {
-      errors.value.global.value = 'Please fill empty areas'
       return false
     }
   })
@@ -441,6 +442,9 @@ const validateField = (fieldName) => {
       }
     }
   })
+  isValid.value =
+    Object.values(payload.value).every((elem) => !!elem) &&
+    Object.values(errors.value).every((elem) => !elem.value || elem.status !== 'Weak')
 }
 
 const showErrorClick = (fieldName) => {

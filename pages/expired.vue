@@ -3,7 +3,7 @@
     <img src="@/assets/images/expired/massage.svg" alt="" />
     <div class="main__container">
       <span class="main__text">Go to</span>
-      <el-button plain class="main__button" @click="$router.push('/login')"> HOME PAGE </el-button>
+      <el-button plain class="main__button" @click="navigateTo('/login')"> HOME PAGE </el-button>
     </div>
   </div>
 </template>

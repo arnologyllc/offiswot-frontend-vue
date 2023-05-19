@@ -54,7 +54,7 @@ const props = defineProps({
 })
 
 const dialogWidth = ref('560px')
-const timer = ref(59)
+const timer = ref(0)
 const error = ref(null)
 
 watch(resendSuccessData, (v) => {})
@@ -79,7 +79,6 @@ onMounted(() => {
       dialogWidth.value = '315px'
     } else dialogWidth.value = '560px'
   })
-  timer._value = 59
   setInterval(() => {
     if (timer.value) timer.value--
   }, 1000)

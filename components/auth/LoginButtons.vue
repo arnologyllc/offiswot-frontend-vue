@@ -2,7 +2,12 @@
   <div class="submit-buttons-container">
     <el-form-item class="submit-form-item">
       <div class="submit-button__outer">
-        <el-button class="submit-button" native-type="submit" :loading="props.loginLoading">
+        <el-button
+          class="submit-button"
+          native-type="submit"
+          :loading="props.loginLoading"
+          :class="{ active: !props.isValid }"
+        >
           <span class="submit-button__text">
             {{ !props.loginLoading ? props.loginTitle : '' }}
           </span>
@@ -41,6 +46,10 @@ const props = defineProps({
   loginLoading: {
     type: Boolean,
     default: false,
+  },
+  isValid: {
+    type: Boolean,
+    default: true,
   },
 })
 </script>
@@ -128,5 +137,9 @@ const props = defineProps({
     position: absolute;
     right: 0;
   }
+}
+
+.active {
+  opacity: 0.5;
 }
 </style>

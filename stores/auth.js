@@ -125,8 +125,10 @@ const useAuthStore = defineStore('auth', {
 
     forgotPasswordWithMail() {
       this.forgotSuccessData = null
+      this.forgotErrorData = null
       const { $myFetch } = useNuxtApp()
       this.forgotLoading = true
+
       $myFetch('/settings/forget-password')
         .then((data) => {
           this.forgotSuccessData = data

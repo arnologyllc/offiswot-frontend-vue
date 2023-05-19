@@ -44,6 +44,7 @@
           :type="showPIN ? 'text' : 'password'"
           class="main__form--box__input"
           placeholder="Enter PIN"
+          autofocus
           @blur="validateField('pin')"
         >
           <template #suffix>
@@ -220,7 +221,9 @@ const onSubmit = () => {
 }
 
 const focusElement = (elem) => {
-  instance.refs[elem].focus()
+  if (process.client) {
+    instance.refs[elem].focus()
+  }
 }
 
 const onForgot = () => {

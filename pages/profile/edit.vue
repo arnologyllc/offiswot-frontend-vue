@@ -190,6 +190,8 @@ const onAvatarUpload = (e, file) => {
   padding-bottom: 186px;
   width: 100%;
   border-radius: 20px 0 0 20px;
+
+  height: 100vh;
   &__user-container {
     padding: 37px 0 82px 0;
     width: 100%;
