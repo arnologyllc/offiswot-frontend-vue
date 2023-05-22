@@ -2,8 +2,21 @@
   <div class="desk">
     <div class="desk__main" :class="{ 'edit-mode': !props.dragOptions.disabled }">
       <div>
+        <div class="dailyEventsContainer" :class="{ 'edit-mode': !props.dragOptions.disabled }">
+          <span class="todayDate"> {{ today }}</span>
+          <div class="eventsList">
+            <div class="todayEvent">
+              <div></div>
+              <span>Today is Tony’s birthday 🎂</span>
+            </div>
+            <div class="todayEvent">
+              <div></div>
+              <span>Shout out to Grace for amazing progress on AI integration. 🎉</span>
+            </div>
+          </div>
+        </div>
         <div v-for="(item, i) in tablesList" :key="`row_${i}`" class="desk__row">
-          <div v-for="(col, idx) in item" :key="`col_${idx}`">
+          <div v-for="(col, idx) in item" :key="`col_${idx}`" class="desk__table">
             <draggable
               class="desk__row--col"
               :list="col"
@@ -15,7 +28,7 @@
             >
               <template #item="{ element, index }">
                 <div
-                  :id="element.id"
+                  :id="'index_' + i + '_' + idx + '_' + index"
                   :key="element.id"
                   class="desk__row--col__table"
                   :class="{ disabled: element.disabled }"
@@ -46,7 +59,11 @@
                         </div>
                       </div>
                       <div class="left-box__right">
-                        <div v-if="!dragOptions.disabled" class="close" @click="handleDeleteUser(i, idx, index)">
+                        <div
+                          v-if="!dragOptions.disabled"
+                          :class="index % 2 === 1 ? 'close-right' : 'close-left'"
+                          @click="handleDeleteUser(i, idx, index)"
+                        >
                           <img src="@/assets/images/icons/close-circle-icon.svg" alt="(x)" />
                         </div>
                         <el-badge v-if="element.online" is-dot class="badge">
@@ -101,7 +118,11 @@
                         </div>
                       </div>
                       <div class="right-box__right">
-                        <div v-if="!dragOptions.disabled" class="close" @click="handleDeleteUser(i, idx, index)">
+                        <div
+                          v-if="!dragOptions.disabled"
+                          :class="index % 2 === 1 ? 'close-right' : 'close-left'"
+                          @click="handleDeleteUser(i, idx, index)"
+                        >
                           <img src="@/assets/images/icons/close-circle-icon.svg" alt="(x)" />
                         </div>
                         <el-badge v-if="element.online" is-dot class="badge">
@@ -132,20 +153,41 @@
                       </div>
                     </div>
                   </div>
-                  <img :src="tableIcons[index].src" :class="{ 'edit-mode': !dragOptions.disabled }" alt="t" />
                 </div>
               </template>
             </draggable>
+            <div class="desk__table--images">
+              <img
+                v-for="(elem, index) in col"
+                :key="`${i}-${idx}-${index}`"
+                :src="tableIcons[index].src"
+                :class="{
+                  'edit-mode': !dragOptions.disabled,
+                  dragzone: col[index].dragzone,
+                  isShowTable: !col[index].user,
+                  'table-left-top': index === 0,
+                  'table-right-top': index === 1,
+                  'table-left-bottom': index === 2,
+                  'table-right-bottom': index === 3,
+                }"
+                class="table"
+                alt="t"
+              />
+            </div>
           </div>
           <el-button v-if="!dragOptions.disabled && i === 0" class="desk__main--add-col horizontal">
-            <span @click="onAddCol">+ More Seats</span>
-            <span v-if="item.length" @click="onDeleteCol">- Delete Seats</span>
+            <div class="desk__main--add-buttons horizontal">
+              <span class="addSeats" @click="onAddCol">+ More Seats</span>
+              <span v-if="item.length" class="removeSeats" @click="onDeleteCol">- Remove Seats</span>
+            </div>
           </el-button>
         </div>
       </div>
       <el-button v-if="!dragOptions.disabled" class="desk__main--add-col">
-        <span @click="onAddRow">+ More Seats</span>
-        <span v-if="tablesList.length" @click="onDeleteRow">- Delete Seats</span>
+        <div class="desk__main--add-buttons">
+          <span class="addSeats" @click="onAddRow">+ More Seats</span>
+          <span v-if="tablesList.length" class="removeSeats" @click="onDeleteRow">- Remove Seats</span>
+        </div>
       </el-button>
     </div>
     <div v-if="dragOptions.disabled" class="desk__hint">
@@ -239,18 +281,22 @@ const tableIcons = ref([
   {
     id: 1,
     src: tableTopLeft,
+    dragzone: false,
   },
   {
     id: 2,
     src: tableTopRigth,
+    dragzone: false,
   },
   {
     id: 3,
     src: tableBottomLeft,
+    dragzone: false,
   },
   {
     id: 4,
     src: tableBottomRigth,
+    dragzone: false,
   },
 ])
 
@@ -308,7 +354,7 @@ const setLastTableId = () => {
 }
 const onAddRow = () => {
   const arr = []
-  for (const i in Array(tablesList.value[0]?.length).fill('')) {
+  for (const i in Array(tablesList.value[0]?.length + 1).fill('')) {
     lastTableId.value += +i + 2
     arr.push([
       { id: lastTableId.value + +i + 2 },
@@ -351,6 +397,15 @@ const onAddCol = () => {
 const onDeleteCol = () => {
   tablesList.value.forEach((row, index) => {
     lastTableId.value -= index + 2
+    row.forEach((table, idx) => {
+      if (idx === row.length - 1) {
+        for (const userID in table) {
+          if (table[userID].user) {
+            handleDeleteUser(index, idx, userID)
+          }
+        }
+      }
+    })
     row.pop()
   })
   if (!tablesList.value[0].length) {
@@ -359,30 +414,48 @@ const onDeleteCol = () => {
 }
 
 const handleDragEnd = (index, subIndex) => {
+  tablesList.value.forEach((row, rowIndex) => {
+    row.forEach((col, colIndex) => {
+      col.forEach((table, tableIndex) => {
+        table.dragzone = false
+      })
+    })
+  })
+
   if (!movingItem.value || !futureItem.value) {
     return
   }
-  if (isInsideFooter.value && movingItem.value.user) {
-    const futureIndex = availableMembers.value.indexOf(futureItem.value)
-    availableMembers.value.splice(futureIndex, 1, movingItem.value)
-    tablesList.value[index][subIndex].splice(movingIndex.value, 1, {
-      id: movingItem.value.id,
-      ...futureItem.value,
-    })
+
+  const futureTemp = { ...futureItem.value }
+  const movingTemp = { ...movingItem.value }
+
+  if (isInsideFooter.value) {
+    const availableTemp = Object.assign([], availableMembers.value)
+    availableTemp.splice(availableTemp.indexOf(futureItem.value), 1, movingTemp)
+    availableMembers.value = availableTemp
+
+    const tablesTemp = Object.assign([], tablesList.value)
+    tablesTemp[index][subIndex][movingIndex.value] = futureTemp
+    tablesList.value = tablesTemp
+
     movingIndex.value = null
     movingItem.value = null
     futureItem.value = null
+    isInsideFooter.value = false
     return
   }
+
   const _items = Object.assign([], tablesList.value)
   _items.forEach((el) => {
     el.forEach((col) => {
-      if (col[col.indexOf(futureItem.value)] && movingItem.value.id !== futureItem.value.id) {
-        col.splice(col.indexOf(futureItem.value), 1, movingItem.value)
+      if (col[col.indexOf(futureItem.value)]) {
+        col[col.indexOf(futureItem.value)] = movingTemp
+      }
+      if (col[col.indexOf(movingItem.value)]) {
+        col[col.indexOf(movingItem.value)] = futureTemp
       }
     })
   })
-  tablesList.value[index][subIndex].splice(movingIndex.value, 1, futureItem.value)
   tablesList.value = _items
 
   setTimeout(() => {
@@ -391,12 +464,25 @@ const handleDragEnd = (index, subIndex) => {
     movingIndex.value = null
   }, 300)
 }
+
 const handleMove = (e) => {
-  const { index, element } = e.draggedContext
+  const { index, element, futureIndex } = e.draggedContext
   movingItem.value = element
   movingIndex.value = index
   futureItem.value = e.relatedContext.element
-  if (e.related.id.includes('footer-user_')) {
+  const cordinates = e.related.id.split('_')
+  tablesList.value.forEach((row, rowIndex) => {
+    row.forEach((col, colIndex) => {
+      col?.forEach((table, tableIndex) => {
+        if (rowIndex === +cordinates[1] && colIndex === +cordinates[2] && tableIndex === +cordinates[3]) {
+          table.dragzone = true
+        } else {
+          table.dragzone = false
+        }
+      })
+    })
+  })
+  if (e.related.className.includes('desk__edit-footer')) {
     isInsideFooter.value = true
   } else {
     isInsideFooter.value = false
@@ -406,6 +492,19 @@ const handleMove = (e) => {
 
 const handleMoveFromFooter = (e) => {
   const { index, futureIndex, element } = e.draggedContext
+
+  const cordinates = e.related.id.split('_')
+  tablesList.value.forEach((row, rowIndex) => {
+    row.forEach((col, colIndex) => {
+      col.forEach((table, tableIndex) => {
+        if (rowIndex === +cordinates[1] && colIndex === +cordinates[2] && tableIndex === +cordinates[3]) {
+          table.dragzone = true
+        } else {
+          table.dragzone = false
+        }
+      })
+    })
+  })
   footerMovingIndex.value = index
   footerFutureIndex.value = futureIndex
   footerMovingElement.value = element
@@ -418,6 +517,13 @@ const handleMoveFromFooter = (e) => {
   return false
 }
 const handleFooterDragEnd = () => {
+  tablesList.value.forEach((row, rowIndex) => {
+    row.forEach((col, colIndex) => {
+      col.forEach((table, tableIndex) => {
+        table.dragzone = false
+      })
+    })
+  })
   if (isInsideFooter.value) {
     const futureItem = availableMembers.value[footerFutureIndex.value]
     const movingItem = availableMembers.value[footerMovingIndex.value]
@@ -452,6 +558,10 @@ const handleFooterDragEnd = () => {
     reloadFooter.value = false
   })
 }
+
+const today = computed(() => {
+  return new Date().toLocaleDateString('en-us', { weekday: 'long', month: 'short', day: 'numeric' })
+})
 </script>
 
 <style scoped lang="scss">
@@ -459,14 +569,20 @@ const handleFooterDragEnd = () => {
   &__main {
     height: calc(100vh - 236px);
     border: 1px solid $ov-border--light;
-    padding-top: 15px;
-
     overflow: auto;
     overflow-x: auto;
     user-select: none;
     position: relative;
     &.edit-mode {
       height: calc(100vh - 296px);
+    }
+    &--add-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      &.horizontal {
+        flex-direction: row;
+      }
     }
     &--add-col {
       border: none;
@@ -475,7 +591,7 @@ const handleFooterDragEnd = () => {
       gap: 15px;
       height: 100%;
       align-items: flex-start;
-      justify-content: center;
+      justify-content: flex-start;
       width: 344px;
       cursor: default;
       &.horizontal {
@@ -484,15 +600,11 @@ const handleFooterDragEnd = () => {
           text-orientation: upright;
           writing-mode: vertical-lr;
           letter-spacing: -2px;
-          align-items: center;
         }
       }
       span {
-        color: #cdcdcd;
-        text-transform: uppercase;
-        font-weight: 700;
-        font-size: 12px;
-        margin-left: 10px !important;
+        text-align: left;
+        letter-spacing: 2px;
         cursor: pointer;
       }
     }
@@ -500,17 +612,20 @@ const handleFooterDragEnd = () => {
 
   &__row {
     display: flex;
-    gap: 0 50px;
     border-bottom: 1px solid $ov-border--light;
 
     &--col {
-      padding: 41px 100px 41px 101px;
+      padding: 65px 125px 65px 125px;
       display: grid;
       border-right: 1px solid $ov-border--light;
       grid-template-columns: repeat(2, 0fr);
+      position: relative;
       &__table {
         position: relative;
         cursor: grab;
+        width: 90px;
+        height: 79px;
+        z-index: 999;
         &.disabled {
           opacity: 0.5;
         }
@@ -648,11 +763,19 @@ const handleFooterDragEnd = () => {
         }
       }
     }
-    .close {
+    .close-right {
       position: absolute;
       z-index: 99;
       top: -20px;
       right: -26px;
+      opacity: 1;
+    }
+
+    .close-left {
+      position: absolute;
+      z-index: 99;
+      top: -20px;
+      left: -26px;
       opacity: 1;
     }
 
@@ -818,5 +941,134 @@ const handleFooterDragEnd = () => {
       }
     }
   }
+  &__table {
+    position: relative;
+    &--images {
+      padding: 65px 125px 65px 125px;
+      display: grid;
+      border-right: 1px solid #ecebed;
+      grid-template-columns: repeat(2, 0fr);
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
+}
+
+.edit-mode.table {
+  opacity: 0.3;
+  z-index: 997;
+}
+
+.table {
+  position: relative;
+  &-left {
+    &-top {
+      right: -12px;
+      top: 16px;
+    }
+    &-bottom {
+      right: -12px;
+      bottom: 8px;
+    }
+  }
+  &-right {
+    &-top {
+      top: 16px;
+      left: -12px;
+    }
+    &-bottom {
+      left: -12px;
+      bottom: 8px;
+    }
+  }
+}
+
+.isShowTable {
+  opacity: 0;
+}
+
+.desk__row--col__table[draggable='true'] {
+  opacity: 0.1 !important;
+  color: inherit;
+  background-color: inherit;
+}
+
+.dragzone {
+  opacity: 1 !important;
+  // background-color: gray;
+}
+
+.sortable-chosen {
+  opacity: 0;
+}
+.sortable-chosen.sortable-ghost {
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.removeSeats {
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 13px;
+
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  color: #ff647c;
+}
+
+.addSeats {
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 13px;
+  text-align: center;
+  text-transform: uppercase;
+
+  color: #6979f8;
+}
+
+.dailyEventsContainer {
+  background: #ffffff;
+  border: 1px solid #4156f6;
+  border-radius: 13px;
+  width: 330px;
+  height: 159px;
+  margin: 50px 50px 5px 50px;
+  padding: 8px 18px 20px 18px;
+  float: left;
+  .todayDate {
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 22px;
+    color: #787878;
+  }
+  .eventsList {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .todayEvent {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    div {
+      background: linear-gradient(270deg, #94cef9 -62.5%, rgba(48, 110, 154, 0.5) 275%);
+      border-radius: 0px 2px 2px 0px;
+      min-width: 4px;
+      width: 4px;
+    }
+    span {
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3f3356;
+    }
+  }
+}
+
+.dailyEventsContainer.edit-mode {
+  opacity: 0.3;
 }
 </style>

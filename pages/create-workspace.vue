@@ -95,6 +95,7 @@
 import { storeToRefs } from 'pinia'
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import $cookies from 'js-cookie'
 
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
@@ -163,8 +164,9 @@ watch(industriesError, (v) => {
 onMounted(async () => {
   auth()
   if (process.client) {
-    email.value = JSON.parse(localStorage.getItem('accounts'))[0].email
+    email.value = JSON.parse(localStorage.getItem('accounts'))[$cookies.get('currentAccountID')].email
   }
+  console.log($cookies.get('currentAccountID'))
   isOpenPINDialog.value = loginToken()
   isOpenPINDialog.value = settingsToken()
   window.addEventListener('resize', handleResize)

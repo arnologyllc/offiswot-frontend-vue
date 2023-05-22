@@ -213,24 +213,42 @@ watch(loginSuccessData, (v) => {
       localStorage.getItem('accounts') !== 'undefined' ? JSON.parse(localStorage.getItem('accounts')) : []
   }
 
-  const [accessToken, isFirstLogin] = [v.access_token, v.is_first_login]
-  const expirationDate = payload.value.remember_me ? null : 1 / 24
+  accounts.value.forEach((elem, index) => {
+    if (elem.email === v.user.email) {
+      accountTokens.value = elem
+      accounts.value.splice(index, 1)
+    }
+  })
 
-  const loginPinTokenExpires = new Date()
-  loginPinTokenExpires.setHours(loginPinTokenExpires.getHours() + 1)
-  Date.parse(loginPinTokenExpires)
-  if (expirationDate) {
+  const [accessToken, isFirstLogin] = [v.access_token, v.is_first_login]
+  const expirationDate = payload.value.remember_me ? 365 : 1 / 24
+
+  if (expirationDate !== 365) {
+    const loginPinTokenExpires = new Date()
+    loginPinTokenExpires.setHours(loginPinTokenExpires.getHours() + 1)
+    Date.parse(loginPinTokenExpires)
     accountTokens.value.token_expires = loginPinTokenExpires
   } else {
-    accountTokens.value.token_expires = null
+    const loginPinTokenExpires = new Date()
+    loginPinTokenExpires.setMonth(loginPinTokenExpires.getMonth() + 12)
+    Date.parse(loginPinTokenExpires)
+    accountTokens.value.token_expires = loginPinTokenExpires
   }
 
   $cookies.set('token', accessToken, { expires: expirationDate })
+  const loginTokenExpires = (Date.parse(accountTokens.value.login_pin_token_expires) - Date.now()) / 86400000
+  if (accountTokens.value.login_pin_token) {
+    $cookies.set('login_pin_token', accountTokens.value.login_pin_token, {
+      expires: loginTokenExpires,
+    })
+  }
+
   accountTokens.value.email = v.user.email
   accountTokens.value.token = accessToken
   accountTokens.value.first_login = isFirstLogin
   accounts.value.push(accountTokens.value)
   accounts.value.forEach((elem, index) => (elem.ID = index))
+  $cookies.set('currentAccountID', accounts.value.length - 1)
   if (process.client) {
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
   }
@@ -248,6 +266,7 @@ watch(loginErrorData, (v) => {
     v?.error === 'Please visit your email to verify your account.'
   ) {
     isOpenEmailDialog.value = true
+    return
   }
   if (v === 'Incorrect username or password.') {
     errors.value.global.value = v
@@ -278,11 +297,18 @@ const onSubmit = () => {
       if (valid) {
         const users =
           localStorage.getItem('accounts') !== 'undefined'
-            ? JSON.parse(localStorage.getItem('accounts'))?.filter(
-                (elem) => Date.parse(elem.token_expires) > new Date()
-              )
+            ? JSON.parse(localStorage.getItem('accounts'))
+                ?.map((elem) => {
+                  if (Date.parse(elem.token_expires) < new Date()) {
+                    elem.token = null
+                    elem.token_expires = null
+                    elem.settings_pin_token = null
+                  }
+                  return elem
+                })
+                ?.filter((elem) => Date.parse(elem.login_pin_token_expires) > new Date())
             : []
-        if (users?.some((elem) => elem.email === payload.value.email)) {
+        if (users?.some((elem) => elem.email === payload.value.email && elem.token)) {
           errors.value.global.value = 'Account already logined'
         } else {
           localStorage.setItem('accounts', JSON.stringify(users))

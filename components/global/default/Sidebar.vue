@@ -2,7 +2,7 @@
   <nav class="main">
     <div class="users">
       <div v-if="accounts" class="main__top">
-        <template v-for="item in accounts" :key="item.ID">
+        <template v-for="item in activeUsers" :key="item.ID">
           <el-dropdown
             class="main__user-actions"
             :class="{ currentUser: currentUser('u', item.ID), bordered: item.workspaces?.length }"
@@ -55,21 +55,28 @@
                 </span>
               </el-dropdown-item>
               <el-dropdown-item class="main__user-actions--add_element">
-                <span :class="isHovered" @mouseover="hoveringStart" @mouseout="hoveringEnd"> Add workspace </span>
+                <span
+                  :class="isHovered"
+                  @click="navigateTo('/create-workspace')"
+                  @mouseover="hoveringStart"
+                  @mouseout="hoveringEnd"
+                >
+                  Add workspace
+                </span>
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
       </div>
     </div>
-    <div class="chats" :class="isOpen ? 'large' : 'small'">
+    <div v-if="$route.path.includes('/pin/reset')" class="chats" :class="isOpen ? 'large' : 'small'">
       <el-button class="chats-button" @click="open">{{ isOpen ? '<' : '>' }}</el-button>
     </div>
   </nav>
 </template>
 
 <script setup>
-import { onMounted, watch, ref } from 'vue'
+import { onMounted, watch, ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import $cookies from 'js-cookie'
 import { storeToRefs } from 'pinia'
@@ -161,7 +168,7 @@ watch(editProfileData, (v) => {
 
 onMounted(async () => {
   if (process.client) {
-    accounts.value = JSON.parse(localStorage.getItem('accounts'))
+    accounts.value = JSON.parse(localStorage.getItem('accounts')).filter((elem) => elem.token)
   }
   if ($cookies.get('login_pin_token')) {
     if (!profileSuccessData.value) {
@@ -269,31 +276,41 @@ const addAccount = () => {
 
 const onLogout = async (userID) => {
   accounts.value.forEach((elem, index) => (elem.ID = index))
-  const initAccountValue = accounts.value.filter((elem) => elem.ID !== userID)
 
   changeAccount(userID)
   await $myFetch('logout', {
     method: 'post',
   })
 
+  const initAccountValue = accounts.value.map((elem) => {
+    if (elem.ID === userID) {
+      elem.token = null
+      elem.token_expires = null
+      elem.first_login = null
+      elem.settings_pin_token = null
+    }
+    return elem
+  })
+
   profileStore.$reset()
   pinStore.$reset()
   authStore.$reset()
   workspaceStore.$reset()
-
-  if (initAccountValue[0]) {
-    if (Date.parse(initAccountValue[0].token_expires) - Date.now() > 0) {
-      $cookies.set('token', initAccountValue[0].token, {
-        expires: (Date.parse(initAccountValue[0].token_expires) - Date.now()) / 86400000,
+  const newIndex = initAccountValue.findIndex((elem) => elem.token)
+  if (initAccountValue[newIndex]) {
+    if (Date.parse(initAccountValue[newIndex].token_expires) - Date.now() > 0) {
+      $cookies.set('token', initAccountValue[newIndex].token, {
+        expires: (Date.parse(initAccountValue[newIndex].token_expires) - Date.now()) / 86400000,
       })
-      if (initAccountValue[0].first_login === true) $cookies.set('first_login', initAccountValue[0].first_login)
-      if (initAccountValue[0].settings_pin_token)
-        $cookies.set('settings_pin_token', initAccountValue[0].settings_pin_token)
-      if (initAccountValue[0].login_pin_token)
-        $cookies.set('login_pin_token', initAccountValue[0].login_pin_token, {
-          expires: (Date.parse(initAccountValue[0].login_pin_token_expires) - new Date()) / 86400000,
+      if (initAccountValue[newIndex].first_login === true)
+        $cookies.set('first_login', initAccountValue[newIndex].first_login)
+      if (initAccountValue[newIndex].settings_pin_token)
+        $cookies.set('settings_pin_token', initAccountValue[newIndex].settings_pin_token)
+      if (initAccountValue[newIndex].login_pin_token)
+        $cookies.set('login_pin_token', initAccountValue[newIndex].login_pin_token, {
+          expires: (Date.parse(initAccountValue[newIndex].login_pin_token_expires) - new Date()) / 86400000,
         })
-      $cookies.set('currentAccountID', 0)
+      $cookies.set('currentAccountID', newIndex)
       profileStore.getProfile()
       await profileStore.getWorkSpaces()
       accounts.value = initAccountValue
@@ -333,6 +350,13 @@ const open = () => {
     isOpen.value = false
   }
 }
+
+const activeUsers = computed(() => {
+  return accounts.value.reduce((acc, elem) => {
+    if (elem.token) acc.push(elem)
+    return acc
+  }, [])
+})
 </script>
 
 <style scoped lang="scss">
@@ -348,6 +372,7 @@ const open = () => {
   position: sticky !important;
   top: 0;
   left: 0;
+  z-index: 9999;
   .users {
     height: 100vh;
     width: 68px;
