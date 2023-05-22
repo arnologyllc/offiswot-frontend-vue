@@ -1,7 +1,7 @@
 <template>
   <div class="main-dash">
     <div class="main-dash__header" :class="{ 'edit-mode': !dragOptions.disabled }">
-      <div class="main-dash__header--left">
+      <div class="main-dash__header">
         <el-button-group class="main-dash__header--button-group">
           <el-button round :class="{ active: currentComponent === 'desk' }" @click="setCurrentComponent('desk')"
             >Desk</el-button
@@ -13,16 +13,6 @@
         <el-button class="main-dash__header--edit-button" circle @click="dragOptions.disabled = false">
           <img src="@/assets/images/icons/edit-icon.svg" alt="/" />
         </el-button>
-      </div>
-      <div class="main-dash__header--right">
-        <el-button class="main-dash__header--meetings" round>
-          <div class="main-dash__header--meetings__left">
-            <img src="@/assets/images/icons/clock-icon.svg" alt="(-)" />
-            <div class="main-dash__header--meetings__left--title">Meeting in 30 minutes</div>
-          </div>
-          <div class="main-dash__header--meetings__right">+ 2 more</div>
-        </el-button>
-        <el-button class="main-dash__header--create-meeting">+ Create meeting</el-button>
       </div>
     </div>
     <div class="main-dash__content">
@@ -67,26 +57,17 @@ const setCurrentComponent = (name) => {
 
   &__header {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     width: 100%;
     height: 100px;
+    gap: 0 26px;
 
     &.edit-mode {
       opacity: 0.5;
       pointer-events: none;
     }
 
-    &--left {
-      display: flex;
-      align-items: center;
-      gap: 0 9px;
-    }
-    &--right {
-      display: flex;
-      align-items: center;
-      gap: 0 26px;
-    }
     &--button-group {
       box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
       border-radius: 18px;

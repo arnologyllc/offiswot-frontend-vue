@@ -201,7 +201,6 @@ watch(checkPinData, async (v) => {
 onMounted(() => {
   auth()
   isOpenPINDialog.value = loginToken()
-  isOpenPINDialog.value = settingsToken()
   if (editProfileData.value) {
     setProfileData(editProfileData.value)
   } else if (profileSuccessData.value) {

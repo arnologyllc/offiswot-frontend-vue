@@ -4,8 +4,22 @@ export default defineNuxtRouteMiddleware((to, from) => {
   if (process.client) {
     const accounts =
       localStorage.getItem('accounts') !== 'undefined' && localStorage.getItem('accounts') !== null
-        ? JSON.parse(localStorage.getItem('accounts'))?.filter((elem) => Date.parse(elem.token_expires) > new Date())
+        ? JSON.parse(localStorage.getItem('accounts'))
+            ?.map((elem) => {
+              if (Date.parse(elem.token_expires) < new Date()) {
+                elem.token = null
+                elem.token_expires = null
+                elem.settings_pin_token = null
+              }
+              return elem
+            })
+            ?.filter((elem) => {
+              return (
+                Date.parse(elem.login_pin_token_expires) > new Date() || Date.parse(elem.token_expires) > new Date()
+              )
+            })
         : []
+
     localStorage.setItem('accounts', JSON.stringify(accounts))
 
     if (!tokenCookies._value) {
@@ -13,11 +27,13 @@ export default defineNuxtRouteMiddleware((to, from) => {
       const settingsToken = useCookie('settings_pin_token')
       const loginToken = useCookie('login_pin_token')
       const accountID = useCookie('currentAccountID')
-      if (accounts[0]) {
-        firstToken.value = accounts[0].firstToken
-        tokenCookies.value = accounts[0].token
-        settingsToken.value = accounts[0].settings_pin_token
-        loginToken.value = accounts[0].login_pin_token
+
+      const newIndex = accounts.findIndex((elem) => elem.token)
+      if (accounts[newIndex]) {
+        firstToken.value = accounts[newIndex].firstToken
+        tokenCookies.value = accounts[newIndex].token
+        settingsToken.value = accounts[newIndex].settings_pin_token
+        loginToken.value = accounts[newIndex].login_pin_token
         accountID.value = 0
         navigateTo('/')
       } else {

@@ -36,50 +36,5 @@
       "name": "James Bond",
       "avatar": "https://www.mantruckandbus.com/fileadmin/_processed_/c/7/csm_frank-sprenger-interviewkachel_4470dab1a7.jpg"
     }
-  },
-  {
-    "professionId": 2,
-    "projectStatus": 1,
-    "user": {
-      "user_id": 5,
-      "name": "James Bond",
-      "avatar": "https://www.mantruckandbus.com/fileadmin/_processed_/c/7/csm_frank-sprenger-interviewkachel_4470dab1a7.jpg"
-    }
-  },
-  {
-    "professionId": 2,
-    "projectStatus": 1,
-    "user": {
-      "user_id": 6,
-      "name": "James Bond",
-      "avatar": "https://www.mantruckandbus.com/fileadmin/_processed_/c/7/csm_frank-sprenger-interviewkachel_4470dab1a7.jpg"
-    }
-  },
-  {
-    "professionId": 2,
-    "projectStatus": 1,
-    "user": {
-      "user_id": 7,
-      "name": "James Bond",
-      "avatar": "https://www.mantruckandbus.com/fileadmin/_processed_/c/7/csm_frank-sprenger-interviewkachel_4470dab1a7.jpg"
-    }
-  },
-  {
-    "professionId": 2,
-    "projectStatus": 1,
-    "user": {
-      "user_id": 8,
-      "name": "James Bond",
-      "avatar": "https://www.mantruckandbus.com/fileadmin/_processed_/c/7/csm_frank-sprenger-interviewkachel_4470dab1a7.jpg"
-    }
-  },
-  {
-    "professionId": 2,
-    "projectStatus": 1,
-    "user": {
-      "user_id": 9,
-      "name": "James Bond",
-      "avatar": "https://www.mantruckandbus.com/fileadmin/_processed_/c/7/csm_frank-sprenger-interviewkachel_4470dab1a7.jpg"
-    }
   }
 ]
