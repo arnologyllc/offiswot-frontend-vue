@@ -149,7 +149,6 @@ const { checkPinData } = storeToRefs(pinStore)
 
 const instance = getCurrentInstance()
 const config = useRuntimeConfig()
-
 const responseWorkspaces = ref(null)
 const payload = ref({
   avatar: null,
@@ -200,6 +199,7 @@ watch(checkPinData, async (v) => {
 
 onMounted(() => {
   auth()
+
   isOpenPINDialog.value = loginToken()
   if (editProfileData.value) {
     setProfileData(editProfileData.value)

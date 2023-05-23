@@ -69,8 +69,26 @@
         </el-dropdown>
       </div>
     </div>
-    <div v-if="$route.path.includes('/pin/reset')" class="chats" :class="isOpen ? 'large' : 'small'">
-      <el-button class="chats-button" @click="open">{{ isOpen ? '<' : '>' }}</el-button>
+    <div
+      v-if="$route.path.includes('workspace') || $route.fullPath == '/'"
+      class="chats"
+      :class="isOpen ? 'large' : 'small'"
+    >
+      <div class="chats-header">
+        <el-button class="chats__search">
+          <img src="~/assets/images/icons/search.svg" alt="" class="chats__button-img" />
+          <span class="chats__button-text">Search</span>
+        </el-button>
+        <el-button class="chats__create">
+          <img src="~/assets/images/icons/new-chat.svg" alt="" class="chats__button-img" />
+          <span class="chats__button-text">Create new chat</span>
+        </el-button>
+        <el-button class="chats__saved">
+          <img src="~/assets/images/icons/saved-messages.svg" alt="" class="chats__button-img" />
+          <span class="chats__button-text">Saved messages</span>
+        </el-button>
+      </div>
+      <el-button class="chats-button" :class="isOpen ? 'right' : 'left'" @click="open"></el-button>
     </div>
   </nav>
 </template>
@@ -80,6 +98,7 @@ import { onMounted, watch, ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import $cookies from 'js-cookie'
 import { storeToRefs } from 'pinia'
+import { Search } from '@element-plus/icons-vue'
 import useProfileStore from '@/stores/profile'
 import usePinStore from '@/stores/pin'
 import useAuthStore from '@/stores/auth'
@@ -95,7 +114,7 @@ const { profileSuccessData, profileFailureData, editProfileData, editFailureData
 const { $myFetch } = useNuxtApp()
 const config = useRuntimeConfig()
 const avatarUrl = ref(defaultAvatar)
-const isOpen = ref(false)
+const isOpen = ref(true)
 const instance = getCurrentInstance()
 
 const profile = ref(null)
@@ -343,7 +362,7 @@ const currentUser = (type, id) => {
   }
 }
 
-const open = () => {
+const open = (e) => {
   if (window.innerWidth > 800) {
     isOpen.value = !isOpen.value
   } else {
@@ -371,8 +390,11 @@ const activeUsers = computed(() => {
   border-radius: 0 !important;
   position: sticky !important;
   top: 0;
-  left: 0;
-  z-index: 9999;
+  z-index: 2000;
+  &__top {
+    z-index: 1;
+    overflow-y: auto;
+  }
   .users {
     height: 100vh;
     width: 68px;
@@ -391,6 +413,9 @@ const activeUsers = computed(() => {
     align-items: center;
     justify-content: space-between;
     transition: all 0.5s linear;
+    & * {
+      transition: all 0.5s linear;
+    }
   }
   &__user {
     &-workspaces {
@@ -470,23 +495,84 @@ const activeUsers = computed(() => {
 .chats {
   background: linear-gradient(180.87deg, #2c3a9f 6.42%, #299ba0 97.68%);
   backdrop-filter: blur(2px);
+  padding: 14px;
+  &__button-text {
+    opacity: 1;
+    display: block;
+  }
+  &-header {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    font-size: 14px;
+    padding: 0 20px 14px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    .el-button {
+      border: none;
+      background-color: inherit;
+      color: white;
+      justify-content: flex-start;
+      margin: 0 !important;
+      padding: 0;
+      span {
+        margin-left: 6px !important;
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 17px;
+        color: #ffffff;
+        text-align: left;
+      }
+    }
+  }
 }
 
 .large {
   width: 236px !important;
+  .chats__button-text {
+    visibility: visible;
+    opacity: 1;
+    width: 148px;
+  }
 }
 .small {
   width: 71px !important;
+  .chats-header {
+    padding: 0 10px 14px 10px;
+  }
+  .el-button {
+    border: none;
+    background-color: inherit;
+    color: white;
+  }
+  .chats__button-text {
+    opacity: 0;
+    width: 0;
+    visibility: hidden;
+  }
 }
 
 .chats-button {
   position: absolute;
-  top: 30px;
-  right: -25px;
+  top: 32px;
+  right: -12px;
   border: none;
   background: none;
   color: white;
   font-weight: 900;
+  width: 0;
+  height: 0;
+  &.left {
+    border-top: 14px solid transparent;
+    border-bottom: 14px solid transparent;
+    border-left: 14px solid white;
+  }
+  &.right {
+    border-top: 14px solid transparent;
+    border-bottom: 14px solid transparent;
+    border-right: 14px solid white;
+    right: 0px;
+  }
+  padding: 0;
 }
 
 .main__user-actions--add_element {

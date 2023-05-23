@@ -37,9 +37,9 @@
                     <div
                       v-if="index % 2 === 0"
                       class="left-box"
-                      :class="{ top: index === 0 || index === 3 }"
+                      :class="{ top: index === 0 || index === 3, bottom: index === 1 || index === 2 }"
                       :style="{
-                        border: `3px solid ${currentProfession(element.professionId).color}`,
+                        border: `3px solid rgb(65, 86, 246)`,
                       }"
                     >
                       <div class="left-box__left">
@@ -70,7 +70,7 @@
                           <img
                             :src="element.user.avatar"
                             :style="{
-                              border: `1px solid ${currentProfession(element.professionId).color}`,
+                              border: `1px solid rgb(65, 86, 246)`,
                             }"
                             alt=""
                           />
@@ -79,26 +79,32 @@
                           v-else
                           :src="element.user.avatar"
                           :style="{
-                            border: `1px solid ${currentProfession(element.professionId).color}`,
+                            border: `1px solid rgb(65, 86, 246)`,
                           }"
                           alt=""
                         />
                       </div>
                       <div
                         class="left-box__triangle"
-                        :style="{
-                          'border-top': `15px solid ${currentProfession(element.professionId).color}`,
+                        :class="{
+                          'left-box__triangle-bottom': index === 0,
+                          'left-box__triangle-top': index === 2,
                         }"
                       >
-                        <div class="left-box__triangle--inner"></div>
+                        <div
+                          :class="{
+                            'left-box__triangle--inner-bottom': index === 2,
+                            'left-box__triangle--inner-top': index === 0,
+                          }"
+                        ></div>
                       </div>
                     </div>
                     <div
                       v-else
                       class="right-box"
-                      :class="{ top: index === 1 || index === 2 }"
+                      :class="{ top: index === 1 || index === 2, bottom: index === 3 || index === 0 }"
                       :style="{
-                        border: `3px solid ${currentProfession(element.professionId).color}`,
+                        border: `3px solid rgb(65, 86, 246)`,
                       }"
                     >
                       <div class="right-box__left">
@@ -129,7 +135,7 @@
                           <img
                             :src="element.user.avatar"
                             :style="{
-                              border: `1px solid ${currentProfession(element.professionId).color}`,
+                              border: `1px solid rgb(65, 86, 246)`,
                             }"
                             alt=""
                           />
@@ -138,18 +144,24 @@
                           v-else
                           :src="element.user.avatar"
                           :style="{
-                            border: `1px solid ${currentProfession(element.professionId).color}`,
+                            border: `1px solid rgb(65, 86, 246)`,
                           }"
                           alt=""
                         />
                       </div>
                       <div
                         class="right-box__triangle"
-                        :style="{
-                          'border-top': `15px solid ${currentProfession(element.professionId).color}`,
+                        :class="{
+                          'left-box__triangle-bottom': index === 1,
+                          'left-box__triangle-top': index === 3,
                         }"
                       >
-                        <div class="right-box__triangle--inner"></div>
+                        <div
+                          :class="{
+                            'left-box__triangle--inner-bottom': index === 3,
+                            'left-box__triangle--inner-top': index === 1,
+                          }"
+                        ></div>
                       </div>
                     </div>
                   </div>
@@ -681,7 +693,6 @@ const today = computed(() => {
     align-items: center;
     justify-content: space-between;
     padding: 4px 8px;
-    top: -20px;
     box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
     .badge {
       sup {
@@ -690,21 +701,41 @@ const today = computed(() => {
       }
     }
     &__triangle {
-      width: 0;
-      height: 0;
-      border-left: 15px solid transparent;
-      border-right: 15px solid transparent;
-      position: absolute;
-      bottom: -15px;
-
-      &--inner {
+      &-top,
+      &-bottom {
+        position: absolute;
         width: 0;
         height: 0;
-        border-left: 11px solid transparent;
-        border-right: 11px solid transparent;
-        border-top: 11px solid white;
-        margin-top: -15px;
-        margin-left: -11px;
+        border-left: 15px solid transparent;
+        border-right: 15px solid transparent;
+      }
+      &-top {
+        top: -15px;
+        border-bottom: 15px solid rgb(65, 86, 246);
+      }
+      &-bottom {
+        bottom: -15px;
+        border-top: 15px solid rgb(65, 86, 246);
+      }
+
+      &--inner {
+        &-top,
+        &-bottom {
+          width: 0;
+          height: 0;
+          border-left: 11px solid transparent;
+          border-right: 11px solid transparent;
+        }
+        &-top {
+          border-top: 11px solid white;
+          margin-top: -15px;
+          margin-left: -11px;
+        }
+        &-bottom {
+          border-bottom: 11px solid white;
+          margin-top: 4px;
+          margin-left: -11px;
+        }
       }
     }
     &__right {
@@ -777,10 +808,6 @@ const today = computed(() => {
       top: -20px;
       left: -26px;
       opacity: 1;
-    }
-
-    &.top {
-      top: -38px;
     }
   }
   &__edit-footer {
@@ -872,14 +899,26 @@ const today = computed(() => {
   }
 
   .left-box {
-    left: -93px;
+    right: 5px;
+    &.top {
+      top: 5px;
+    }
+    &.bottom {
+      bottom: 5px;
+    }
     &__triangle {
       right: 8px;
     }
   }
   .right-box {
-    right: -93px;
+    left: 5px;
     flex-direction: row-reverse;
+    &.top {
+      top: 5px;
+    }
+    &.bottom {
+      bottom: 5px;
+    }
     &__triangle {
       left: 8px;
     }
@@ -990,22 +1029,10 @@ const today = computed(() => {
 
 .desk__row--col__table[draggable='true'] {
   opacity: 0.1 !important;
-  color: inherit;
-  background-color: inherit;
 }
 
 .dragzone {
   opacity: 1 !important;
-  // background-color: gray;
-}
-
-.sortable-chosen {
-  opacity: 0;
-}
-.sortable-chosen.sortable-ghost {
-  opacity: 0 !important;
-  width: 0 !important;
-  height: 0 !important;
 }
 
 .removeSeats {
