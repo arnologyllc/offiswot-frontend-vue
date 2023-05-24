@@ -73,6 +73,7 @@
       v-if="$route.path.includes('workspace') || $route.fullPath == '/'"
       class="chats"
       :class="isOpen ? 'large' : 'small'"
+      :style="{ width: sidebarWidth + 'px' }"
     >
       <div class="chats-header">
         <el-button class="chats__search">
@@ -88,7 +89,7 @@
           <span class="chats__button-text">Saved messages</span>
         </el-button>
       </div>
-      <el-button class="chats-button" :class="isOpen ? 'right' : 'left'" @click="open"></el-button>
+      <div class="cursorbefore" @mousedown="handleChangeWidth"></div>
     </div>
   </nav>
 </template>
@@ -124,12 +125,13 @@ const accounts = ref(false)
 const $route = useRoute()
 const currentAccountID = ref($cookies.get('currentAccountID') ? +$cookies.get('currentAccountID') : 0)
 const currentWorkspaceID = ref(false)
+const sidebarWidth = ref(236)
 
 const getAvatar = (v) => {
   profile.value = v
-  if (v?.user.avatar) {
+  if (v?.user.avatar && accounts.value[currentAccountID.value]) {
     accounts.value[currentAccountID.value].avatarUrl = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
-  } else {
+  } else if (accounts.value[currentAccountID.value]) {
     accounts.value[currentAccountID.value].avatarUrl = `${defaultAvatar}`
   }
   if (process.client) {
@@ -140,7 +142,7 @@ const getAvatar = (v) => {
 const setWorkspaceData = (v) => {
   if (process.client) {
     accounts.value = JSON.parse(localStorage.getItem('accounts'))
-    accounts.value[currentAccountID.value].workspaces = v?.myWorkspaces
+    if (accounts.value[currentAccountID.value]) accounts.value[currentAccountID.value].workspaces = v?.myWorkspaces
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
   }
 }
@@ -362,20 +364,35 @@ const currentUser = (type, id) => {
   }
 }
 
-const open = (e) => {
-  if (window.innerWidth > 800) {
-    isOpen.value = !isOpen.value
-  } else {
-    isOpen.value = false
-  }
-}
-
 const activeUsers = computed(() => {
   return accounts.value.reduce((acc, elem) => {
     if (elem.token) acc.push(elem)
     return acc
   }, [])
 })
+
+const handleChangeWidth = (e) => {
+  e.target.parentNode.style.cursor = 'e-resize'
+  window.addEventListener('mousemove', resizeSidebar, false)
+  window.addEventListener(
+    'mouseup',
+    () => {
+      e.target.parentNode.style.cursor = 'auto'
+      window.removeEventListener('mousemove', resizeSidebar, false)
+    },
+    false
+  )
+}
+
+const resizeSidebar = (e) => {
+  sidebarWidth.value = e.x - 68
+
+  if (sidebarWidth.value < 85) {
+    isOpen.value = false
+  } else {
+    isOpen.value = true
+  }
+}
 </script>
 
 <style scoped lang="scss">
@@ -409,13 +426,7 @@ const activeUsers = computed(() => {
     min-width: 71px;
     max-width: 236px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: space-between;
-    transition: all 0.5s linear;
-    & * {
-      transition: all 0.5s linear;
-    }
   }
   &__user {
     &-workspaces {
@@ -495,18 +506,28 @@ const activeUsers = computed(() => {
 .chats {
   background: linear-gradient(180.87deg, #2c3a9f 6.42%, #299ba0 97.68%);
   backdrop-filter: blur(2px);
-  padding: 14px;
+  padding: 10px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   &__button-text {
     opacity: 1;
     display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   &-header {
     display: flex;
     flex-direction: column;
     gap: 7px;
     font-size: 14px;
-    padding: 0 20px 14px 20px;
-    border-bottom: 1px solid #f0f0f0;
+    padding: 0 0 14px 0;
+    border-bottom: 1px solid rgba(240, 240, 240, 0.3);
+    width: 100%;
+    height: max-content;
+    overflow: hidden;
+    text-overflow: ellipsis;
     .el-button {
       border: none;
       background-color: inherit;
@@ -514,6 +535,9 @@ const activeUsers = computed(() => {
       justify-content: flex-start;
       margin: 0 !important;
       padding: 0;
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
       span {
         margin-left: 6px !important;
         font-weight: 500;
@@ -521,13 +545,15 @@ const activeUsers = computed(() => {
         line-height: 17px;
         color: #ffffff;
         text-align: left;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
   }
 }
 
 .large {
-  width: 236px !important;
   .chats__button-text {
     visibility: visible;
     opacity: 1;
@@ -535,7 +561,6 @@ const activeUsers = computed(() => {
   }
 }
 .small {
-  width: 71px !important;
   .chats-header {
     padding: 0 10px 14px 10px;
   }
@@ -549,30 +574,6 @@ const activeUsers = computed(() => {
     width: 0;
     visibility: hidden;
   }
-}
-
-.chats-button {
-  position: absolute;
-  top: 32px;
-  right: -12px;
-  border: none;
-  background: none;
-  color: white;
-  font-weight: 900;
-  width: 0;
-  height: 0;
-  &.left {
-    border-top: 14px solid transparent;
-    border-bottom: 14px solid transparent;
-    border-left: 14px solid white;
-  }
-  &.right {
-    border-top: 14px solid transparent;
-    border-bottom: 14px solid transparent;
-    border-right: 14px solid white;
-    right: 0px;
-  }
-  padding: 0;
 }
 
 .main__user-actions--add_element {
@@ -609,5 +610,22 @@ const activeUsers = computed(() => {
 
 .bordered {
   border-bottom: 1px solid #f0f0f0;
+}
+
+.cursorbefore {
+  position: relative;
+  width: 4px;
+  height: 103%;
+  right: -10px;
+  margin-top: -14px;
+  cursor: e-resize;
+}
+
+.cursorbefore:active {
+  background-color: blue;
+}
+
+.cursorbefore:hover {
+  background-color: aqua;
 }
 </style>
