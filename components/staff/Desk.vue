@@ -366,15 +366,28 @@ const setLastTableId = () => {
 }
 const onAddRow = () => {
   const arr = []
-  for (const i in Array(tablesList.value[0]?.length + 1).fill('')) {
-    lastTableId.value += +i + 2
-    arr.push([
-      { id: lastTableId.value + +i + 2 },
-      { id: lastTableId.value + +i + 3 },
-      { id: lastTableId.value + +i + 4 },
-      { id: lastTableId.value + +i + 5 },
-    ])
+  if (tablesList.value[0]) {
+    for (const i in Array(tablesList.value[0]?.length + 1).fill('')) {
+      lastTableId.value += +i + 2
+      arr.push([
+        { id: lastTableId.value + +i + 2 },
+        { id: lastTableId.value + +i + 3 },
+        { id: lastTableId.value + +i + 4 },
+        { id: lastTableId.value + +i + 5 },
+      ])
+    }
+  } else {
+    for (const i in Array(1).fill('')) {
+      lastTableId.value += +i + 2
+      arr.push([
+        { id: lastTableId.value + +i + 2 },
+        { id: lastTableId.value + +i + 3 },
+        { id: lastTableId.value + +i + 4 },
+        { id: lastTableId.value + +i + 5 },
+      ])
+    }
   }
+
   tablesList.value.push(arr)
   setLastTableId()
 }
@@ -391,6 +404,7 @@ const onDeleteRow = () => {
     })
   })
   tablesList.value.pop()
+
   setLastTableId()
 }
 
@@ -412,7 +426,6 @@ const onDeleteCol = () => {
     row.forEach((table, idx) => {
       if (idx === row.length - 1) {
         for (const userID in table) {
-          console.log(idx, index)
           if (table[userID].user) {
             handleDeleteUser(index, idx, userID)
           }
