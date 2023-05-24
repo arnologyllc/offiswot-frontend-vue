@@ -384,7 +384,7 @@ const onDeleteRow = () => {
   tablesList.value.forEach((row, index) => {
     row.forEach((table, i) => {
       for (const userID in table) {
-        if (table[userID].user) {
+        if (table[userID].user && index === tablesList.value.length - 1) {
           handleDeleteUser(index, i, userID)
         }
       }
@@ -412,6 +412,7 @@ const onDeleteCol = () => {
     row.forEach((table, idx) => {
       if (idx === row.length - 1) {
         for (const userID in table) {
+          console.log(idx, index)
           if (table[userID].user) {
             handleDeleteUser(index, idx, userID)
           }
@@ -1028,7 +1029,7 @@ const today = computed(() => {
 }
 
 .desk__row--col__table[draggable='true'] {
-  opacity: 0.1 !important;
+  opacity: 0.001 !important;
 }
 
 .dragzone {
@@ -1097,5 +1098,9 @@ const today = computed(() => {
 
 .dailyEventsContainer.edit-mode {
   opacity: 0.3;
+}
+
+.sortable-ghost {
+  opacity: 0 !important;
 }
 </style>
