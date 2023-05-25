@@ -123,7 +123,7 @@ const $router = useRouter()
 const isHovered = ref(false)
 const accounts = ref(false)
 const $route = useRoute()
-const currentAccountID = ref($cookies.get('currentAccountID') ? +$cookies.get('currentAccountID') : 0)
+const currentAccountID = ref(null)
 const currentWorkspaceID = ref(false)
 const sidebarWidth = ref(236)
 
@@ -149,9 +149,9 @@ const setWorkspaceData = (v) => {
 watch(workspacesSuccessData, (v) => setWorkspaceData(v))
 
 watch(profileSuccessData, (v) => {
-  if (v?.user.avatar) {
+  if (v?.user.avatar && currentAccountID.value >= 0) {
     accounts.value[currentAccountID.value].avatarUrl = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
-  } else {
+  } else if (currentAccountID.value >= 0) {
     accounts.value[currentAccountID.value].avatarUrl = `${defaultAvatar}`
   }
   if (process.client) {
@@ -190,6 +190,16 @@ watch(editProfileData, (v) => {
 onMounted(async () => {
   if (process.client) {
     accounts.value = JSON.parse(localStorage.getItem('accounts')).filter((elem) => elem.token)
+    const path = window.location.pathname.split('/')
+    if (!isNaN(+path[path.length - 1])) {
+      currentWorkspaceID.value = path[path.length - 1]
+      currentAccountID.value = null
+    }
+  }
+  if (!currentWorkspaceID.value && $cookies.get('currentAccountID')) {
+    currentAccountID.value = +$cookies.get('currentAccountID')
+  } else if (!currentWorkspaceID.value) {
+    currentAccountID.value = 0
   }
   if ($cookies.get('login_pin_token')) {
     if (!profileSuccessData.value) {

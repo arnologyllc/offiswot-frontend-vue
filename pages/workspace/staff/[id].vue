@@ -52,15 +52,15 @@ const setCurrentComponent = (name) => {
   width: 100%;
   height: calc(100vh - 58px);
   padding: 16px 66px 0 21px;
-  background-color: #f5f7fb;
   border-radius: 20px 0 0 20px;
+  background-color: #f5f7fb;
 
   &__header {
     display: flex;
     justify-content: flex-end;
     align-items: center;
     width: 100%;
-    height: 100px;
+    height: 50px;
     gap: 0 26px;
 
     &.edit-mode {

@@ -72,9 +72,7 @@ const useProfileStore = defineStore('profile', {
           .replaceAll('-', '')
       }
       const formData = new FormData()
-      if (typeof payload.avatar === 'string') {
-        delete payload.avatar
-      }
+
       if (typeof payload.cv === 'string') {
         delete payload.cv
       }
