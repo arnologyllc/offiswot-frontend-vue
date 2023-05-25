@@ -29,23 +29,40 @@
         <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }" class="main__form--picture">
           <el-form-item prop="avatar">
             <img :src="avatarUrl" alt="avatar" />
-            <el-upload
-              v-model="payload.avatar"
-              :show-file-list="false"
-              class="main__form--upload"
-              action="#"
-              accept="image/*"
-              :on-success="onAvatarUpload"
-            >
-              <el-button class="el-upload--text">
-                <el-icon>
-                  <EditPen />
-                </el-icon>
-              </el-button>
-            </el-upload>
+
+            <el-dropdown class="el-upload--text">
+              <img src="~/assets/images/icons/edit-button.svg" alt="edit" class="avatar-edit_button" />
+
+              <template #dropdown>
+                <el-dropdown-menu class="avatar-edit_actions">
+                  <el-dropdown-item class="avatar-edit_actions-element">
+                    <el-upload
+                      v-model="payload.avatar"
+                      :show-file-list="false"
+                      class="main__form--upload"
+                      action="#"
+                      accept="image/*"
+                      :on-success="onAvatarUpload"
+                    >
+                      <span :class="isHovered" @mouseover="hoveringStart" @mouseout="hoveringEnd"> Edit </span>
+                    </el-upload>
+                  </el-dropdown-item>
+                  <el-dropdown-item class="avatar-edit_actions-element">
+                    <span
+                      :class="isHovered"
+                      @mouseover="hoveringStart"
+                      @mouseout="hoveringEnd"
+                      @click="handleDeleteAvatar"
+                    >
+                      Delete
+                    </span>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </el-form-item>
           <div class="main__form--info">
-            <span v-if="payload.surname" class="main__form--info__title">{{ payload.surname }}</span>
+            <span v-if="username" class="main__form--info__title">{{ username }}</span>
             <span v-if="email" class="main__form--info__subtitle">{{ email }}</span>
           </div>
         </el-col>
@@ -136,9 +153,13 @@
         <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
           <el-form-item prop="timezone">
             <el-select v-model="payload.timezone" class="main__form--input select" placeholder="Timezone">
-              <el-option v-for="zone in timeZonesList" :key="`time_${zone.value}`" :value="zone.name">{{
-                'UTC(' + zone.value + ')'
-              }}</el-option>
+              <el-option
+                v-for="zone in timeZonesList"
+                :key="`time_${zone.VALUE}`"
+                :value="zone.NAME.replace(', ', '/')"
+              >
+                {{ 'GMT' + (zone.VALUE === '0' ? '+' : '') + zone.VALUE + ' (' + zone.NAME + ')' }}
+              </el-option>
             </el-select>
           </el-form-item>
         </el-col>
@@ -198,6 +219,7 @@ import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import auth from '~/middleware/auth'
 import settingsToken from '~/middleware/settingsToken'
 import loginToken from '~/middleware/loginToken'
+import timeZonesList from '@/data/timezones.json'
 import useProfileStore from '@/stores/profile'
 const instance = getCurrentInstance()
 
@@ -229,39 +251,9 @@ const languagesList = ref([
 ])
 
 const email = ref(null)
+const username = ref(null)
+const isHovered = ref(false)
 
-const timeZonesList = ref([
-  { value: '-12', name: 'Pacific/Kwajalein' },
-  { value: '-11', name: 'Pacific/Samoa' },
-  { value: '-10', name: 'Pacific/Honolulu' },
-  { value: '-9', name: 'America/Juneau' },
-  { value: '-8', name: 'America/Los_Angeles' },
-  { value: '-7', name: 'America/Denver' },
-  { value: '-6', name: 'America/Mexico_City' },
-  { value: '-5', name: 'America/New_York' },
-  { value: '-4', name: 'America/Caracas' },
-  { value: '-3.5', name: 'America/St_Johns' },
-  { value: '-3', name: 'America/Sao_Paulo' },
-  { value: '-2', name: 'Atlantic/South_Georgia' },
-  { value: '-1', name: 'Atlantic/Azores' },
-  { value: '0', name: 'UTC' },
-  { value: '+1', name: 'Europe/Paris' },
-  { value: '+2', name: 'Europe/Helsinki' },
-  { value: '+3', name: 'Europe/Moscow' },
-  { value: '+3.5', name: 'Asia/Tehran' },
-  { value: '+4', name: 'Asia/Yerevan' },
-  { value: '+4.5', name: 'Asia/Kabul' },
-  { value: '+5', name: 'Asia/Karachi' },
-  { value: '+5.5', name: 'Asia/Calcutta' },
-  { value: '+6', name: 'Asia/Dhaka' },
-  { value: '+7', name: 'Asia/Bangkok' },
-  { value: '+8', name: 'Asia/Hong_Kong' },
-  { value: '+9', name: 'Asia/Tokyo' },
-  { value: '+9.5', name: 'Australia/Adelaide' },
-  { value: '+10', name: 'Australia/Sydney' },
-  { value: '+11', name: 'Pacific/Noumea' },
-  { value: '+12', name: 'Pacific/Auckland' },
-])
 const avatarSrc = ref(null)
 const isOpenPINDialog = ref(null)
 const avatarUrl = ref(defaultAvatar)
@@ -270,6 +262,9 @@ const config = useRuntimeConfig()
 const setProfileData = (v) => {
   if (v?.user.email) {
     email.value = v.user.email
+  }
+  if (v?.user.username) {
+    username.value = v.user.username
   }
   if (v?.user.avatar) {
     avatarUrl.value = v.avatarPath.includes(config.public.env.serverUrl)
@@ -323,8 +318,22 @@ const onAvatarUpload = (e, file) => {
   avatarSrc.value = URL.createObjectURL(file.raw)
   profileStore.editProfile(payload.value)
 }
+
+const handleDeleteAvatar = () => {
+  payload.value.avatar = 'default.jpg'
+  avatarSrc.value = 'default.jpg'
+  profileStore.editProfile(payload.value)
+}
+
 const onSubmit = () => {
   profileStore.editProfile(payload.value)
+}
+
+const hoveringStart = () => {
+  isHovered.value = 'hovered'
+}
+const hoveringEnd = () => {
+  isHovered.value = false
 }
 </script>
 
@@ -335,7 +344,7 @@ const onSubmit = () => {
   padding-top: 50px;
   padding-bottom: 50px;
   border-radius: 20px 0 0 20px;
-    min-height: calc(100vh - 50px);
+  min-height: calc(100vh - 50px);
   &__title {
     font-size: 20px;
     font-weight: 600;
@@ -410,16 +419,7 @@ const onSubmit = () => {
     &--upload {
       display: flex;
       width: 100%;
-      .el-upload--text {
-        position: absolute;
-        cursor: pointer;
-        bottom: -6px;
-        right: -6px;
-        width: 33px;
-        border: 1px solid #e5e7fa;
-        background: #ffffff;
-        border-radius: 50%;
-      }
+
       button {
         color: $ov-text--aqua;
         border: none;
@@ -621,6 +621,60 @@ const onSubmit = () => {
 @media (max-width: 770px) {
   .main {
     padding-left: 0;
+  }
+}
+
+.avatar-edit_button {
+  background: #ffffff !important;
+  width: 22px !important;
+  height: 22px !important;
+}
+
+.el-upload--text {
+  position: absolute !important;
+  cursor: pointer !important;
+  bottom: -6px !important;
+  right: -6px !important;
+  width: 33px !important;
+  height: 33px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e5e7fa !important;
+  background: #ffffff !important;
+  border-radius: 50% !important;
+}
+
+.avatar-edit {
+  &_actions {
+    &-element {
+      background-color: #ffffff;
+      width: 100%;
+      padding: 0 !important;
+      &:hover {
+        span {
+          width: 100%;
+          display: block;
+          padding: 0;
+          margin: 0;
+          color: #3f3356 !important;
+          background-color: #f5f7fb !important;
+        }
+      }
+    }
+    &-element > span {
+      display: block;
+      font-size: 15px;
+      font-weight: 400;
+      width: 100%;
+      height: 100%;
+      color: #3f3356 !important;
+    }
+  }
+}
+.avatar-edit_actions-element {
+  .hovered {
+    color: #d0c9d6 !important;
   }
 }
 </style>

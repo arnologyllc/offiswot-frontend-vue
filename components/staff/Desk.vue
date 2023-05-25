@@ -202,13 +202,7 @@
         </div>
       </el-button>
     </div>
-    <div v-if="dragOptions.disabled" class="desk__hint">
-      <div v-for="(item, index) in hints" :key="`hint_${index}`" class="desk__hint--item">
-        <div class="desk__hint--circle" :style="{ background: item.color }"></div>
-        <span>{{ item.name }}</span>
-      </div>
-    </div>
-    <div v-else class="desk__edit-footer">
+    <div v-if="!dragOptions.disabled" class="desk__edit-footer">
       <el-button class="desk__edit-footer--invite" @click="isOpenInviteModal = true"> Invite Member </el-button>
       <draggable
         v-if="availableMembers.length"
@@ -599,6 +593,8 @@ const today = computed(() => {
     overflow-x: auto;
     user-select: none;
     position: relative;
+    background: url('~/assets/images/tables-background.svg');
+    background-repeat: repeat;
     &.edit-mode {
       height: calc(100vh - 296px);
     }
@@ -638,12 +634,10 @@ const today = computed(() => {
 
   &__row {
     display: flex;
-    border-bottom: 1px solid $ov-border--light;
 
     &--col {
       padding: 65px 125px 65px 125px;
       display: grid;
-      border-right: 1px solid $ov-border--light;
       grid-template-columns: repeat(2, 0fr);
       position: relative;
       &__table {
@@ -852,6 +846,7 @@ const today = computed(() => {
       cursor: pointer;
       &__outer {
         width: calc(100% - 397px);
+        max-width: calc(100% - 397px);
         display: flex;
         overflow-x: auto;
       }
@@ -999,7 +994,6 @@ const today = computed(() => {
     &--images {
       padding: 65px 125px 65px 125px;
       display: grid;
-      border-right: 1px solid #ecebed;
       grid-template-columns: repeat(2, 0fr);
       position: absolute;
       top: 0;
@@ -1042,7 +1036,7 @@ const today = computed(() => {
 }
 
 .desk__row--col__table[draggable='true'] {
-  opacity: 0.001 !important;
+  opacity: 0.3 !important;
 }
 
 .dragzone {
@@ -1111,9 +1105,5 @@ const today = computed(() => {
 
 .dailyEventsContainer.edit-mode {
   opacity: 0.3;
-}
-
-.sortable-ghost {
-  opacity: 0 !important;
 }
 </style>
