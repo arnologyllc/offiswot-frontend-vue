@@ -142,7 +142,7 @@
         <div class="forgot-password">
           <el-button style="font-size: 14px; font-weight: 400" @click="onForgot">Forgot PIN?</el-button>
         </div>
-        <el-button class="submit-button" native-type="submit" :loading="isLoadingSubmit">
+        <el-button class="submit-button" native-type="submit" :loading="isLoadingSubmit" :disabled="!isValid">
           <span class="submit-button__text">{{ isLoadingSubmit ? '' : 'Save' }}</span>
         </el-button>
 
@@ -245,6 +245,7 @@ const showPIN = ref(false)
 const showPINConfirmation = ref(false)
 const isOpenEmailDialog = ref(false)
 const isOpenPINDialog = ref(false)
+const isValid = ref(false)
 
 const errors = ref({
   previous: {
@@ -353,6 +354,10 @@ const validateField = (fieldName) => {
       errors.value[fieldName].value = ''
     }
   })
+
+  isValid.value =
+    Object.values(payload.value).every((elem) => !!elem) &&
+    Object.values(errors.value).every((elem) => !elem.value || (elem.status && elem.status !== 'Weak'))
 }
 
 const clearError = () => {

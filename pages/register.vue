@@ -444,7 +444,7 @@ const validateField = (fieldName) => {
   })
   isValid.value =
     Object.values(payload.value).every((elem) => !!elem) &&
-    Object.values(errors.value).every((elem) => !elem.value || elem.status !== 'Weak')
+    Object.values(errors.value).every((elem) => !elem.value || (elem.status && elem.status !== 'Weak'))
 }
 
 const showErrorClick = (fieldName) => {

@@ -162,7 +162,7 @@
         <div class="forgot-password">
           <el-button style="font-size: 14px; font-weight: 400" @click="onForgot">Forgot Password?</el-button>
         </div>
-        <el-button class="submit-button" native-type="submit" :loading="resetLoading">
+        <el-button class="submit-button" native-type="submit" :loading="resetLoading" :disabled="!isValid">
           <span class="submit-button__text">{{ resetLoading ? '' : 'Save' }}</span>
         </el-button>
 
@@ -240,6 +240,7 @@ const isOpenEmailDialog = ref(false)
 const showPrevious = ref(false)
 const showPassword = ref(false)
 const showPasswordConfirmation = ref(false)
+const isValid = ref(false)
 
 const validatePass = (rule, value, callback) => {
   if (!value) {
@@ -378,6 +379,22 @@ const validateField = (fieldName) => {
       errors.value[fieldName].value = ''
     }
   })
+
+  isValid.value =
+    Object.values(payload.value).every((elem) => !!elem) &&
+    Object.values(errors.value).every((elem) => {
+      console.log(elem)
+      if (elem.status) {
+        console.log(elem.status !== 'Weak')
+        return elem.status !== 'Weak'
+      } else if (elem.value) {
+        console.log(elem.value)
+        return false
+      } else {
+        console.log(true)
+        return true
+      }
+    })
 }
 
 const showErrorClick = (fieldName) => {

@@ -96,7 +96,7 @@
             <div></div>
           </template>
         </el-form-item>
-        <el-button class="submit-button" native-type="submit" :loading="isLoadingSubmit">
+        <el-button class="submit-button" native-type="submit" :loading="isLoadingSubmit" :disabled="!isValid">
           <span class="submit-button__text">{{ isLoadingSubmit ? '' : 'Save' }}</span>
         </el-button>
 
@@ -204,6 +204,7 @@ const rules = ref({
 
 const showPIN = ref(false)
 const showPINConfirmation = ref(false)
+const isValid = ref(false)
 
 watch(changePinFailureData, (v) => {
   for (const i in v) {
@@ -256,6 +257,10 @@ const validateField = (fieldName) => {
       errors.value[fieldName].value = ''
     }
   })
+
+  isValid.value =
+    Object.values(payload.value).every((elem) => !!elem) &&
+    Object.values(errors.value).every((elem) => !elem.value || (elem.status && elem.status !== 'Weak'))
 }
 
 const isWeb = () => {

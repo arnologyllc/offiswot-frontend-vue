@@ -114,7 +114,12 @@
             <div></div>
           </template>
         </el-form-item>
-        <login-buttons login-title="Next" :show-social="false" :login-loading="resetLoading"></login-buttons>
+        <login-buttons
+          login-title="Next"
+          :is-valid="isValid"
+          :show-social="false"
+          :login-loading="resetLoading"
+        ></login-buttons>
       </el-form>
     </div>
     <error-massage
@@ -158,6 +163,7 @@ const { resetSuccessData, resetErrorData, resetLoading } = storeToRefs(authStore
 
 const instance = getCurrentInstance()
 const $route = useRoute()
+const isValid = ref(false)
 
 const validatePass = (rule, value, callback) => {
   if (!value) {
@@ -243,6 +249,10 @@ const validateField = (fieldName) => {
       errors.value[fieldName].value = ''
     }
   })
+
+  isValid.value =
+    Object.values(payload.value).every((elem) => !!elem) &&
+    Object.values(errors.value).every((elem) => !elem.value || (elem.status && elem.status !== 'Weak'))
 }
 
 const showErrorClick = (fieldName) => {

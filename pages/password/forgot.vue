@@ -51,7 +51,12 @@
             <div></div>
           </template>
         </el-form-item>
-        <login-buttons login-title="Next" :login-loading="forgotLoading" :show-social="false"></login-buttons>
+        <login-buttons
+          login-title="Next"
+          :is-valid="isValid"
+          :login-loading="forgotLoading"
+          :show-social="false"
+        ></login-buttons>
       </el-form>
     </div>
 
@@ -109,6 +114,7 @@ const errors = ref({
 })
 
 const isOpenEmailDialog = ref(false)
+const isValid = ref(false)
 
 const onSubmit = () => {
   instance.refs.forgotForm.validate((valid) => {
@@ -128,6 +134,10 @@ const validateField = (fieldName) => {
       errors.value[fieldName].value = ''
     }
   })
+
+  isValid.value =
+    Object.values(payload.value).every((elem) => !!elem) &&
+    Object.values(errors.value).every((elem) => !elem.value || (elem.status && elem.status !== 'Weak'))
 }
 
 const showErrorClick = (fieldName) => {
