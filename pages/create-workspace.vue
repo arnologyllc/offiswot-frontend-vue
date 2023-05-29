@@ -36,9 +36,9 @@
               src="@/assets/images/icons/error.svg"
               alt=""
               class="error_icon"
-              @mouseover="showError('name')"
-              @mouseout="hideError('name')"
-              @click="showErrorClick('name')"
+              @mouseover="showError('name', 'mouseover')"
+              @mouseout="showError('name', 'mouseout')"
+              @click="showError('name', 'click')"
             />
           </template>
         </el-input>
@@ -198,19 +198,12 @@ const validateField = (fieldName) => {
   })
 }
 
-const showErrorClick = (fieldName) => {
-  errors.value[fieldName].isShow = true
-}
-
-const showError = (fieldName) => {
-  if (isWeb()) {
+const showError = (fieldName, event) => {
+  const webApp = isWeb()
+  if (webApp) {
+    errors.value[fieldName].isShow = event === 'mouseover'
+  } else if (event === 'click') {
     errors.value[fieldName].isShow = true
-  }
-}
-
-const hideError = (fieldName) => {
-  if (isWeb()) {
-    errors.value[fieldName].isShow = false
   }
 }
 

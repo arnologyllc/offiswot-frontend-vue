@@ -203,3 +203,12 @@ input[type='number'] {
   background: linear-gradient(225deg, #bd7ae3 0%, #8461c9 100%);
   color: #ffffff !important;
 }
+
+.el-button:disabled {
+  opacity: 0.3;
+}
+
+.el-button:disabled:hover {
+  background: #4156f6 !important;
+  color: white !important;
+}

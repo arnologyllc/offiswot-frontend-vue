@@ -38,9 +38,9 @@
                 class="error_icon"
                 src="@/assets/images/icons/error.svg"
                 alt=""
-                @click="showErrorClick('email')"
-                @mouseover="showError('email')"
-                @mouseout="hideError('email')"
+                @mouseover="showError('email', 'mouseover')"
+                @mouseout="showError('email', 'mouseout')"
+                @click="showError('email', 'click')"
               />
             </template>
           </el-input>
@@ -135,24 +135,16 @@ const validateField = (fieldName) => {
     }
   })
 
-  isValid.value =
-    Object.values(payload.value).every((elem) => !!elem) &&
-    Object.values(errors.value).every((elem) => !elem.value || (elem.status && elem.status !== 'Weak'))
+  if (Object.values(payload.value).every((item) => item))
+    instance.refs.forgotForm.validate((res) => (isValid.value = res))
 }
 
-const showErrorClick = (fieldName) => {
-  errors.value[fieldName].isShow = true
-}
-
-const showError = (fieldName) => {
-  if (isWeb()) {
+const showError = (fieldName, event) => {
+  const webApp = isWeb()
+  if (webApp) {
+    errors.value[fieldName].isShow = event === 'mouseover'
+  } else if (event === 'click') {
     errors.value[fieldName].isShow = true
-  }
-}
-
-const hideError = (fieldName) => {
-  if (isWeb()) {
-    errors.value[fieldName].isShow = false
   }
 }
 

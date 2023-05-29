@@ -332,8 +332,8 @@ const onAvatarUpload = (e, file) => {
 }
 
 const handleDeleteAvatar = () => {
-  payload.value.avatar = 'default.jpg'
-  avatarSrc.value = 'default.jpg'
+  payload.value.avatar = 'default'
+  avatarSrc.value = 'default'
   profileStore.editProfile(payload.value)
 }
 
@@ -683,7 +683,7 @@ const hoveringEnd = () => {
       display: block;
       font-size: 15px;
       font-weight: 400;
-      width: 112px;
+      width: 80px;
       color: #3f3356 !important;
     }
   }
@@ -692,5 +692,9 @@ const hoveringEnd = () => {
   .hovered {
     color: #d0c9d6 !important;
   }
+}
+
+.el-popper__arrow {
+  display: none !important;
 }
 </style>

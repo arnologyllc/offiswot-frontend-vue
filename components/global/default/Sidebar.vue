@@ -37,7 +37,7 @@
               alt="Avatar"
               class="main__user-workspaces--avatar"
               :title="workspace.name"
-              @click="changeWorkspace(workspace.id)"
+              @click="changeWorkspace(workspace.id, item.ID)"
             />
           </div>
         </template>
@@ -213,7 +213,12 @@ onMounted(async () => {
       setWorkspaceData(workspacesSuccessData.value)
     }
   }
+
   window.addEventListener('resize', handleResize)
+  if (window.innerWidth < 800) {
+    isOpen.value = false
+    sidebarWidth.value = 68
+  }
 })
 
 const hoveringStart = () => {
@@ -226,11 +231,12 @@ const hoveringEnd = () => {
 const handleResize = () => {
   if (window.innerWidth < 800) {
     isOpen.value = false
+    sidebarWidth.value = 68
   }
   instance.update()
 }
 
-const changeAccount = async (userID) => {
+const changeAccount = async (userID, isWorkspace) => {
   currentWorkspaceID.value = -1
   currentAccountID.value = userID
   $cookies.set('currentAccountID', userID)
@@ -286,13 +292,17 @@ const changeAccount = async (userID) => {
   profileStore.getProfile()
   await profileStore.getWorkSpaces()
 
-  navigateTo(`/`)
+  if (!isWorkspace) {
+    navigateTo(`/`)
+  }
 }
 
-const changeWorkspace = (userID) => {
+const changeWorkspace = async (workspaceID, userID) => {
+  currentAccountID.value = userID
+  await changeAccount(userID)
   currentAccountID.value = -1
-  currentWorkspaceID.value = userID
-  openWorkspace(userID)
+  currentWorkspaceID.value = workspaceID
+  openWorkspace(workspaceID, true)
 }
 
 const openWorkspace = (id) => {
@@ -397,11 +407,7 @@ const handleChangeWidth = (e) => {
 const resizeSidebar = (e) => {
   sidebarWidth.value = e.x - 68
 
-  if (sidebarWidth.value < 85) {
-    isOpen.value = false
-  } else {
-    isOpen.value = true
-  }
+  isOpen.value = sidebarWidth.value > 85
 }
 </script>
 

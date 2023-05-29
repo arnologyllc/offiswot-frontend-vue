@@ -36,9 +36,9 @@
                 class="error_icon"
                 src="@/assets/images/icons/error.svg"
                 alt=""
-                @mouseover="showError('email')"
-                @mouseout="hideError('email')"
-                @click="showErrorClick('email')"
+                @mouseover="showError('email', 'mouseover')"
+                @mouseout="showError('email', 'mouseout')"
+                @click="showError('email', 'click')"
               />
               <div v-if="payload.email" style="position: relative" @click="focusElement('email')">
                 <span for="email" class="custom_placeholder"> Email or username </span>
@@ -82,9 +82,9 @@
                 src="@/assets/images/icons/error.svg"
                 alt=""
                 class="error_icon"
-                @mouseover="showError('password')"
-                @mouseout="hideError('password')"
-                @click="showErrorClick('password')"
+                @mouseover="showError('password', 'mouseover')"
+                @mouseout="showError('password', 'mouseout')"
+                @click="showError('password', 'click')"
               />
             </template>
           </el-input>
@@ -265,6 +265,7 @@ watch(loginErrorData, (v) => {
     v === 'Please visit your email to verify your account.' ||
     v?.error === 'Please visit your email to verify your account.'
   ) {
+    authStore.resendEmail(payload.value.email)
     isOpenEmailDialog.value = true
     return
   }
@@ -336,19 +337,12 @@ const validateField = (fieldName) => {
   })
 }
 
-const showErrorClick = (fieldName) => {
-  errors.value[fieldName].isShow = true
-}
-
-const showError = (fieldName) => {
-  if (isWeb()) {
+const showError = (fieldName, event) => {
+  const webApp = isWeb()
+  if (webApp) {
+    errors.value[fieldName].isShow = event === 'mouseover'
+  } else if (event === 'click') {
     errors.value[fieldName].isShow = true
-  }
-}
-
-const hideError = (fieldName) => {
-  if (isWeb()) {
-    errors.value[fieldName].isShow = false
   }
 }
 

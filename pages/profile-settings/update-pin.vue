@@ -47,9 +47,9 @@
                 src="@/assets/images/icons/error.svg"
                 alt=""
                 class="error_icon"
-                @mouseover="showError('previous')"
-                @mouseout="hideError('previous')"
-                @click="showErrorClick('previous')"
+                @mouseover="showError('previous', 'mouseover')"
+                @mouseout="showError('previous', 'mouseout')"
+                @click="showError('previous', 'click')"
               />
             </template>
           </el-input>
@@ -86,9 +86,9 @@
                 src="@/assets/images/icons/error.svg"
                 alt=""
                 class="error_icon"
-                @mouseover="showError('pin')"
-                @mouseout="hideError('pin')"
-                @click="showErrorClick('pin')"
+                @mouseover="showError('pin', 'mouseover')"
+                @mouseout="showError('pin', 'mouseout')"
+                @click="showError('pin', 'click')"
               />
             </template>
           </el-input>
@@ -125,9 +125,9 @@
                 src="@/assets/images/icons/error.svg"
                 alt=""
                 class="error_icon"
-                @mouseover="showError('pin_confirmation')"
-                @mouseout="hideError('pin_confirmation')"
-                @click="showErrorClick('pin_confirmation')"
+                @mouseover="showError('pin_confirmation', 'mouseover')"
+                @mouseout="showError('pin_confirmation', 'mouseout')"
+                @click="showError('pin_confirmation', 'click')"
               />
             </template>
           </el-input>
@@ -338,9 +338,11 @@ onMounted(() => {
   }
   window.addEventListener('resize', handleResize(instance))
 })
+
 const onSubmit = () => {
   pinStore.resetPin(payload.value)
 }
+
 const onForgot = () => {
   payload.value.email = profileSuccessData.value?.user.email
   pinStore.forgotPin()
@@ -355,9 +357,7 @@ const validateField = (fieldName) => {
     }
   })
 
-  isValid.value =
-    Object.values(payload.value).every((elem) => !!elem) &&
-    Object.values(errors.value).every((elem) => !elem.value || (elem.status && elem.status !== 'Weak'))
+  if (Object.values(payload.value).every((item) => item)) instance.refs.pinForm.validate((res) => (isValid.value = res))
 }
 
 const clearError = () => {
@@ -372,18 +372,11 @@ const handleResize = () => {
   instance.update()
 }
 
-const hideError = (fieldName) => {
-  if (isWeb()) {
-    errors.value[fieldName].isShow = false
-  }
-}
-
-const showErrorClick = (fieldName) => {
-  errors.value[fieldName].isShow = true
-}
-
-const showError = (fieldName) => {
-  if (isWeb()) {
+const showError = (fieldName, event) => {
+  const webApp = isWeb()
+  if (webApp) {
+    errors.value[fieldName].isShow = event === 'mouseover'
+  } else if (event === 'click') {
     errors.value[fieldName].isShow = true
   }
 }
