@@ -22,7 +22,7 @@
           <el-input
             v-model="payload.email"
             class="main__form--box__input"
-            placeholder="E-mail"
+            placeholder="Email"
             @blur="validateField('email')"
           >
             <template #prefix>

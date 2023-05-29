@@ -145,7 +145,7 @@ const email = ref(false)
 
 watch(createWorkspaceSuccess, (v) => {
   if (v) {
-    navigateTo('/profile')
+    navigateTo(`/workspace/staff/${v.workspace.id}`)
   }
 })
 
@@ -166,7 +166,6 @@ onMounted(async () => {
   if (process.client) {
     email.value = JSON.parse(localStorage.getItem('accounts'))[$cookies.get('currentAccountID')].email
   }
-  console.log($cookies.get('currentAccountID'))
   isOpenPINDialog.value = loginToken()
   isOpenPINDialog.value = settingsToken()
   window.addEventListener('resize', handleResize)
