@@ -47,9 +47,9 @@
                 src="@/assets/images/icons/error.svg"
                 alt=""
                 class="error_icon"
-                @mouseover="showError('old_password')"
-                @mouseout="hideError('old_password')"
-                @click="showErrorClick('old_password')"
+                @mouseover="showError('old_password', 'mouseover')"
+                @mouseout="showError('old_password', 'mouseout')"
+                @click="showError('old_password', 'click')"
               />
             </template>
           </el-input>
@@ -84,9 +84,9 @@
               <div
                 v-if="errors.password.value"
                 class="error_icon"
-                @mouseover="showError('password')"
-                @mouseout="hideError('password')"
-                @click="showErrorClick('password')"
+                @mouseover="showError('password', 'mouseover')"
+                @mouseout="showError('password', 'mouseout')"
+                @click="showError('password', 'click')"
               >
                 <img
                   v-if="errors.password.status === 'Medium' && payload.password"
@@ -145,9 +145,9 @@
                 src="@/assets/images/icons/error.svg"
                 alt=""
                 class="error_icon"
-                @mouseover="showError('password_confirmation')"
-                @mouseout="hideError('password_confirmation')"
-                @click="showErrorClick('password_confirmation')"
+                @mouseover="showError('password_confirmation', 'mouseover')"
+                @mouseout="showError('password_confirmation', 'mouseout')"
+                @click="showError('password_confirmation', 'click')"
               />
             </template>
           </el-input>
@@ -162,7 +162,7 @@
         <div class="forgot-password">
           <el-button style="font-size: 14px; font-weight: 400" @click="onForgot">Forgot Password?</el-button>
         </div>
-        <el-button class="submit-button" native-type="submit" :loading="resetLoading">
+        <el-button class="submit-button" native-type="submit" :loading="resetLoading" :disabled="!isValid">
           <span class="submit-button__text">{{ resetLoading ? '' : 'Save' }}</span>
         </el-button>
 
@@ -240,6 +240,7 @@ const isOpenEmailDialog = ref(false)
 const showPrevious = ref(false)
 const showPassword = ref(false)
 const showPasswordConfirmation = ref(false)
+const isValid = ref(false)
 
 const validatePass = (rule, value, callback) => {
   if (!value) {
@@ -378,21 +379,16 @@ const validateField = (fieldName) => {
       errors.value[fieldName].value = ''
     }
   })
+  if (Object.values(payload.value).every((item) => item))
+    instance.refs.passwordForm.validate((res) => (isValid.value = res))
 }
 
-const showErrorClick = (fieldName) => {
-  errors.value[fieldName].isShow = true
-}
-
-const showError = (fieldName) => {
-  if (isWeb()) {
+const showError = (fieldName, event) => {
+  const webApp = isWeb()
+  if (webApp) {
+    errors.value[fieldName].isShow = event === 'mouseover'
+  } else if (event === 'click') {
     errors.value[fieldName].isShow = true
-  }
-}
-
-const hideError = (fieldName) => {
-  if (isWeb()) {
-    errors.value[fieldName].isShow = false
   }
 }
 
@@ -414,7 +410,7 @@ const updatePasswordStrength = (password) => {
   const strongRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])[a-zA-Z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{12,}$/
   const identicalRegex = /^(?:(.)(?!\1{3}))*$/
-  const words = ['password', 'admin', 'qwerty', 'asdfgh', 'xzcvb']
+  const words = ['password', 'admin', 'qwerty', 'asdfgh', 'zxcvb']
 
   if (
     identicalRegex.test(password) &&
@@ -433,7 +429,14 @@ const updatePasswordStrength = (password) => {
 }
 
 const getColor = () => {
-  return errors.value.password.status === 'Medium' ? 'warning' : errors.value.password.status === 'Strong' ? 'done' : ''
+  switch (errors.value.password.status) {
+    case 'Medium':
+      return 'warning'
+    case 'Strong':
+      return 'done'
+    default:
+      return ''
+  }
 }
 </script>
 

@@ -38,9 +38,9 @@
                 class="error_icon"
                 src="@/assets/images/icons/error.svg"
                 alt=""
-                @click="showErrorClick('email')"
-                @mouseover="showError('email')"
-                @mouseout="hideError('email')"
+                @mouseover="showError('email', 'mouseover')"
+                @mouseout="showError('email', 'mouseout')"
+                @click="showError('email', 'click')"
               />
             </template>
           </el-input>
@@ -51,7 +51,12 @@
             <div></div>
           </template>
         </el-form-item>
-        <login-buttons login-title="Next" :login-loading="forgotLoading" :show-social="false"></login-buttons>
+        <login-buttons
+          login-title="Next"
+          :is-valid="isValid"
+          :login-loading="forgotLoading"
+          :show-social="false"
+        ></login-buttons>
       </el-form>
     </div>
 
@@ -109,6 +114,7 @@ const errors = ref({
 })
 
 const isOpenEmailDialog = ref(false)
+const isValid = ref(false)
 
 const onSubmit = () => {
   instance.refs.forgotForm.validate((valid) => {
@@ -128,21 +134,17 @@ const validateField = (fieldName) => {
       errors.value[fieldName].value = ''
     }
   })
+
+  if (Object.values(payload.value).every((item) => item))
+    instance.refs.forgotForm.validate((res) => (isValid.value = res))
 }
 
-const showErrorClick = (fieldName) => {
-  errors.value[fieldName].isShow = true
-}
-
-const showError = (fieldName) => {
-  if (isWeb()) {
+const showError = (fieldName, event) => {
+  const webApp = isWeb()
+  if (webApp) {
+    errors.value[fieldName].isShow = event === 'mouseover'
+  } else if (event === 'click') {
     errors.value[fieldName].isShow = true
-  }
-}
-
-const hideError = (fieldName) => {
-  if (isWeb()) {
-    errors.value[fieldName].isShow = false
   }
 }
 

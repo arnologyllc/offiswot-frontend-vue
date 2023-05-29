@@ -43,9 +43,9 @@
                 src="@/assets/images/icons/error.svg"
                 alt=""
                 class="error_icon"
-                @mouseover="showError('pin')"
-                @mouseout="hideError('pin')"
-                @click="showErrorClick('pin')"
+                @mouseover="showError('pin', 'mouseover')"
+                @mouseout="showError('pin', 'mouseout')"
+                @click="showError('pin', 'click')"
               />
             </template>
           </el-input>
@@ -82,9 +82,9 @@
                 src="@/assets/images/icons/error.svg"
                 alt=""
                 class="error_icon"
-                @mouseover="showError('pin_confirmation')"
-                @mouseout="hideError('pin_confirmation')"
-                @click="showErrorClick('pin_confirmation')"
+                @mouseover="showError('pin_confirmation', 'mouseover')"
+                @mouseout="showError('pin_confirmation', 'mouseout')"
+                @click="showError('pin_confirmation', 'click')"
               />
             </template>
           </el-input>
@@ -96,7 +96,7 @@
             <div></div>
           </template>
         </el-form-item>
-        <el-button class="submit-button" native-type="submit" :loading="isLoadingSubmit">
+        <el-button class="submit-button" native-type="submit" :loading="isLoadingSubmit" :disabled="!isValid">
           <span class="submit-button__text">{{ isLoadingSubmit ? '' : 'Save' }}</span>
         </el-button>
 
@@ -204,6 +204,7 @@ const rules = ref({
 
 const showPIN = ref(false)
 const showPINConfirmation = ref(false)
+const isValid = ref(false)
 
 watch(changePinFailureData, (v) => {
   for (const i in v) {
@@ -256,6 +257,9 @@ const validateField = (fieldName) => {
       errors.value[fieldName].value = ''
     }
   })
+
+  if (Object.values(payload.value).every((item) => item))
+    instance.refs.resetForm.validate((res) => (isValid.value = res))
 }
 
 const isWeb = () => {
@@ -266,18 +270,11 @@ const handleResize = () => {
   instance.update()
 }
 
-const hideError = (fieldName) => {
-  if (isWeb()) {
-    errors.value[fieldName].isShow = false
-  }
-}
-
-const showErrorClick = (fieldName) => {
-  errors.value[fieldName].isShow = true
-}
-
-const showError = (fieldName) => {
-  if (isWeb()) {
+const showError = (fieldName, event) => {
+  const webApp = isWeb()
+  if (webApp) {
+    errors.value[fieldName].isShow = event === 'mouseover'
+  } else if (event === 'click') {
     errors.value[fieldName].isShow = true
   }
 }

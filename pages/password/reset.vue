@@ -37,9 +37,9 @@
               <div
                 v-if="errors.password.value"
                 class="error_icon"
-                @mouseover="showError('password')"
-                @mouseout="hideError('password')"
-                @click="showErrorClick('password')"
+                @mouseover="showError('password', 'mouseover')"
+                @mouseout="showError('password', 'mouseout')"
+                @click="showError('password', 'click')"
               >
                 <img
                   v-if="errors.password.status === 'Medium' && payload.password"
@@ -101,9 +101,9 @@
                 src="@/assets/images/icons/error.svg"
                 alt=""
                 class="error_icon"
-                @mouseover="showError('password_confirmation')"
-                @mouseout="hideError('password_confirmation')"
-                @click="showErrorClick('password_confirmation')"
+                @mouseover="showError('password_confirmation', 'mouseover')"
+                @mouseout="showError('password_confirmation', 'mouseout')"
+                @click="showError('password_confirmation', 'click')"
               />
             </template>
           </el-input>
@@ -114,7 +114,12 @@
             <div></div>
           </template>
         </el-form-item>
-        <login-buttons login-title="Next" :show-social="false" :login-loading="resetLoading"></login-buttons>
+        <login-buttons
+          login-title="Next"
+          :is-valid="isValid"
+          :show-social="false"
+          :login-loading="resetLoading"
+        ></login-buttons>
       </el-form>
     </div>
     <error-massage
@@ -158,6 +163,7 @@ const { resetSuccessData, resetErrorData, resetLoading } = storeToRefs(authStore
 
 const instance = getCurrentInstance()
 const $route = useRoute()
+const isValid = ref(false)
 
 const validatePass = (rule, value, callback) => {
   if (!value) {
@@ -243,21 +249,17 @@ const validateField = (fieldName) => {
       errors.value[fieldName].value = ''
     }
   })
+
+  if (Object.values(payload.value).every((item) => item))
+    instance.refs.resetForm.validate((res) => (isValid.value = res))
 }
 
-const showErrorClick = (fieldName) => {
-  errors.value[fieldName].isShow = true
-}
-
-const showError = (fieldName) => {
-  if (isWeb()) {
+const showError = (fieldName, event) => {
+  const webApp = isWeb()
+  if (webApp) {
+    errors.value[fieldName].isShow = event === 'mouseover'
+  } else if (event === 'click') {
     errors.value[fieldName].isShow = true
-  }
-}
-
-const hideError = (fieldName) => {
-  if (isWeb()) {
-    errors.value[fieldName].isShow = false
   }
 }
 
@@ -294,7 +296,14 @@ const updatePasswordStrength = (password) => {
 }
 
 const getColor = () => {
-  return errors.value.password.status === 'Medium' ? 'warning' : errors.value.password.status === 'Strong' ? 'done' : ''
+  switch (errors.value.password.status) {
+    case 'Medium':
+      return 'warning'
+    case 'Strong':
+      return 'done'
+    default:
+      return ''
+  }
 }
 
 watch(resetSuccessData, (v) => {

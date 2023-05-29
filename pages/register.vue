@@ -40,9 +40,9 @@
                 class="error_icon"
                 src="@/assets/images/icons/error.svg"
                 alt=""
-                @mouseover="showError('email')"
-                @mouseout="hideError('email')"
-                @click="showErrorClick('email')"
+                @mouseover="showError('email', 'mouseover')"
+                @mouseout="showError('email', 'mouseout')"
+                @click="showError('email', 'click')"
               />
             </template>
           </el-input>
@@ -77,9 +77,9 @@
               <template v-if="errors.username.value || errors.username.status">
                 <div
                   class="error_icon"
-                  @mouseover="showError('username')"
-                  @mouseout="hideError('username')"
-                  @click="showErrorClick('username')"
+                  @mouseover="showError('username', 'mouseover')"
+                  @mouseout="showError('username', 'mouseout')"
+                  @click="showError('username', 'click')"
                 >
                   <img
                     v-if="errors.username.status === 'Medium' && payload.username"
@@ -89,15 +89,15 @@
                   <img v-else-if="errors.username.value" src="@/assets/images/icons/error.svg" alt="" />
                 </div>
               </template>
-              <div
-                v-if="errors.username.status === 'Medium' && errors.username.isShow && isWeb()"
-                class="el-form-item__error strength warning"
-              >
-                <span v-html="errors.username.value"></span>
-              </div>
-              <div></div>
             </template>
           </el-input>
+
+          <div
+            v-if="errors.username.status === 'Medium' && errors.username.isShow && isWeb()"
+            class="el-form-item__error strength warning"
+          >
+            <span v-html="errors.username.value"></span>
+          </div>
           <template #error>
             <div v-if="errors.username.isShow && isWeb()" class="el-form-item__error">
               <span v-html="errors.username.value"></span>
@@ -131,9 +131,9 @@
               <template v-if="errors.password.value">
                 <div
                   class="error_icon"
-                  @mouseover="showError('password')"
-                  @mouseout="hideError('password')"
-                  @click="showErrorClick('password')"
+                  @mouseover="showError('password', 'mouseover')"
+                  @mouseout="showError('password', 'mouseout')"
+                  @click="showError('password', 'click')"
                 >
                   <img
                     v-if="errors.password.status === 'Medium' && payload.password"
@@ -189,9 +189,9 @@
                   src="@/assets/images/icons/error.svg"
                   alt=""
                   class="error_icon"
-                  @mouseover="showError('password_confirmation')"
-                  @mouseout="hideError('password_confirmation')"
-                  @click="showErrorClick('password_confirmation')"
+                  @mouseover="showError('password_confirmation', 'mouseover')"
+                  @mouseout="showError('password_confirmation', 'mouseout')"
+                  @click="showError('password_confirmation', 'click')"
                 />
               </template>
             </template>
@@ -442,24 +442,16 @@ const validateField = (fieldName) => {
       }
     }
   })
-  isValid.value =
-    Object.values(payload.value).every((elem) => !!elem) &&
-    Object.values(errors.value).every((elem) => !elem.value || elem.status !== 'Weak')
+  if (Object.values(payload.value).every((item) => item))
+    instance.refs.registerForm.validate((res) => (isValid.value = res))
 }
 
-const showErrorClick = (fieldName) => {
-  errors.value[fieldName].isShow = true
-}
-
-const showError = (fieldName) => {
-  if (isWeb()) {
+const showError = (fieldName, event) => {
+  const webApp = isWeb()
+  if (webApp) {
+    errors.value[fieldName].isShow = event === 'mouseover'
+  } else if (event === 'click') {
     errors.value[fieldName].isShow = true
-  }
-}
-
-const hideError = (fieldName) => {
-  if (isWeb()) {
-    errors.value[fieldName].isShow = false
   }
 }
 
@@ -500,7 +492,14 @@ const updatePasswordStrength = (password) => {
 }
 
 const getColor = () => {
-  return errors.value.password.status === 'Medium' ? 'warning' : errors.value.password.status === 'Strong' ? 'done' : ''
+  switch (errors.value.password.status) {
+    case 'Medium':
+      return 'warning'
+    case 'Strong':
+      return 'done'
+    default:
+      return ''
+  }
 }
 
 watch(registerSuccessData, (v) => {

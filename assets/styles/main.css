@@ -166,3 +166,49 @@ input[type='number'] {
 .m-input-wrapper {
   box-shadow: none !important;
 }
+
+.avatar-edit_actions .el-upload.el-upload--text,
+.avatar-edit_actions-element {
+  width: 100%;
+}
+
+.prev-month .el-date-table-cell__text,
+.next-month .el-date-table-cell__text,
+.available .el-date-table-cell__text {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  width: 32px !important;
+  height: 32px !important;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.available .el-date-table-cell__text {
+  color: #3f3356;
+}
+
+.available.today .el-date-table-cell__text {
+  color: #be52f2 !important;
+  background-color: #eedff2 !important;
+}
+
+.available:last-child .el-date-table-cell__text {
+  color: #ffa26b;
+}
+
+.available.current .el-date-table-cell__text,
+.available:hover .el-date-table-cell__text {
+  background: linear-gradient(225deg, #bd7ae3 0%, #8461c9 100%);
+  color: #ffffff !important;
+}
+
+.el-button:disabled {
+  opacity: 0.3;
+}
+
+.el-button:disabled:hover {
+  background: #4156f6 !important;
+  color: white !important;
+}

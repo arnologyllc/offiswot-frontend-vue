@@ -5,8 +5,8 @@ export default defineNuxtConfig({
   ssr: true,
   components: true,
 
-  buildModules: ['@nuxtjs/eslint-module'],
-  modules: ['@pinia/nuxt', '@element-plus/nuxt'],
+  buildModules: ['@nuxtjs/eslint-module', '@nuxtjs/pwa'],
+  modules: ['@pinia/nuxt', '@element-plus/nuxt', '@vite-pwa/nuxt'],
   plugins: ['@/plugins/headers'],
 
   pinia: {
@@ -54,5 +54,27 @@ export default defineNuxtConfig({
   },
   build: {
     transpile: ['maz-ui'],
+  },
+
+  pwa: {
+    manifest: {
+      name: 'offisewot PWA',
+      short_name: 'offisewot',
+      start_url: '/login',
+      icons: [
+        { src: 'android-chrome-64x64.png', sizes: '64x64', type: 'image/png' },
+        { src: 'android-chrome-144x144.png', sizes: '144x144', type: 'image/png' },
+        { src: 'android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+        { src: 'android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
+      ],
+    },
+
+    workbox: {
+      navigateFallback: '/login',
+    },
+    devOptions: {
+      enabled: true,
+      type: 'module',
+    },
   },
 })

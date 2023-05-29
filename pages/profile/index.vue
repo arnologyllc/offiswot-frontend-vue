@@ -35,27 +35,28 @@
 
               <template #dropdown>
                 <el-dropdown-menu class="avatar-edit_actions">
-                  <el-dropdown-item class="avatar-edit_actions-element">
-                    <el-upload
-                      v-model="payload.avatar"
-                      :show-file-list="false"
-                      class="main__form--upload"
-                      action="#"
-                      accept="image/*"
-                      :on-success="onAvatarUpload"
-                    >
-                      <span :class="isHovered" @mouseover="hoveringStart" @mouseout="hoveringEnd"> Edit </span>
-                    </el-upload>
-                  </el-dropdown-item>
-                  <el-dropdown-item class="avatar-edit_actions-element">
-                    <span
-                      :class="isHovered"
+                  <el-upload
+                    v-model="payload.avatar"
+                    :show-file-list="false"
+                    class="main__form--upload"
+                    action="#"
+                    accept="image/*"
+                    :on-success="onAvatarUpload"
+                  >
+                    <el-dropdown-item
+                      class="avatar-edit_actions-element"
                       @mouseover="hoveringStart"
                       @mouseout="hoveringEnd"
-                      @click="handleDeleteAvatar"
                     >
-                      Delete
-                    </span>
+                      <span :class="isHovered"> Edit </span>
+                    </el-dropdown-item>
+                  </el-upload>
+                  <el-dropdown-item
+                    class="avatar-edit_actions-element"
+                    @mouseover="hoveringStart"
+                    @mouseout="hoveringEnd"
+                  >
+                    <span :class="isHovered" @click="handleDeleteAvatar"> Delete </span>
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
@@ -107,7 +108,13 @@
         </el-col>
         <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
           <el-form-item prop="languages">
-            <el-select v-model="payload.languages" multiple class="main__form--input select" placeholder="Languages">
+            <el-select
+              v-model="payload.languages"
+              multiple
+              class="main__form--input select"
+              placeholder="Languages"
+              :filterable="true"
+            >
               <el-option
                 v-for="(item, index) in languagesList"
                 :key="`lang_${index}`"
@@ -152,7 +159,12 @@
         </el-col>
         <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
           <el-form-item prop="timezone">
-            <el-select v-model="payload.timezone" class="main__form--input select" placeholder="Timezone">
+            <el-select
+              v-model="payload.timezone"
+              class="main__form--input select"
+              placeholder="Timezone"
+              :filterable="true"
+            >
               <el-option
                 v-for="zone in timeZonesList"
                 :key="`time_${zone.VALUE}`"
@@ -320,8 +332,8 @@ const onAvatarUpload = (e, file) => {
 }
 
 const handleDeleteAvatar = () => {
-  payload.value.avatar = 'default.jpg'
-  avatarSrc.value = 'default.jpg'
+  payload.value.avatar = 'default'
+  avatarSrc.value = 'default'
   profileStore.editProfile(payload.value)
 }
 
@@ -647,27 +659,31 @@ const hoveringEnd = () => {
 
 .avatar-edit {
   &_actions {
+    .main__form--upload {
+      .el-upload--text {
+        width: 100%;
+      }
+    }
     &-element {
       background-color: #ffffff;
-      width: 100%;
+      width: 116px;
       padding: 0 !important;
       &:hover {
+        width: 100%;
         span {
-          width: 100%;
           display: block;
           padding: 0;
           margin: 0;
           color: #3f3356 !important;
-          background-color: #f5f7fb !important;
         }
       }
     }
     &-element > span {
+      text-align: center;
       display: block;
       font-size: 15px;
       font-weight: 400;
-      width: 100%;
-      height: 100%;
+      width: 80px;
       color: #3f3356 !important;
     }
   }
@@ -676,5 +692,9 @@ const hoveringEnd = () => {
   .hovered {
     color: #d0c9d6 !important;
   }
+}
+
+.el-popper__arrow {
+  display: none !important;
 }
 </style>
