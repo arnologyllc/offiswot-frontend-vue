@@ -224,7 +224,6 @@
 <script setup>
 import { storeToRefs } from 'pinia'
 import { getCurrentInstance, onMounted } from 'vue'
-import { EditPen } from '@element-plus/icons-vue'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
@@ -286,7 +285,11 @@ const setProfileData = (v) => {
     avatarUrl.value = defaultAvatar
   }
   for (const i in payload.value) {
-    payload.value[i] = v?.user[i]
+    if (!isNaN(v?.user[i]) && v?.user[i]) {
+      payload.value[i] = +v?.user[i]
+    } else {
+      payload.value[i] = v?.user[i]
+    }
   }
   if (payload.value.phone_number) {
     payload.value.phone_number = payload.value.phone_number.toString()
@@ -415,6 +418,8 @@ const hoveringEnd = () => {
     }
     &--info {
       padding-left: 16px;
+      display: flex;
+      flex-direction: column;
       &__title {
         font-weight: 500;
         font-size: 16px;

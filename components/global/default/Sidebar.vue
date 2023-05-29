@@ -57,7 +57,7 @@
               <el-dropdown-item class="main__user-actions--add_element">
                 <span
                   :class="isHovered"
-                  @click="navigateTo('/create-workspace')"
+                  @click="navigateTo('/profile/choose-account')"
                   @mouseover="hoveringStart"
                   @mouseout="hoveringEnd"
                 >
@@ -98,8 +98,8 @@
 import { onMounted, watch, ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import $cookies from 'js-cookie'
-import { storeToRefs } from 'pinia'
 import { Search } from '@element-plus/icons-vue'
+import { storeToRefs } from 'pinia'
 import useProfileStore from '@/stores/profile'
 import usePinStore from '@/stores/pin'
 import useAuthStore from '@/stores/auth'
@@ -115,7 +115,7 @@ const { profileSuccessData, profileFailureData, editProfileData, editFailureData
 const { $myFetch } = useNuxtApp()
 const config = useRuntimeConfig()
 const avatarUrl = ref(defaultAvatar)
-const isOpen = ref(true)
+const isOpen = ref(false)
 const instance = getCurrentInstance()
 
 const profile = ref(null)
@@ -125,7 +125,7 @@ const accounts = ref(false)
 const $route = useRoute()
 const currentAccountID = ref(null)
 const currentWorkspaceID = ref(false)
-const sidebarWidth = ref(236)
+const sidebarWidth = ref(68)
 
 const getAvatar = (v) => {
   profile.value = v
@@ -149,6 +149,9 @@ const setWorkspaceData = (v) => {
 watch(workspacesSuccessData, (v) => setWorkspaceData(v))
 
 watch(profileSuccessData, (v) => {
+  if (process.client) {
+    currentAccountID.value = +$cookies.get('currentAccountID')
+  }
   if (v?.user.avatar && currentAccountID.value >= 0) {
     accounts.value[currentAccountID.value].avatarUrl = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
   } else if (currentAccountID.value >= 0) {

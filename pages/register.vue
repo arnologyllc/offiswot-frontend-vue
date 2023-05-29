@@ -24,7 +24,7 @@
             ref="email"
             v-model="payload.email"
             class="main__form--box__input"
-            placeholder="E-mail"
+            placeholder="Email"
             @input="validateField('email')"
             @blur="validateField('email')"
           >

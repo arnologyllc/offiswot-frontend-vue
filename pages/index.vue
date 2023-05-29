@@ -73,7 +73,7 @@
             <el-button
               v-if="isWithWorkspaces"
               class="user-workspaces__create-btn-outline"
-              @click="navigateTo('/create-workspace')"
+              @click="navigateTo('/profile/choose-account')"
             >
               <span>+ Create workspace</span>
             </el-button>
@@ -107,7 +107,7 @@
             <el-button
               class="user-workspaces__text-create-btn"
               style="position: absolute"
-              @click="navigateTo('/create-workspace')"
+              @click="navigateTo('/profile/choose-account')"
             >
               <span>Create</span>
             </el-button>
@@ -229,13 +229,13 @@ const handleResize = () => {
 const formattedTextFtn = () => {
   if (window.innerWidth > 935) {
     return `Thanks for joining Offiswot!<br /><br />
-            Create a workspace for your team or company using our productivity platform.<br/>Enjoy collaborating with each other easily and managing yourteam members and the projects effectively.`
+            Create a workspace for your team or company using our productivity platform.<br/>Enjoy collaborating with each other easily and managing your team members and the projects effectively.`
   } else if (window.innerWidth <= 935 && window.innerWidth > 628) {
     return `Thanks for joining Offiswot!<br /><br />
-            Create a workspace for your team or company using our productivity platform. Enjoy collaborating with each other easily and managing yourteam members and the projects effectively.`
+            Create a workspace for your team or company using our productivity platform. Enjoy collaborating with each other easily and managing your team members and the projects effectively.`
   } else {
     return `Thanks for<br /> joining Offiswot!<br /><br />
-            Create a workspace for your team or company using our productivity platform. Enjoy collaborating with each other easily and managing yourteam members and the projects effectively.`
+            Create a workspace for your team or company using our productivity platform. Enjoy collaborating with each other easily and managing your team members and the projects effectively.`
   }
 }
 </script>

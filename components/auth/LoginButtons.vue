@@ -128,14 +128,14 @@ const props = defineProps({
 @media (max-width: 375px) {
   .arrow_position {
     position: absolute;
-    right: 0;
+    right: 5px;
   }
 }
 
 @media (min-width: 375px) {
   .arrow_position {
     position: absolute;
-    right: 0;
+    right: 5px;
   }
 }
 
