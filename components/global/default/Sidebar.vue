@@ -430,6 +430,9 @@ const resizeSidebar = (e) => {
   &__top {
     z-index: 1;
     overflow-y: auto;
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
   .users {
     height: 100vh;

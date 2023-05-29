@@ -145,7 +145,7 @@ const email = ref(false)
 
 watch(createWorkspaceSuccess, (v) => {
   if (v) {
-    navigateTo('/profile')
+    navigateTo(`/workspace/staff/${v.workspace.id}`)
   }
 })
 

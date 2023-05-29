@@ -109,14 +109,14 @@
         <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
           <el-form-item prop="languages">
             <el-select
-              v-model="payload.languages"
+              v-model="payload.languagesList"
               multiple
               class="main__form--input select"
               placeholder="Languages"
               :filterable="true"
             >
               <el-option
-                v-for="(item, index) in languagesList"
+                v-for="(item, index) in languages"
                 :key="`lang_${index}`"
                 :value="item.id"
                 :label="item.name"
@@ -195,7 +195,7 @@
               placeholder="Speciality"
             >
               <el-option
-                v-for="(item, index) in profileSuccessData.specialties"
+                v-for="(item, index) in profileSuccessData?.specialties"
                 :key="`spec_${index}`"
                 :value="item.id"
                 :label="item.name"
@@ -248,17 +248,17 @@ const payload = ref({
   gender: null,
   phone_number: null,
   speciality_id: null,
-  languages: null,
+  languagesList: null,
   experience: null,
   timezone: null,
   cv: null,
   avatar: null,
 })
 
-const languagesList = ref([
-  { name: 'EN', id: 'en' },
-  { name: 'RU', id: 'ru' },
-  { name: 'HY', id: 'hy' },
+const languages = ref([
+  { name: 'EN', id: 'EN' },
+  { name: 'RU', id: 'RU' },
+  { name: 'HY', id: 'HY' },
 ])
 
 const email = ref(null)
@@ -290,6 +290,9 @@ const setProfileData = (v) => {
     } else {
       payload.value[i] = v?.user[i]
     }
+  }
+  if (v?.user.languages) {
+    payload.value.languagesList = v?.user.languages.split(',')
   }
   if (payload.value.phone_number) {
     payload.value.phone_number = payload.value.phone_number.toString()
