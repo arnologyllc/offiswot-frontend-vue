@@ -1,25 +1,53 @@
 <template>
-  <el-dialog v-model="props.dialogVisible" :width="dialogWidth" show-close top="30vh" @close="$emit('close')">
+  <el-dialog
+    v-model="props.dialogVisible"
+    class="invite-dialog"
+    :width="dialogWidth"
+    show-close
+    top="30vh"
+    @close="$emit('close')"
+  >
     <div class="dialog__title">
-      {{ showSecondPage ? 'Workspace Rules' : 'Invite member' }}
+      {{ !showFirstPage ? 'Invite member' : 'Workspace Rules' }}
     </div>
-    <div v-if="!showSecondPage" class="dialog__body">
+
+    <div v-if="showFirstPage" class="dialog__first-page">
+      <div class="dialog__first-page--title">What info must your workspace members provide to join?</div>
+      <div class="dialog__first-page--checkobox-container">
+        <el-checkbox-group v-model="checkList">
+          <div class="dialog__first-page--checkbox">
+            <div v-for="(item, index) in checkboxItems" :key="`checkbox_${index}`">
+              <el-checkbox :label="item.value"> {{ item.name }}</el-checkbox>
+            </div>
+          </div>
+        </el-checkbox-group>
+      </div>
+      <div class="dialog__first-page--small-text">
+        You will be able to edit requried information abour memebers of the workspace in settings (click
+        <a href="">here</a>).
+      </div>
+      <div class="dialog__first-page--submit-box">
+        <el-button class="dialog__invite--btn" @click="goNextPage"> NEXT </el-button>
+        <el-button class="dialog__invite--skip-btn"> SKIP </el-button>
+      </div>
+    </div>
+    <div v-else class="dialog__body">
       <el-form ref="inviteForm">
         <div class="dialog__input--label">Enter email</div>
         <el-autocomplete
           ref="email"
           v-model="userEmail"
           popper-class="custom-style-popup"
-          class="dialog__input"
+          class="invite-dialog__input"
           :class="error.value ? 'is-error' : ''"
           :fetch-suggestions="querySearch"
           placeholder="Enter email"
-          prefix-icon="el-icon-search"
           @select="handleSelect"
           @input="validateEmail"
+          @keydown.enter="addEmail"
         >
           <template v-if="!error.value" #default="{ item }">
-            <span v-html="showingEmail(item.value, userEmail.length)"></span>
+            <span v-html="showingEmail(item, userEmail.length)"></span>
             <span v-if="item.link" class="list_item_isMember">Member</span>
           </template>
 
@@ -38,41 +66,25 @@
         </el-autocomplete>
         <div class="dialog__chips-box">
           <div v-for="(item, index) in selectedEmails" :key="`email_${index}`" class="dialog__chip">
-            <div class="dialog__chip--text">{{ item.value }}</div>
+            <div class="dialog__chip--text">{{ item.email }}</div>
             <div class="dialog__chip--icon" @click="removeChip(item)">
-              <i class="el-icon-close"></i>
+              <i class="el-icon-close">X</i>
             </div>
           </div>
         </div>
         <div class="dialog__invite">
-          <el-button class="dialog__invite--btn" @click="goNextPage"> INVITE </el-button>
+          <el-button class="dialog__invite--btn" @click="inviteUsers"> INVITE </el-button>
+          <el-button class="dialog__invite--skip-btn"> SKIP </el-button>
         </div>
       </el-form>
-    </div>
-    <div v-else class="dialog__second-page">
-      <div class="dialog__second-page--title">What info must your workspace members provide to join?</div>
-      <div class="dialog__second-page--checkobox-container">
-        <el-checkbox-group v-model="checkList">
-          <div class="dialog__second-page--checkbox">
-            <div v-for="(item, index) in checkboxItems" :key="`checkbox_${index}`">
-              <el-checkbox :label="item"></el-checkbox>
-            </div>
-          </div>
-        </el-checkbox-group>
-      </div>
-      <div class="dialog__second-page--small-text">
-        You will be able to edit requried information abour memebers of the workspace in settings (click
-        <a href="">here</a>).
-      </div>
-      <div class="dialog__second-page--submit-box">
-        <el-button class="dialog__invite--btn"> SUBMIT </el-button>
-      </div>
     </div>
   </el-dialog>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, getCurrentInstance, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import useWorkspaceStore from '@/stores/workspace'
 
 const props = defineProps({
   dialogVisible: {
@@ -81,58 +93,39 @@ const props = defineProps({
   },
 })
 
+const workspaceStore = useWorkspaceStore()
+const { getUsersListSuccess, getUsersListError, inviteUsersSuccess, inviteUsersError } = storeToRefs(workspaceStore)
+
 const error = ref({
   value: null,
   isShow: null,
 })
 
-const emails = ref([
-  {
-    value: 'aaaaaaaaaaaaaaaaaaaaaa@email.ru',
-    link: 'https://github.com/vuejs/vue',
-  },
-  { value: 'bbb@gmail.com', link: 'https://github.com/ElemeFE/element' },
-  { value: 'cc@gmail.com', link: 'https://github.com/ElemeFE/cooking' },
-  { value: 'ffff@mail.ru', link: 'https://github.com/ElemeFE/mint-ui' },
-  { value: 'asas@mail.ru', link: 'https://github.com/vuejs/vuex' },
-  {
-    value: 'dsdf@gmail.com',
-    link: 'https://github.com/vuejs/vue-router',
-  },
-  { value: 'babel@mail.ru', link: 'https://github.com/babel/babel' },
-])
+const emails = ref([])
+const workspaceID = ref(null)
 
 const checkboxItems = ref([
-  'Name',
-  'Picture',
-  'Surname',
-  'Languages',
-  'Phone number',
-  'Years of experience',
-  'Date of birth',
-  'Specialty',
-  'Upload CV',
+  { name: 'Name', value: 'name' },
+  { name: 'Picture', value: 'picture' },
+  { name: 'Full Name', value: 'fullName' },
+  { name: 'Languages', value: 'languages' },
+  { name: 'Phone number', value: 'phoneNumber' },
+  { name: 'Years of experience', value: 'experience' },
+  { name: 'Date of birth', value: 'birthday' },
+  { name: 'Specialty', value: 'specialty' },
+  { name: 'Upload CV', value: 'cv' },
 ])
 
 const userEmail = ref('')
 const selectedEmails = ref([])
-const showSecondPage = ref(false)
-const checkList = ref([
-  'Name',
-  'Picture',
-  'Surname',
-  'Languages',
-  'Phone number',
-  'Years of experience',
-  'Date of birth',
-  'Specialty',
-  'Upload CV',
-])
+const showFirstPage = ref(true)
+const checkList = ref([])
+const instance = getCurrentInstance()
 
-const dialogWidth = computed(() => (showSecondPage.value ? '918px' : '432px'))
+const dialogWidth = computed(() => (showFirstPage.value ? '918px' : '432px'))
 
 const goNextPage = () => {
-  showSecondPage.value = true
+  showFirstPage.value = false
 }
 
 const handleSelect = (item) => {
@@ -140,29 +133,36 @@ const handleSelect = (item) => {
     selectedEmails.value.push(item)
     userEmail.value = ''
   }
-  emails.value = emails.value.filter((el) => el.value !== item.value)
+  emails.value = emails.value.filter((el) => el.email !== item.email)
 }
 
 const querySearch = (queryString, cb) => {
   const allEmails = emails.value
   const results = queryString && !error.value.value ? allEmails.filter(createFilter(queryString)) : []
+  if (!results[0] && queryString.includes('@')) {
+    validateEmail(queryString)
+    if (!error.value.value) {
+      results.push({ email: queryString, status: null })
+    }
+  }
+
   cb(results)
 }
 
 const createFilter = (queryString) => {
-  return (email) => {
-    return email.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+  return (user) => {
+    return user.email.toLowerCase().indexOf(queryString.toLowerCase()) === 0
   }
 }
 
 const removeChip = (item) => {
-  selectedEmails.value = selectedEmails.value.filter((el) => el.value !== item.value)
+  selectedEmails.value = selectedEmails.value.filter((el) => el.email !== item.email)
   emails.value.push(item)
 }
 
 const validateEmail = (value) => {
   const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/
-  if (value.includes('@') && !emailRegex.test(value)) {
+  if (value?.includes('@') && !emailRegex.test(value)) {
     error.value.value = 'Email is not valid.'
   } else {
     error.value.value = ''
@@ -172,15 +172,50 @@ const validateEmail = (value) => {
 const showError = () => {
   error.value.isShow = true
 }
+
 const hideError = () => {
   error.value.isShow = false
 }
 
-const showingEmail = (email, size) => {
-  const part1 = email.slice(0, size)
-  const part2 = email.slice(size)
+const showingEmail = (user, size) => {
+  const part1 = user.email.slice(0, size)
+  const part2 = user.email.slice(size)
   return `<span class="list_item_value">${part1}<span style="opacity: 0.3">${part2}</span></span>`
 }
+
+onMounted(() => {
+  if (process.client) {
+    const path = window.location.pathname.split('/')
+    if (!isNaN(+path[path.length - 1])) {
+      workspaceID.value = path[path.length - 1]
+    }
+  }
+  workspaceStore.getUsersList(workspaceID.value)
+})
+
+const inviteUsers = () => {
+  const payload = {
+    emails: [...selectedEmails.value.map((user) => user.email)],
+    workspace_id: workspaceID.value,
+  }
+  workspaceStore.inviteUsers(payload)
+}
+
+watch(getUsersListSuccess, (v) => {
+  emails.value = v
+})
+
+watch(getUsersListError, (v) => {
+  console.log(v)
+})
+
+watch(inviteUsersSuccess, (v) => {
+  instance.emit('close')
+})
+
+watch(inviteUsersError, (v) => {
+  console.log(v)
+})
 </script>
 
 <style scoped lang="scss">
@@ -268,6 +303,7 @@ const showingEmail = (email, size) => {
     padding: 27px 63px 0 63px;
   }
   &__input {
+    width: 100%;
     &--label {
       color: $ov-text--title;
       font-size: 14px;
@@ -296,7 +332,6 @@ const showingEmail = (email, size) => {
     justify-content: space-between;
     padding: 0 8px;
     margin-bottom: 5px;
-    margin-right: 4px;
     &--text {
       color: $ov-primary--light;
       font-size: 11px;
@@ -315,6 +350,8 @@ const showingEmail = (email, size) => {
   &__invite {
     display: flex;
     justify-content: center;
+    flex-direction: column;
+    gap: 18px;
     &--btn {
       width: 177px;
       height: 40px;
@@ -325,6 +362,17 @@ const showingEmail = (email, size) => {
       font-weight: 700;
       font-size: 16px;
     }
+    &--skip-btn {
+      margin: 0 !important;
+      background-color: inherit !important;
+      font-weight: 600;
+      font-size: 17px;
+      line-height: 22px;
+      text-align: center;
+      text-transform: lowercase;
+      border: none !important;
+      color: #d0c9d6;
+    }
   }
   &__text-btn {
     margin-top: 9px;
@@ -332,7 +380,7 @@ const showingEmail = (email, size) => {
     font-weight: 600;
     color: #d0c9d6;
   }
-  &__second-page {
+  &__first-page {
     padding: 9px 100px 0 100px;
     &--title {
       font-size: 14px;
@@ -362,6 +410,8 @@ const showingEmail = (email, size) => {
     &--submit-box {
       display: flex;
       justify-content: center;
+      flex-direction: column;
+      gap: 18px;
     }
   }
 }
@@ -382,5 +432,9 @@ const showingEmail = (email, size) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.custom-style-popup {
+  top: 482px !important;
 }
 </style>

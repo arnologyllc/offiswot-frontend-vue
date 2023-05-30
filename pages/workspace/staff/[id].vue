@@ -22,17 +22,27 @@
         @save="dragOptions.disabled = true"
       ></component>
     </div>
+
+    <check-modal
+      v-if="isOpenPINDialog"
+      :dialog-visible="isOpenPINDialog"
+      @close="isOpenPINDialog = false"
+    ></check-modal>
   </div>
 </template>
 
 <script setup>
-import { resolveDynamicComponent } from 'vue'
+import { onMounted, resolveDynamicComponent } from 'vue'
 import Desk from '@/components/staff/Desk.vue'
 import List from '@/components/staff/List.vue'
+import settingsToken from '~/middleware/settingsToken'
+import loginToken from '~/middleware/loginToken'
+import CheckModal from '@/components/auth/AccessCheckModal.vue'
 
 const desk = resolveDynamicComponent(Desk)
 const list = resolveDynamicComponent(List)
 const currentComponent = ref('desk')
+const isOpenPINDialog = ref(false)
 
 const dragOptions = ref({
   animation: 1,
@@ -44,6 +54,10 @@ const dragOptions = ref({
 const setCurrentComponent = (name) => {
   currentComponent.value = name
 }
+onMounted(() => {
+  isOpenPINDialog.value = loginToken()
+  isOpenPINDialog.value = settingsToken()
+})
 </script>
 
 <style scoped lang="scss">

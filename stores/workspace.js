@@ -17,11 +17,17 @@ const useWorkspaceStore = defineStore('workspace', {
       getMembersSuccess: null,
       getMembersError: null,
 
+      getUsersListSuccess: null,
+      getUsersListError: null,
+
       getSeatsSuccess: null,
       getSeatsError: null,
 
       setSeatsSuccess: null,
       setSeatsError: null,
+
+      inviteUsersSuccess: null,
+      inviteUsersError: null,
     }
   },
   actions: {
@@ -66,6 +72,26 @@ const useWorkspaceStore = defineStore('workspace', {
         })
         .finally(() => {
           this.isLoadingSubmit = false
+        })
+    },
+
+    getUsersList(id) {
+      const { $myFetch } = useNuxtApp()
+      this.isLoadingIndustries = true
+      $myFetch(`/workspace/${id}/emails-list`)
+        .then((data) => {
+          this.getUsersListSuccess = data
+        })
+        .catch((e) => {
+          try {
+            JSON.parse(e.data)
+          } catch {
+            this.getUsersListError = e.data
+          }
+          this.getUsersListError = JSON.parse(e.data)
+        })
+        .finally(() => {
+          this.isLoadingIndustries = false
         })
     },
 
@@ -126,6 +152,30 @@ const useWorkspaceStore = defineStore('workspace', {
             this.setSeatsError = e.data
           }
           this.setSeatsError = JSON.parse(e.data)
+        })
+        .finally(() => {
+          this.isLoadingSubmit = false
+        })
+    },
+
+    inviteUsers(payload) {
+      console.log(payload)
+      const { $myFetch } = useNuxtApp()
+      this.isLoadingSubmit = true
+      $myFetch(`/invite`, {
+        method: 'post',
+        body: payload,
+      })
+        .then((data) => {
+          this.inviteUsersSuccess = data
+        })
+        .catch((e) => {
+          try {
+            JSON.parse(e.data)
+          } catch {
+            this.inviteUsersError = e.data
+          }
+          this.inviteUsersError = JSON.parse(e.data)
         })
         .finally(() => {
           this.isLoadingSubmit = false

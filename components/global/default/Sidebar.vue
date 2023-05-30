@@ -477,7 +477,6 @@ const resizeSidebar = (e) => {
         height: 46px;
         border-radius: 26px;
         background: inherit;
-        padding: 10px;
       }
       &--avatar {
         width: 40px;

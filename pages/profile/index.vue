@@ -63,7 +63,7 @@
             </el-dropdown>
           </el-form-item>
           <div class="main__form--info">
-            <span v-if="username" class="main__form--info__title">{{ username }}</span>
+            <span v-if="fullName" class="main__form--info__title">{{ fullName }}</span>
             <span v-if="email" class="main__form--info__subtitle">{{ email }}</span>
           </div>
         </el-col>
@@ -71,12 +71,19 @@
       <el-row :gutter="70">
         <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
           <el-form-item prop="name">
-            <el-input v-model="payload.name" class="main__form--input" placeholder="Full Name"></el-input>
+            <el-input ref="full_name" v-model="payload.full_name" class="main__form--input" placeholder="Full Name">
+              <template #suffix>
+                <div v-if="payload.full_name" style="position: relative" @click="focusElement('full_name')">
+                  <span for="full_name" class="custom_placeholder"> Full Name </span>
+                </div>
+              </template>
+            </el-input>
           </el-form-item>
         </el-col>
         <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
           <el-form-item prop="phone_number">
             <MazPhoneNumberInput
+              ref="phoneNumber"
               v-model="payload.phone_number"
               class="main__form--phone-number"
               default-country-code="AM"
@@ -92,23 +99,42 @@
         <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
           <el-form-item prop="experience">
             <el-input
+              ref="experience"
               v-model="payload.experience"
               type="number"
               class="main__form--input"
               placeholder="Years of experience"
-            ></el-input>
+            >
+              <template #suffix>
+                <div v-if="payload.experience" style="position: relative" @click="focusElement('experience')">
+                  <span for="experience" class="custom_placeholder"> Years of experience </span>
+                </div>
+              </template>
+            </el-input>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row :gutter="70">
         <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
-          <el-form-item prop="surname">
-            <el-input v-model="payload.surname" class="main__form--input" placeholder="Display Name"></el-input>
+          <el-form-item prop="display_name">
+            <el-input
+              ref="display_name"
+              v-model="payload.display_name"
+              class="main__form--input"
+              placeholder="Display Name"
+            >
+              <template #suffix>
+                <div v-if="payload.display_name" style="position: relative" @click="focusElement('display_name')">
+                  <span for="display_name" class="custom_placeholder"> Display Name </span>
+                </div>
+              </template>
+            </el-input>
           </el-form-item>
         </el-col>
         <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
           <el-form-item prop="languages">
             <el-select
+              ref="languagesList"
               v-model="payload.languagesList"
               multiple
               class="main__form--input select"
@@ -241,8 +267,8 @@ const { profileLoading, profileSuccessData, profileFailureData, isLoadingSubmit,
 auth()
 
 const payload = ref({
-  name: null,
-  surname: null,
+  full_name: null,
+  display_name: null,
   lastname: null,
   date_of_birth: null,
   gender: null,
@@ -262,7 +288,7 @@ const languages = ref([
 ])
 
 const email = ref(null)
-const username = ref(null)
+const fullName = ref(null)
 const isHovered = ref(false)
 
 const avatarSrc = ref(null)
@@ -274,8 +300,8 @@ const setProfileData = (v) => {
   if (v?.user.email) {
     email.value = v.user.email
   }
-  if (v?.user.username) {
-    username.value = v.user.username
+  if (v?.user.full_name) {
+    fullName.value = v.user.full_name
   }
   if (v?.user.avatar) {
     avatarUrl.value = v.avatarPath.includes(config.public.env.serverUrl)
@@ -304,6 +330,10 @@ const isCountrySelector = ref(true)
 const handleResize = () => {
   isCountrySelector.value = window.innerWidth < 400
   instance.update()
+}
+
+const focusElement = (elem) => {
+  instance.refs[elem].focus()
 }
 
 watch(editProfileData, (v) => {
