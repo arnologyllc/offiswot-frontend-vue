@@ -54,53 +54,53 @@
             <div></div>
           </template>
         </el-form-item>
-        <el-form-item prop="username" class="form-item">
+        <el-form-item prop="full_name" class="form-item">
           <el-input
-            ref="username"
-            v-model="payload.username"
+            ref="full_name"
+            v-model="payload.full_name"
             class="main__form--box__input"
-            placeholder="Username"
+            placeholder="Full Name"
             maxlength="30"
-            @input="validateField('username')"
-            @blur="validateField('username')"
+            @input="validateField('full_name')"
+            @blur="validateField('full_name')"
           >
             <template #prefix>
               <img src="@/assets/images/icons/user-icon.svg" alt="user_icon" />
             </template>
 
             <template #suffix>
-              <div v-if="payload.username" style="position: relative" @click="focusElement('username')">
-                <span for="username" class="custom_placeholder" :class="payload.username ? 'active' : ''">
-                  Username
+              <div v-if="payload.full_name" style="position: relative" @click="focusElement('full_name')">
+                <span for="full_name" class="custom_placeholder" :class="payload.full_name ? 'active' : ''">
+                  Full Name
                 </span>
               </div>
-              <template v-if="errors.username.value || errors.username.status">
+              <template v-if="errors.full_name.value || errors.full_name.status">
                 <div
                   class="error_icon"
-                  @mouseover="showError('username', 'mouseover')"
-                  @mouseout="showError('username', 'mouseout')"
-                  @click="showError('username', 'click')"
+                  @mouseover="showError('full_name', 'mouseover')"
+                  @mouseout="showError('full_name', 'mouseout')"
+                  @click="showError('full_name', 'click')"
                 >
                   <img
-                    v-if="errors.username.status === 'Medium' && payload.username"
+                    v-if="errors.full_name.status === 'Medium' && payload.full_name"
                     src="@/assets/images/icons/warning.svg"
                     alt=""
                   />
-                  <img v-else-if="errors.username.value" src="@/assets/images/icons/error.svg" alt="" />
+                  <img v-else-if="errors.full_name.value" src="@/assets/images/icons/error.svg" alt="" />
                 </div>
               </template>
             </template>
           </el-input>
 
           <div
-            v-if="errors.username.status === 'Medium' && errors.username.isShow && isWeb()"
+            v-if="errors.full_name.status === 'Medium' && errors.full_name.isShow && isWeb()"
             class="el-form-item__error strength warning"
           >
-            <span v-html="errors.username.value"></span>
+            <span v-html="errors.full_name.value"></span>
           </div>
           <template #error>
-            <div v-if="errors.username.isShow && isWeb()" class="el-form-item__error">
-              <span v-html="errors.username.value"></span>
+            <div v-if="errors.full_name.isShow && isWeb()" class="el-form-item__error">
+              <span v-html="errors.full_name.value"></span>
             </div>
             <div></div>
           </template>
@@ -229,11 +229,11 @@
     ></error-massage>
 
     <error-massage
-      v-if="errors.username.isShow && !isWeb()"
-      :dialog-visible="errors.username.isShow && !isWeb()"
-      :error-text="errors.username.value"
-      :text-color="errors.username.status === 'Medium' && payload.username ? 'warning' : 'weak'"
-      @visible="errors.username.isShow = false"
+      v-if="errors.full_name.isShow && !isWeb()"
+      :dialog-visible="errors.full_name.isShow && !isWeb()"
+      :error-text="errors.full_name.value"
+      :text-color="errors.full_name.status === 'Medium' && payload.full_name ? 'warning' : 'weak'"
+      @visible="errors.full_name.isShow = false"
     ></error-massage>
 
     <error-massage
@@ -281,7 +281,7 @@ const isValid = ref(false)
 
 const payload = ref({
   email: null,
-  username: null,
+  full_name: null,
   password: null,
   password_confirmation: null,
 })
@@ -291,7 +291,7 @@ const errors = ref({
     value: '',
     isShow: false,
   },
-  username: {
+  full_name: {
     value: '',
     status: null,
     isShow: false,
@@ -339,41 +339,6 @@ const validatePass2 = (rule, value, callback) => {
   }
 }
 
-const validateUsernameSymbols = (rule, value, callback) => {
-  const regex = /^[A-Za-z0-9_.]*$/g
-  if (!regex.test(value)) {
-    callback(
-      new Error(
-        `<span>Username is improperly formatted.<br></span>
-            <ul class="error_info">
-              <li>Your handle can't exceed 30 characters. </li>
-              <li>It can only contain letters, numbers, underscores and dots. </li>
-              <li>It can't contain symbols or punctuation marks. </li>
-              <li>It needs to be unique.</li>
-            </ul>`
-      )
-    )
-  } else {
-    callback()
-  }
-}
-
-const validateUsernameSymbolsCount = (rule, value, callback) => {
-  if (value?.length === 30) {
-    errors.value.username.value = "Your handle can't exceed 30 characters."
-    errors.value.username.status = 'Medium'
-    callback()
-  } else if (value?.length > 0 && value?.length < 30) {
-    errors.value.username.value = ''
-    errors.value.username.status = null
-    callback()
-  } else {
-    errors.value.username.value = 'This field is required'
-    errors.value.username.status = null
-    callback(new Error(`This field is required`))
-  }
-}
-
 const rules = ref({
   email: [
     {
@@ -387,21 +352,12 @@ const rules = ref({
       trigger: 'blur',
     },
   ],
-  username: [
+  full_name: [
     {
       required: true,
       message: 'This field is required.',
       trigger: 'blur',
     },
-    {
-      min: 3,
-      message: `Username is improperly formatted.<br />
-                      <span class="error_info">Your username must be at least 3 characters long.</span>
-                      `,
-      trigger: 'blur',
-    },
-    { validator: validateUsernameSymbols, trigger: 'blur' },
-    { validator: validateUsernameSymbolsCount, trigger: 'change' },
   ],
   password: [{ validator: validatePass, trigger: 'input' }],
   password_confirmation: [
@@ -434,7 +390,7 @@ const focusElement = (elem) => {
 
 const validateField = (fieldName) => {
   instance.refs.registerForm.validateField(fieldName, (isValid, catchedError) => {
-    if ((errors.value[fieldName].status !== 'Medium' && fieldName === 'username') || fieldName !== 'username') {
+    if ((errors.value[fieldName].status !== 'Medium' && fieldName === 'full_name') || fieldName !== 'full_name') {
       if (!isValid) {
         errors.value[fieldName].value = catchedError[fieldName][0].message
       } else if (fieldName !== 'password') {

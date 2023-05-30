@@ -2,8 +2,6 @@
   [
     [
       {
-        "professionId": 1,
-        "projectStatus": 4,
         "online": true,
         "id": 1,
         "dragzone": false,
@@ -14,58 +12,16 @@
         }
       },
       {
-        "professionId": 2,
-        "projectStatus": 3,
         "id": 2,
         "dragzone": false,
         "user": null
       },
       {
-        "professionId": 1,
-        "projectStatus": 1,
         "id": 3,
         "dragzone": false,
         "user": null
       },
       {
-        "professionId": 2,
-        "projectStatus": 1,
-        "id": 4,
-        "dragzone": false,
-        "user": null
-      }
-    ],
-    [
-      {
-        "professionId": 1,
-        "projectStatus": 4,
-        "online": true,
-        "id": 1,
-        "dragzone": false,
-        "user": null
-      },
-      {
-        "professionId": 1,
-        "projectStatus": 4,
-        "online": true,
-        "id": 2,
-        "dragzone": false,
-        "user": {
-          "user_id": 1,
-          "name": "Anzhelika M.",
-          "avatar": "https://www.mantruckandbus.com/fileadmin/_processed_/c/7/csm_frank-sprenger-interviewkachel_4470dab1a7.jpg"
-        }
-      },
-      {
-        "professionId": 1,
-        "projectStatus": 1,
-        "id": 3,
-        "dragzone": false,
-        "user": null
-      },
-      {
-        "professionId": 2,
-        "projectStatus": 1,
         "id": 4,
         "dragzone": false,
         "user": null

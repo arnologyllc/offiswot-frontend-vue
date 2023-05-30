@@ -46,17 +46,7 @@
                         <div class="left-box__left--name">
                           {{ element.user.name }}
                         </div>
-                        <div class="left-box__left--profession">
-                          {{ currentProfession(element.professionId).name }}
-                        </div>
-                        <div class="left-box__left--status">
-                          <div
-                            v-for="bar in 5"
-                            :key="`bar_${bar}`"
-                            class="bar"
-                            :class="{ active: bar <= element.projectStatus }"
-                          ></div>
-                        </div>
+                        <div class="left-box__left--status"></div>
                       </div>
                       <div class="left-box__right">
                         <div
@@ -111,17 +101,7 @@
                         <div class="right-box__left--name">
                           {{ element.user.name }}
                         </div>
-                        <div class="right-box__left--profession">
-                          {{ currentProfession(element.professionId).name }}
-                        </div>
-                        <div class="right-box__left--status">
-                          <div
-                            v-for="bar in 5"
-                            :key="`bar_${bar}`"
-                            class="bar"
-                            :class="{ active: bar <= element.projectStatus }"
-                          ></div>
-                        </div>
+                        <div class="right-box__left--status"></div>
                       </div>
                       <div class="right-box__right">
                         <div
@@ -226,16 +206,13 @@
               </div>
               <div class="desk__edit-footer--members__member--right">
                 <div class="user-name">{{ element.user.name }}</div>
-                <div class="user-profession">
-                  {{ currentProfession(element.professionId).name }}
-                </div>
               </div>
             </div>
           </div>
         </template>
       </draggable>
       <div v-else class="desk__edit-footer--members__outer"></div>
-      <el-button class="desk__edit-footer--save" @click="$emit('save')"> Save </el-button>
+      <el-button class="desk__edit-footer--save" @click="onSave"> Save </el-button>
     </div>
     <div v-if="!dragOptions.disabled" class="tutorial-box">
       <img src="@/assets/images/drag-tutorial/tutorial-cursor.svg" alt="^" class="tutorial-box__cursor" />
@@ -253,15 +230,21 @@
 </template>
 
 <script setup>
-import { nextTick } from 'vue'
+import { getCurrentInstance, nextTick } from 'vue'
+import { storeToRefs } from 'pinia'
 import draggable from 'vuedraggable'
 import OvInviteMemberModal from '@/components/shared/OvInviteMemberModal'
 import AllTablesList from '@/data/tablesList.json'
-import AllUsersList from '@/data/usersList.json'
 import tableTopLeft from '@/assets/images/tables/table-top-left.svg'
 import tableTopRigth from '@/assets/images/tables/table-top-right.svg'
 import tableBottomLeft from '@/assets/images/tables/table-bottom-left.svg'
 import tableBottomRigth from '@/assets/images/tables/table-bottom-right.svg'
+import useWorkspaceStore from '@/stores/workspace'
+
+const workspaceStore = useWorkspaceStore()
+const { getSeatsSuccess, getSeatsError, setSeatsSuccess, setSeatsError, getMembersSuccess, getMembersError } =
+  storeToRefs(workspaceStore)
+const route = useRoute()
 
 const props = defineProps({
   dragOptions: {
@@ -269,9 +252,6 @@ const props = defineProps({
     default: null,
   },
 })
-
-const tablesList = ref(JSON.parse(JSON.stringify(AllTablesList)))
-const usersList = ref(JSON.parse(JSON.stringify(AllUsersList)))
 
 const footerFutureIndex = ref(null)
 const footerMovingIndex = ref(null)
@@ -282,6 +262,14 @@ const movingIndex = ref(null)
 const futureItem = ref(null)
 const isInsideFooter = ref(false)
 const reloadFooter = ref(true)
+const workspaceID = ref(null)
+const instance = getCurrentInstance()
+
+// const AllTablesList = ref([])
+const AllUsersList = ref([])
+
+const tablesList = ref(JSON.parse(JSON.stringify(AllTablesList)))
+const usersList = ref(JSON.parse(JSON.stringify(AllUsersList.value)))
 
 const tableIcons = ref([
   {
@@ -306,11 +294,6 @@ const tableIcons = ref([
   },
 ])
 
-const hints = ref([
-  { name: 'Marketing', color: '#4156F6', id: 1 },
-  { name: 'Team Marketing', color: '#E4AC1A', id: 2 },
-])
-
 const lastTableId = ref(null)
 const isOpenInviteModal = ref(false)
 
@@ -319,11 +302,15 @@ const availableMembers = ref([])
 onMounted(() => {
   setAvailableMembers()
   setLastTableId()
+  if (process.client) {
+    const path = window.location.pathname.split('/')
+    if (!isNaN(+path[path.length - 1])) {
+      workspaceID.value = path[path.length - 1]
+    }
+  }
+  workspaceStore.getMembers(workspaceID.value)
+  workspaceStore.getSeats(workspaceID.value)
 })
-
-const currentProfession = (id) => {
-  return hints.value.find((el) => el.id === id)
-}
 
 const setAvailableMembers = () => {
   const arr = []
@@ -343,10 +330,9 @@ const handleDeleteUser = (index, subIndex, deleteIndex) => {
   const tableList = JSON.parse(JSON.stringify(tablesList.value))
   availableMembers.value.push(tableList[index][subIndex][deleteIndex])
   delete tablesList.value[index][subIndex][deleteIndex].user
-  delete tablesList.value[index][subIndex][deleteIndex].professionId
-  delete tablesList.value[index][subIndex][deleteIndex].projectStatus
   delete tablesList.value[index][subIndex][deleteIndex].disabled
 }
+
 const setLastTableId = () => {
   const arr = []
   tablesList.value.forEach((row) => {
@@ -358,6 +344,7 @@ const setLastTableId = () => {
   })
   lastTableId.value = Math.max(...arr)
 }
+
 const onAddRow = () => {
   const arr = []
   if (tablesList.value[0]) {
@@ -536,6 +523,7 @@ const handleMoveFromFooter = (e) => {
   } // Check if drag is into footer
   return false
 }
+
 const handleFooterDragEnd = () => {
   tablesList.value.forEach((row, rowIndex) => {
     row.forEach((col, colIndex) => {
@@ -581,6 +569,46 @@ const handleFooterDragEnd = () => {
 
 const today = computed(() => {
   return new Date().toLocaleDateString('en-us', { weekday: 'long', month: 'short', day: 'numeric' })
+})
+
+const onSave = () => {
+  instance.emit('save')
+}
+
+const setTables = (seats) => {
+  const tables = []
+  seats.forEach((elem) => {
+    tables[elem.table_num] = {
+      position: elem.row_col,
+      user: elem.user,
+    }
+  })
+  console.log(tables)
+}
+
+watch(getMembersSuccess, (v) => {
+  console.log(v)
+})
+
+watch(getMembersError, (v) => {
+  console.log(v)
+})
+
+watch(getSeatsSuccess, (v) => {
+  AllUsersList.value = v.users
+  setTables(v.seats)
+})
+
+watch(getSeatsError, (v) => {
+  console.log(v)
+})
+
+watch(setSeatsSuccess, (v) => {
+  console.log(v)
+})
+
+watch(setSeatsError, (v) => {
+  console.log(v)
 })
 </script>
 

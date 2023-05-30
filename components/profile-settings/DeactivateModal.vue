@@ -25,8 +25,8 @@
             </h4>
             <div class="dialog-footer-subtitle">
               <p>
-                You can reactivate your profile in login page by trying to login with your current email or username
-                within 3 months after deactivation. After that the account will be permanently deleted. Check account
+                You can reactivate your profile in login page by trying to login with your current email within 3 months
+                after deactivation. After that the account will be permanently deleted. Check account
                 <span> deactivation and account deletion policy.</span>
               </p>
             </div>

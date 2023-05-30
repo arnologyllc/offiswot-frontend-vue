@@ -23,7 +23,7 @@
             ref="email"
             v-model="payload.email"
             class="main__form--box__input"
-            placeholder="Email or username"
+            placeholder="Email"
             @blur="validateField('email')"
           >
             <template #prefix>
@@ -41,7 +41,7 @@
                 @click="showError('email', 'click')"
               />
               <div v-if="payload.email" style="position: relative" @click="focusElement('email')">
-                <span for="email" class="custom_placeholder"> Email or username </span>
+                <span for="email" class="custom_placeholder"> Email  </span>
               </div>
 
               <div></div>
@@ -269,7 +269,7 @@ watch(loginErrorData, (v) => {
     isOpenEmailDialog.value = true
     return
   }
-  if (v === 'Incorrect username or password.') {
+  if (v === 'Incorrect email or password.') {
     errors.value.global.value = v
   }
   if (typeof v !== 'string') {

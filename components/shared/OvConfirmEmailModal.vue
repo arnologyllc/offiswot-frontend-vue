@@ -61,7 +61,7 @@ watch(resendSuccessData, (v) => {})
 
 watch(resendFailureData, (v) => {
   if (v) {
-    error.value = `You have exceeded the maximum number of reset password requests.`
+    error.value = `You have exceeded the maximum number of verification link requests.`
   }
 })
 
