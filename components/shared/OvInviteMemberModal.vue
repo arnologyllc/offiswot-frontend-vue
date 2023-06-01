@@ -7,11 +7,11 @@
     top="30vh"
     @close="$emit('close')"
   >
-    <div class="dialog__title">
-      {{ !showFirstPage ? 'Invite member' : 'Workspace Rules' }}
+    <div class="dialog__title" :style="showPage === 3 ? { display: 'none' } : { display: 'block' }">
+      {{ showPage === 1 ? 'Workspace Rules' : 'Invite member' }}
     </div>
 
-    <div v-if="showFirstPage" class="dialog__first-page">
+    <div v-if="showPage === 1" class="dialog__first-page">
       <div class="dialog__first-page--title">What info must your workspace members provide to join?</div>
       <div class="dialog__first-page--checkobox-container">
         <el-checkbox-group v-model="checkList">
@@ -28,12 +28,19 @@
       </div>
       <div class="dialog__first-page--submit-box">
         <el-button class="dialog__invite--btn" @click="goNextPage"> NEXT </el-button>
-        <el-button class="dialog__invite--skip-btn"> SKIP </el-button>
+        <el-button class="dialog__invite--skip-btn" @click="goNextPage"> SKIP </el-button>
       </div>
     </div>
-    <div v-else class="dialog__body">
+    <div v-if="showPage === 2" class="dialog__body">
       <el-form ref="inviteForm">
         <div class="dialog__input--label">Enter email</div>
+        <div v-if="error.global" class="el-form-item__global-error-container">
+          <div class="el-form-item__global-error">
+            <img src="@/assets/images/icons/error.svg" alt="" />
+            <span>{{ error.global }}</span>
+          </div>
+          <span class="clear-error" @click="clearError">X</span>
+        </div>
         <el-autocomplete
           ref="email"
           v-model="userEmail"
@@ -51,7 +58,7 @@
             <span v-if="item.link" class="list_item_isMember">Member</span>
           </template>
 
-          <template v-if="error.value" #suffix>
+          <template v-else #suffix>
             <img
               src="@/assets/images/icons/error.svg"
               alt=""
@@ -73,10 +80,24 @@
           </div>
         </div>
         <div class="dialog__invite">
-          <el-button class="dialog__invite--btn" @click="inviteUsers"> INVITE </el-button>
-          <el-button class="dialog__invite--skip-btn"> SKIP </el-button>
+          <el-button class="dialog__invite--btn" :loading="isLoadingSubmit" @click="inviteUsers"> INVITE </el-button>
+          <el-button class="dialog__invite--skip-btn" @click="$emit('close')"> SKIP </el-button>
         </div>
       </el-form>
+    </div>
+    <div v-if="showPage === 3" class="invite-dialog__success">
+      <img src="@/assets/images/icons/success.svg" alt="success" />
+      <span class="invite-dialog__success--title">Invites are sent!</span>
+      <span class="invite-dialog__success--subtitle">
+        We have emailed all invitations.<br />You can now enjoy your new workspace!
+      </span>
+
+      <img
+        src="@/assets/images/icons/close-icon.svg"
+        alt="success"
+        class="invite-dialog__success--close"
+        @click="$emit('close')"
+      />
     </div>
   </el-dialog>
 </template>
@@ -85,6 +106,7 @@
 import { computed, getCurrentInstance, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import useWorkspaceStore from '@/stores/workspace'
+import useProfileStore from '@/stores/profile'
 
 const props = defineProps({
   dialogVisible: {
@@ -94,10 +116,13 @@ const props = defineProps({
 })
 
 const workspaceStore = useWorkspaceStore()
-const { getUsersListSuccess, getUsersListError, inviteUsersSuccess, inviteUsersError } = storeToRefs(workspaceStore)
+const profileStore = useProfileStore()
+const { getUsersListSuccess, getUsersListError, inviteUsersSuccess, inviteUsersError, isLoadingSubmit } =
+  storeToRefs(workspaceStore)
 
 const error = ref({
   value: null,
+  global: null,
   isShow: null,
 })
 
@@ -105,7 +130,7 @@ const emails = ref([])
 const workspaceID = ref(null)
 
 const checkboxItems = ref([
-  { name: 'Name', value: 'name' },
+  { name: 'Display Name', value: 'displayName' },
   { name: 'Picture', value: 'picture' },
   { name: 'Full Name', value: 'fullName' },
   { name: 'Languages', value: 'languages' },
@@ -118,14 +143,14 @@ const checkboxItems = ref([
 
 const userEmail = ref('')
 const selectedEmails = ref([])
-const showFirstPage = ref(true)
+const showPage = ref(1)
 const checkList = ref([])
 const instance = getCurrentInstance()
 
-const dialogWidth = computed(() => (showFirstPage.value ? '918px' : '432px'))
+const dialogWidth = computed(() => (showPage.value === 1 ? '918px' : '432px'))
 
 const goNextPage = () => {
-  showFirstPage.value = false
+  showPage.value = 2
 }
 
 const handleSelect = (item) => {
@@ -177,6 +202,10 @@ const hideError = () => {
   error.value.isShow = false
 }
 
+const clearError = () => {
+  error.value.global = null
+}
+
 const showingEmail = (user, size) => {
   const part1 = user.email.slice(0, size)
   const part2 = user.email.slice(size)
@@ -205,16 +234,13 @@ watch(getUsersListSuccess, (v) => {
   emails.value = v
 })
 
-watch(getUsersListError, (v) => {
-  console.log(v)
-})
-
-watch(inviteUsersSuccess, (v) => {
-  instance.emit('close')
+watch(inviteUsersSuccess, async (v) => {
+  await workspaceStore.getMembers(workspaceID.value)
+  showPage.value = 3
 })
 
 watch(inviteUsersError, (v) => {
-  console.log(v)
+  error.value.global = 'Something went wrong.'
 })
 </script>
 
@@ -436,5 +462,61 @@ watch(inviteUsersError, (v) => {
 
 .custom-style-popup {
   top: 482px !important;
+}
+
+.el-form-item__error {
+  position: absolute;
+  font-family: 'Montserrat';
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 400;
+  top: 0;
+  left: 105%;
+  padding: 14px;
+  color: #e60022;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: max-content;
+  max-width: 224px;
+  height: max-content;
+  min-height: 48px;
+  border-radius: 13px;
+  background-color: white;
+  box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.invite-dialog {
+  &__success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+    padding: 65px 70px 25px;
+    &--title {
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 24px;
+      text-align: center;
+      color: #0d1c2e;
+    }
+    &--subtitle {
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 17px;
+      text-align: center;
+      color: #0d1c2e;
+    }
+    &--close {
+      position: absolute;
+      top: 25px;
+      right: 27px;
+      font-weight: 900;
+      font-size: 12px;
+      cursor: pointer;
+    }
+  }
 }
 </style>

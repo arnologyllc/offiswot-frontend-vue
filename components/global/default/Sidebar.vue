@@ -70,7 +70,7 @@
       </div>
     </div>
     <div
-      v-if="$route.path.includes('workspace') || $route.fullPath == '/'"
+      v-if="($route.path.includes('workspace') && !$route.path.includes('create-workspace')) || $route.fullPath == '/'"
       class="chats"
       :class="isOpen ? 'large' : 'small'"
       :style="{ width: sidebarWidth + 'px' }"
@@ -134,6 +134,7 @@ const getAvatar = (v) => {
   } else if (accounts.value[currentAccountID.value]) {
     accounts.value[currentAccountID.value].avatarUrl = `${defaultAvatar}`
   }
+
   if (process.client) {
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
   }
@@ -143,6 +144,7 @@ const setWorkspaceData = (v) => {
   if (process.client) {
     accounts.value = JSON.parse(localStorage.getItem('accounts'))
     if (accounts.value[currentAccountID.value]) accounts.value[currentAccountID.value].workspaces = v?.myWorkspaces
+
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
   }
 }
@@ -157,6 +159,7 @@ watch(profileSuccessData, (v) => {
   } else if (currentAccountID.value >= 0) {
     accounts.value[currentAccountID.value].avatarUrl = `${defaultAvatar}`
   }
+
   if (process.client) {
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
   }
@@ -185,6 +188,7 @@ watch(editProfileData, (v) => {
   } else {
     accounts.value[currentAccountID.value].avatarUrl = `${defaultAvatar}`
   }
+
   if (process.client) {
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
   }
@@ -241,9 +245,9 @@ const handleResize = () => {
 
 const changeAccount = async (userID, isWorkspace) => {
   currentWorkspaceID.value = -1
-  currentAccountID.value = userID
-  $cookies.set('currentAccountID', userID)
-  if (accounts.value[userID].token === $cookies.get('token')) {
+  currentAccountID.value = accounts.value.findIndex((user) => user.ID === userID)
+  $cookies.set('currentAccountID', currentAccountID.value)
+  if (accounts.value[currentAccountID.value].token === $cookies.get('token')) {
     navigateTo(`/`)
     return
   }
@@ -252,11 +256,13 @@ const changeAccount = async (userID, isWorkspace) => {
   authStore.$reset()
   workspaceStore.$reset()
 
-  if ((Date.parse(accounts.value[userID].token_expires) - Date.now()) / 86400000 < 0) {
+  if ((Date.parse(accounts.value[currentAccountID.value].token_expires) - Date.now()) / 86400000 < 0) {
     accounts.value.splice(userID, 1)
+
     if (process.client) {
       localStorage.setItem('accounts', JSON.stringify(accounts.value))
     }
+
     if (accounts.value[0]) {
       changeAccount(0)
     } else {
@@ -270,22 +276,28 @@ const changeAccount = async (userID, isWorkspace) => {
     return
   }
 
-  $cookies.set('token', accounts.value[userID].token, {
-    expires: (Date.parse(accounts.value[userID].token_expires) - Date.now()) / 86400000,
+  $cookies.set('token', accounts.value[currentAccountID.value].token, {
+    expires: (Date.parse(accounts.value[currentAccountID.value].token_expires) - Date.now()) / 86400000,
   })
 
-  $cookies.set('first_login', accounts.value[userID].first_login)
-  if (accounts.value[userID].settings_pin_token)
-    $cookies.set('settings_pin_token', accounts.value[userID].settings_pin_token)
-  if (accounts.value[userID].login_pin_token)
-    $cookies.set('login_pin_token', accounts.value[userID].login_pin_token, {
-      expires: (Date.parse(accounts.value[userID].login_pin_token_expires) - new Date()) / 86400000,
+  $cookies.set('first_login', accounts.value[currentAccountID.value].first_login)
+  if (accounts.value[currentAccountID.value].settings_pin_token) {
+    $cookies.set('settings_pin_token', accounts.value[currentAccountID.value].settings_pin_token)
+  } else {
+    $cookies.remove('settings_pin_token')
+  }
+  if (accounts.value[currentAccountID.value].login_pin_token) {
+    $cookies.set('login_pin_token', accounts.value[currentAccountID.value].login_pin_token, {
+      expires: (Date.parse(accounts.value[currentAccountID.value].login_pin_token_expires) - new Date()) / 86400000,
     })
+  } else {
+    $cookies.remove('login_pin_token')
+  }
 
   if (process.client) {
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
 
-    if (accounts.value[userID].first_login === true) {
+    if (accounts.value[currentAccountID.value].first_login === true) {
       navigateTo('/pin')
     } else if ($route.path === '/pin') {
       navigateTo('/')
@@ -358,9 +370,11 @@ const onLogout = async (userID) => {
       profileStore.getProfile()
       await profileStore.getWorkSpaces()
       accounts.value = initAccountValue
+
       if (process.client) {
         localStorage.setItem('accounts', JSON.stringify(initAccountValue))
       }
+
       $router.go()
     } else {
       initAccountValue.shift()
@@ -370,9 +384,11 @@ const onLogout = async (userID) => {
     $cookies.remove('first_login')
     $cookies.remove('settings_pin_token')
     $cookies.remove('login_pin_token')
+
     if (process.client) {
       localStorage.setItem('accounts', JSON.stringify(initAccountValue))
     }
+
     accounts.value = initAccountValue
     navigateTo('/login')
   }

@@ -133,7 +133,7 @@
           </el-input>
 
           <template #error>
-            <div v-if="errors.pin_confirmation.isShow && isWeb()" class="el-form-item__error">
+            <div v-if="!errors.pin_confirmation.isShow && isWeb()" class="el-form-item__error">
               <span v-html="errors.pin_confirmation.value"></span>
             </div>
             <div></div>

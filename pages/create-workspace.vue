@@ -339,7 +339,7 @@ const clearError = () => {
       }
     }
     &--footer {
-      margin-top: auto;
+      margin-top: 278px;
       margin-bottom: 0;
     }
   }

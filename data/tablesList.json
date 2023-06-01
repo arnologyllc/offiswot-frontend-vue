@@ -2,14 +2,9 @@
   [
     [
       {
-        "online": true,
         "id": 1,
         "dragzone": false,
-        "user": {
-          "user_id": 1,
-          "name": "Anzhelika M.",
-          "avatar": "https://www.mantruckandbus.com/fileadmin/_processed_/c/7/csm_frank-sprenger-interviewkachel_4470dab1a7.jpg"
-        }
+        "user": null
       },
       {
         "id": 2,

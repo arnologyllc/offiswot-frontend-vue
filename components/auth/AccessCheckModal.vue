@@ -135,6 +135,7 @@ const isOpenEmailDialog = ref(false)
 
 watch(checkPinData, ({ data: v }) => {
   const userID = $cookies.get('currentAccountID') ? $cookies.get('currentAccountID') : 0
+  
   if (process.client) {
     const initAccountValue = JSON.parse(localStorage.getItem('accounts'))
     if (!$cookies.get('login_pin_token') && $cookies.get('login_pin_token') !== v.login_pin_token) {
@@ -152,6 +153,7 @@ watch(checkPinData, ({ data: v }) => {
 
     localStorage.setItem('accounts', JSON.stringify(initAccountValue))
   }
+  
   instance.emit('close')
   $router.go()
 })
@@ -209,6 +211,7 @@ onMounted(() => {
 })
 
 const onSubmit = () => {
+  
   instance.refs.pinForm.validate((valid) => {
     if (valid) {
       pinStore.checkPin(payload.value)
