@@ -26,7 +26,7 @@ firstLogin()
 <style lang="scss">
 .default-layout {
   width: 100%;
-  overflow-y: auto;
+  overflow: hidden;
   background-color: $ov-gray-bg;
   display: flex;
 

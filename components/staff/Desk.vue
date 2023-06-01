@@ -38,13 +38,10 @@
                       v-if="index % 2 === 0"
                       class="left-box"
                       :class="{ top: index === 0 || index === 3, bottom: index === 1 || index === 2 }"
-                      :style="{
-                        border: `3px solid rgb(65, 86, 246)`,
-                      }"
                     >
                       <div class="left-box__left">
                         <div class="left-box__left--name">
-                          {{ element.user.name }}
+                          {{ element.user.full_name }}
                         </div>
                         <div class="left-box__left--status"></div>
                       </div>
@@ -58,7 +55,7 @@
                         </div>
                         <el-badge v-if="element.online" is-dot class="badge">
                           <img
-                            :src="element.user.avatar"
+                            :src="element.user.avatar ? element.user.avatar : defaultAvatar"
                             :style="{
                               border: `1px solid rgb(65, 86, 246)`,
                             }"
@@ -67,7 +64,7 @@
                         </el-badge>
                         <img
                           v-else
-                          :src="element.user.avatar"
+                          :src="element.user.avatar ? element.user.avatar : defaultAvatar"
                           :style="{
                             border: `1px solid rgb(65, 86, 246)`,
                           }"
@@ -93,13 +90,10 @@
                       v-else
                       class="right-box"
                       :class="{ top: index === 1 || index === 2, bottom: index === 3 || index === 0 }"
-                      :style="{
-                        border: `3px solid rgb(65, 86, 246)`,
-                      }"
                     >
                       <div class="right-box__left">
                         <div class="right-box__left--name">
-                          {{ element.user.name }}
+                          {{ element.user.full_name }}
                         </div>
                         <div class="right-box__left--status"></div>
                       </div>
@@ -113,7 +107,7 @@
                         </div>
                         <el-badge v-if="element.online" is-dot class="badge">
                           <img
-                            :src="element.user.avatar"
+                            :src="element.user.avatar ? element.user.avatar : defaultAvatar"
                             :style="{
                               border: `1px solid rgb(65, 86, 246)`,
                             }"
@@ -122,7 +116,7 @@
                         </el-badge>
                         <img
                           v-else
-                          :src="element.user.avatar"
+                          :src="element.user.avatar ? element.user.avatar : defaultAvatar"
                           :style="{
                             border: `1px solid rgb(65, 86, 246)`,
                           }"
@@ -197,15 +191,15 @@
         <template #item="{ element }">
           <div class="desk__edit-footer--members">
             <div
-              :id="`footer-user_${element.user.user_id}`"
-              :key="`footer-member_${element.user.user_id}`"
+              :id="`footer-user_${element.user.pivot.user_id}`"
+              :key="`footer-member_${element.user.pivot.user_id}`"
               class="desk__edit-footer--members__member"
             >
               <div class="desk__edit-footer--members__member--left">
-                <img :src="element.user.avatar" alt="Avatar" />
+                <img :src="element.user.avatar ? element.user.avatar : defaultAvatar" alt="Avatar" />
               </div>
               <div class="desk__edit-footer--members__member--right">
-                <div class="user-name">{{ element.user.name }}</div>
+                <div class="user-name">{{ element.user.full_name }}</div>
               </div>
             </div>
           </div>
@@ -240,6 +234,7 @@ import tableTopRigth from '@/assets/images/tables/table-top-right.svg'
 import tableBottomLeft from '@/assets/images/tables/table-bottom-left.svg'
 import tableBottomRigth from '@/assets/images/tables/table-bottom-right.svg'
 import useWorkspaceStore from '@/stores/workspace'
+import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
 
 const workspaceStore = useWorkspaceStore()
 const { getSeatsSuccess, getSeatsError, setSeatsSuccess, setSeatsError, getMembersSuccess, getMembersError } =
@@ -267,9 +262,9 @@ const instance = getCurrentInstance()
 
 // const AllTablesList = ref([])
 const AllUsersList = ref([])
+const usersList = ref([])
 
 const tablesList = ref(JSON.parse(JSON.stringify(AllTablesList)))
-const usersList = ref(JSON.parse(JSON.stringify(AllUsersList.value)))
 
 const tableIcons = ref([
   {
@@ -300,7 +295,6 @@ const isOpenInviteModal = ref(false)
 const availableMembers = ref([])
 
 onMounted(() => {
-  setAvailableMembers()
   setLastTableId()
   if (process.client) {
     const path = window.location.pathname.split('/')
@@ -323,7 +317,9 @@ const setAvailableMembers = () => {
       })
     })
   })
-  availableMembers.value = usersList.value.filter((el) => !arr.find((elem) => elem.user.user_id === el.user.user_id))
+  availableMembers.value = usersList.value.filter(
+    (el) => !arr.find((elem) => elem.user.user_id === el.user.pivot.user_id)
+  )
 }
 
 const handleDeleteUser = (index, subIndex, deleteIndex) => {
@@ -583,33 +579,28 @@ const setTables = (seats) => {
       user: elem.user,
     }
   })
-  console.log(tables)
 }
 
 watch(getMembersSuccess, (v) => {
-  console.log(v)
+  AllUsersList.value = v.members.map((item) => ({
+    user: item,
+  }))
+  usersList.value = JSON.parse(JSON.stringify(AllUsersList.value))
+  setAvailableMembers()
 })
 
-watch(getMembersError, (v) => {
-  console.log(v)
-})
+watch(getMembersError, (v) => {})
 
 watch(getSeatsSuccess, (v) => {
   AllUsersList.value = v.users
   setTables(v.seats)
 })
 
-watch(getSeatsError, (v) => {
-  console.log(v)
-})
+watch(getSeatsError, (v) => {})
 
-watch(setSeatsSuccess, (v) => {
-  console.log(v)
-})
+watch(setSeatsSuccess, (v) => {})
 
-watch(setSeatsError, (v) => {
-  console.log(v)
-})
+watch(setSeatsError, (v) => {})
 </script>
 
 <style scoped lang="scss">
@@ -639,7 +630,6 @@ watch(setSeatsError, (v) => {
       background: transparent;
       display: flex;
       gap: 15px;
-      height: 100%;
       align-items: flex-start;
       justify-content: flex-start;
       width: 344px;
@@ -679,8 +669,8 @@ watch(setSeatsError, (v) => {
         }
 
         img {
-          width: 71px;
-          height: 65px;
+          width: 23px;
+          height: 23px;
           -o-object-fit: cover;
           object-fit: none;
           &:hover {
@@ -718,8 +708,9 @@ watch(setSeatsError, (v) => {
   }
   .left-box,
   .right-box {
-    width: 138px;
-    height: 51px;
+    width: max-content;
+    gap: 5px;
+    height: 34px;
     border-radius: 13px;
     background: white;
     opacity: 1;
@@ -729,7 +720,9 @@ watch(setSeatsError, (v) => {
     align-items: center;
     justify-content: space-between;
     padding: 4px 8px;
+    border: 1px solid #4156f6;
     box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
     .badge {
       sup {
         right: 8px;
@@ -741,17 +734,17 @@ watch(setSeatsError, (v) => {
       &-bottom {
         position: absolute;
         width: 0;
-        height: 0;
-        border-left: 15px solid transparent;
-        border-right: 15px solid transparent;
+        height: 0px;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
       }
       &-top {
-        top: -15px;
-        border-bottom: 15px solid rgb(65, 86, 246);
+        top: -10px;
+        border-bottom: 10px solid rgb(65, 86, 246);
       }
       &-bottom {
-        bottom: -15px;
-        border-top: 15px solid rgb(65, 86, 246);
+        bottom: -10px;
+        border-top: 10px solid rgb(65, 86, 246);
       }
 
       &--inner {
@@ -759,18 +752,18 @@ watch(setSeatsError, (v) => {
         &-bottom {
           width: 0;
           height: 0;
-          border-left: 11px solid transparent;
-          border-right: 11px solid transparent;
+          border-left: 12px solid transparent;
+          border-right: 12px solid transparent;
         }
         &-top {
-          border-top: 11px solid white;
-          margin-top: -15px;
-          margin-left: -11px;
+          border-top: 13px solid white;
+          margin-top: -13px;
+          margin-left: -12px;
         }
         &-bottom {
-          border-bottom: 11px solid white;
-          margin-top: 4px;
-          margin-left: -11px;
+          border-bottom: 13px solid white;
+          margin-top: 1px;
+          margin-left: -12px;
         }
       }
     }
@@ -789,13 +782,12 @@ watch(setSeatsError, (v) => {
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
-        max-width: 100px;
       }
       &--name {
-        font-size: 14px;
         font-weight: 600;
-        color: #444348;
-        line-height: 13px;
+        font-size: 14px;
+        line-height: 17px;
+        color: #515151;
       }
       &--profession {
         font-size: 11px;
@@ -861,8 +853,8 @@ watch(setSeatsError, (v) => {
       background: white;
       box-shadow: 0px 7px 16px rgba(65, 86, 246, 0.16);
       border-radius: 20px;
-      height: 64px;
-      padding: 21px 31px;
+      height: 48px;
+      padding: 13px 31px;
     }
     &--members {
       min-width: 190px;
@@ -883,7 +875,7 @@ watch(setSeatsError, (v) => {
         min-width: 207px;
         max-width: 207px;
         width: 207px;
-        height: 64px;
+        height: 48px;
         display: flex;
         align-items: center;
         gap: 0 11px;
@@ -894,8 +886,8 @@ watch(setSeatsError, (v) => {
 
         &--left {
           img {
-            width: 35px;
-            height: 35px;
+            width: 23px;
+            height: 23px;
             border-radius: 50%;
             object-fit: cover;
           }
@@ -944,7 +936,7 @@ watch(setSeatsError, (v) => {
       bottom: 5px;
     }
     &__triangle {
-      right: 8px;
+      right: 26px;
     }
   }
   .right-box {
@@ -957,7 +949,7 @@ watch(setSeatsError, (v) => {
       bottom: 5px;
     }
     &__triangle {
-      left: 8px;
+      left: 26px;
     }
   }
   .grid-move {

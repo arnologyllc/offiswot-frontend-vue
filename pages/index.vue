@@ -92,7 +92,7 @@
                     {{ item.name }}
                   </div>
                   <div class="user-workspaces__workspace-specific">
-                    {{ item.name }}
+                    {{ item.industry?.name }}
                   </div>
                 </div>
               </div>
@@ -115,8 +115,61 @@
               <span v-html="formattedText"> </span>
             </div>
           </div>
-          <div v-if="userInviteWorkspaces" class="user-workspaces__header-bottom">
-            <div class="user-workspaces__title">participate in workspace</div>
+          <div v-if="pendingWorkspaces?.length" class="user-workspaces__header-bottom">
+            <div class="user-workspaces__title">workspaces (Invites)</div>
+            <div v-for="(item, i) in pendingWorkspaces" :key="`workspace_${i}`" class="user-workspaces__container">
+              <div class="user-workspaces__element">
+                <img class="user-workspaces__picture" :src="avatarUrl" alt="user_avatar" />
+                <div class="user-workspaces__element--title">
+                  <div class="user-workspaces__workspace-name">
+                    {{ item.workspace?.name }}
+                  </div>
+                  <div class="user-workspaces__workspace-specific">
+                    {{ item.workspace?.industry?.name }}
+                  </div>
+                </div>
+              </div>
+              <div class="user-workspaces__buttons">
+                <el-button
+                  class="user-workspaces__element-create-btn"
+                  @click="openInviteDialog('accept', item?.name, item.avatar, item.token)"
+                >
+                  <span>Accept</span>
+                </el-button>
+                <el-button
+                  class="user-workspaces__element-create-btn--decline"
+                  @click="openInviteDialog('decline', item?.name, item.avatar, item.token)"
+                >
+                  <span>Decline</span>
+                </el-button>
+              </div>
+            </div>
+          </div>
+          <div v-if="inviteWorkspaces?.length" class="user-workspaces__header-bottom">
+            <div class="user-workspaces__title">workspaces (Invites)</div>
+            <div
+              v-for="(item, i) in inviteWorkspaces"
+              :key="`workspace_${i}`"
+              class="user-workspaces__container"
+              @click="openWorkspace(item.id)"
+            >
+              <div class="user-workspaces__element">
+                <img class="user-workspaces__picture" :src="avatarUrl" alt="user_avatar" />
+                <div class="user-workspaces__element--title">
+                  <div class="user-workspaces__workspace-name">
+                    {{ item.name }}
+                  </div>
+                  <div class="user-workspaces__workspace-specific">
+                    {{ item.industry?.name }}
+                  </div>
+                </div>
+              </div>
+              <div class="user-workspaces__buttons">
+                <el-button class="user-workspaces__element-create-btn">
+                  <span>Open</span>
+                </el-button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -126,6 +179,14 @@
       :dialog-visible="isOpenPINDialog"
       @close="isOpenPINDialog = false"
     ></check-modal>
+
+    <invite-dialog
+      v-if="isOpenInviteDialog"
+      :dialog-visible="isOpenInviteDialog"
+      :dialog-type="inviteDialogType"
+      :workspace-data="invitedWorkspace"
+      @close="isOpenInviteDialog = false"
+    ></invite-dialog>
   </div>
 </template>
 
@@ -135,32 +196,32 @@ import { onMounted } from 'vue'
 import { Search } from '@element-plus/icons-vue'
 import defaultAvatar from '@/assets/images/icons/default-user-icon.jpg'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
-import settingsToken from '~/middleware/settingsToken'
 import loginToken from '~/middleware/loginToken'
 import useProfileStore from '~/stores/profile'
 import usePINStore from '~/stores/pin'
 import auth from '~/middleware/auth'
+import inviteDialog from '@/components/invite/invite-dialog.vue'
 definePageMeta({ layout: 'default' })
 
 const profileStore = useProfileStore()
 const pinStore = usePINStore()
-const { profileLoading, profileSuccessData, editProfileData, workspacesSuccessData } = storeToRefs(profileStore)
+const { profileSuccessData, editProfileData, workspacesSuccessData } = storeToRefs(profileStore)
 const { checkPinData } = storeToRefs(pinStore)
 
 const instance = getCurrentInstance()
 const config = useRuntimeConfig()
 const responseWorkspaces = ref(null)
-const payload = ref({
-  avatar: null,
-})
 
 const isOpenPINDialog = ref(null)
-const userInviteWorkspaces = ref(null)
+const isOpenInviteDialog = ref(null)
+const inviteDialogType = ref('accept')
+const invitedWorkspace = ref({})
+const pendingWorkspaces = ref(null)
+const inviteWorkspaces = ref(null)
 const userEmail = ref(null)
 const formattedText = ref(null)
 
 const avatarUrl = ref(defaultAvatar)
-const avatarSrc = ref(null)
 
 const setProfileData = (v) => {
   if (v) {
@@ -171,14 +232,14 @@ const setProfileData = (v) => {
     } else {
       avatarUrl.value = defaultAvatar
     }
-
-    userInviteWorkspaces.value = v.user.invite_workspaces.length
     userEmail.value = v.user.email
   }
 }
 
 const setWorkspaceData = (v) => {
   responseWorkspaces.value = v
+  if (v?.pendingWorkspaces) pendingWorkspaces.value = v.pendingWorkspaces
+  if (v?.inviteWorkspaces) inviteWorkspaces.value = v.inviteWorkspaces
 }
 
 watch(profileSuccessData, (v) => setProfileData(v))
@@ -238,6 +299,16 @@ const formattedTextFtn = () => {
             Create a workspace for your team or company using our productivity platform. Enjoy collaborating with each other easily and managing your team members and the projects effectively.`
   }
 }
+
+const openInviteDialog = (type, name, avatar, token) => {
+  inviteDialogType.value = type
+  isOpenInviteDialog.value = true
+  invitedWorkspace.value = {
+    name,
+    avatar,
+    token,
+  }
+}
 </script>
 
 <style scoped lang="scss">
@@ -247,6 +318,8 @@ const formattedTextFtn = () => {
   padding-bottom: 186px;
   border-radius: 20px 0 0 20px;
   padding: 37px 0 82px 0;
+  overflow: auto;
+  height: calc(100vh - 48px);
 }
 .account {
   height: max-content;
@@ -481,6 +554,12 @@ const formattedTextFtn = () => {
     text-transform: uppercase;
 
     color: #ffffff;
+    &--decline {
+      background: #e5e7fa;
+      border-radius: 6px;
+      color: #6979f8;
+      height: 40px;
+    }
   }
   &__icon-btn {
     width: 48px;

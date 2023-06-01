@@ -41,7 +41,7 @@
                 @click="showError('email', 'click')"
               />
               <div v-if="payload.email" style="position: relative" @click="focusElement('email')">
-                <span for="email" class="custom_placeholder"> Email  </span>
+                <span for="email" class="custom_placeholder"> Email </span>
               </div>
 
               <div></div>
@@ -208,6 +208,7 @@ watch(loginSuccessData, (v) => {
   $cookies.remove('settings_pin_token')
   $cookies.remove('login_pin_token')
   $cookies.remove('addAccount')
+
   if (process.client) {
     accounts.value =
       localStorage.getItem('accounts') !== 'undefined' ? JSON.parse(localStorage.getItem('accounts')) : []
@@ -225,7 +226,7 @@ watch(loginSuccessData, (v) => {
 
   if (expirationDate !== 365) {
     const loginPinTokenExpires = new Date()
-    loginPinTokenExpires.setHours(loginPinTokenExpires.getHours() + 1)
+    loginPinTokenExpires.setMinutes(loginPinTokenExpires.getMinutes() + 10)
     Date.parse(loginPinTokenExpires)
     accountTokens.value.token_expires = loginPinTokenExpires
   } else {
@@ -310,7 +311,7 @@ const onSubmit = () => {
                 ?.filter((elem) => Date.parse(elem.login_pin_token_expires) > new Date())
             : []
         if (users?.some((elem) => elem.email === payload.value.email && elem.token)) {
-          errors.value.global.value = 'Account already logined'
+          errors.value.global.value = 'Account already logged in'
         } else {
           localStorage.setItem('accounts', JSON.stringify(users))
           authStore.loginUser(payload.value)

@@ -28,6 +28,18 @@ const useWorkspaceStore = defineStore('workspace', {
 
       inviteUsersSuccess: null,
       inviteUsersError: null,
+
+      inviteAcceptSuccess: null,
+      inviteAcceptError: null,
+
+      inviteDeclineSuccess: null,
+      inviteDeclineError: null,
+
+      revokeInviteSuccess: null,
+      revokeInviteError: null,
+
+      deleteInviteSuccess: null,
+      deleteInviteError: null,
     }
   },
   actions: {
@@ -159,7 +171,6 @@ const useWorkspaceStore = defineStore('workspace', {
     },
 
     inviteUsers(payload) {
-      console.log(payload)
       const { $myFetch } = useNuxtApp()
       this.isLoadingSubmit = true
       $myFetch(`/invite`, {
@@ -176,6 +187,96 @@ const useWorkspaceStore = defineStore('workspace', {
             this.inviteUsersError = e.data
           }
           this.inviteUsersError = JSON.parse(e.data)
+        })
+        .finally(() => {
+          this.isLoadingSubmit = false
+        })
+    },
+
+    acceptInvite(payload) {
+      const { $myFetch } = useNuxtApp()
+      this.isLoadingSubmit = true
+      $myFetch(`/invite/accept`, {
+        method: 'post',
+        body: payload,
+      })
+        .then((data) => {
+          this.inviteAcceptSuccess = data
+        })
+        .catch((e) => {
+          try {
+            JSON.parse(e.data)
+          } catch {
+            this.inviteAcceptError = e.data
+          }
+          this.inviteAcceptError = JSON.parse(e.data)
+        })
+        .finally(() => {
+          this.isLoadingSubmit = false
+        })
+    },
+
+    declineInvite(payload) {
+      const { $myFetch } = useNuxtApp()
+      this.isLoadingSubmit = true
+      $myFetch(`/invite/decline`, {
+        method: 'post',
+        body: payload,
+      })
+        .then((data) => {
+          this.inviteDeclineSuccess = data
+        })
+        .catch((e) => {
+          try {
+            JSON.parse(e.data)
+          } catch {
+            this.inviteDeclineError = e.data
+          }
+          this.inviteDeclineError = JSON.parse(e.data)
+        })
+        .finally(() => {
+          this.isLoadingSubmit = false
+        })
+    },
+
+    deleteInvite(payload) {
+      const { $myFetch } = useNuxtApp()
+      this.isLoadingSubmit = true
+      $myFetch(`/invite/${payload.id}`, {
+        method: 'delete',
+      })
+        .then((data) => {
+          this.deleteInviteSuccess = data
+        })
+        .catch((e) => {
+          try {
+            JSON.parse(e.data)
+          } catch {
+            this.deleteInviteError = e.data
+          }
+          this.deleteInviteError = JSON.parse(e.data)
+        })
+        .finally(() => {
+          this.isLoadingSubmit = false
+        })
+    },
+
+    revokeInvite(payload) {
+      const { $myFetch } = useNuxtApp()
+      this.isLoadingSubmit = true
+      $myFetch(`/invite/revoke/${payload.id}`, {
+        method: 'post',
+      })
+        .then((data) => {
+          this.revokeInviteSuccess = data
+        })
+        .catch((e) => {
+          try {
+            JSON.parse(e.data)
+          } catch {
+            this.revokeInviteError = e.data
+          }
+          this.revokeInviteError = JSON.parse(e.data)
         })
         .finally(() => {
           this.isLoadingSubmit = false

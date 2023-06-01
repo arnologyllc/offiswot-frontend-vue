@@ -104,9 +104,11 @@ const changeAccount = async (userID) => {
 
   if ((Date.parse(accounts.value[userID].token_expires) - Date.now()) / 86400000 < 0) {
     accounts.value.splice(userID, 1)
+
     if (process.client) {
       localStorage.setItem('accounts', JSON.stringify(accounts.value))
     }
+
     if (accounts.value[0]) {
       changeAccount(0)
     } else {

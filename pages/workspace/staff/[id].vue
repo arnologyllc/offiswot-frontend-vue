@@ -3,14 +3,24 @@
     <div class="main-dash__header" :class="{ 'edit-mode': !dragOptions.disabled }">
       <div class="main-dash__header">
         <el-button-group class="main-dash__header--button-group">
-          <el-button round :class="{ active: currentComponent === 'desk' }" @click="setCurrentComponent('desk')"
-            >Desk</el-button
+          <el-button round :class="{ active: currentComponent === 'desk' }" @click="setCurrentComponent('desk')">
+            Desk
+          </el-button>
+          <el-button
+            v-if="user === owner"
+            round
+            :class="{ active: currentComponent === 'list' }"
+            @click="setCurrentComponent('list')"
           >
-          <el-button round :class="{ active: currentComponent === 'list' }" @click="setCurrentComponent('list')"
-            >List</el-button
-          >
+            List
+          </el-button>
         </el-button-group>
-        <el-button class="main-dash__header--edit-button" circle @click="dragOptions.disabled = false">
+        <el-button
+          v-if="user === owner"
+          class="main-dash__header--edit-button"
+          circle
+          @click="dragOptions.disabled = false"
+        >
           <img src="@/assets/images/icons/edit-icon.svg" alt="/" />
         </el-button>
       </div>
@@ -18,7 +28,7 @@
     <div class="main-dash__content">
       <component
         :is="currentComponent === 'desk' ? desk : list"
-        :drag-options="dragOptions"
+        :drag-options="currentComponent === 'desk' ? dragOptions : false"
         @save="dragOptions.disabled = true"
       ></component>
     </div>
@@ -33,16 +43,26 @@
 
 <script setup>
 import { onMounted, resolveDynamicComponent } from 'vue'
+import { storeToRefs } from 'pinia'
+import $cookies from 'js-cookie'
 import Desk from '@/components/staff/Desk.vue'
 import List from '@/components/staff/List.vue'
 import settingsToken from '~/middleware/settingsToken'
 import loginToken from '~/middleware/loginToken'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
+import useWorkspaceStore from '@/stores/workspace'
+
+const workspaceStore = useWorkspaceStore()
+const { getMembersSuccess } = storeToRefs(workspaceStore)
 
 const desk = resolveDynamicComponent(Desk)
 const list = resolveDynamicComponent(List)
 const currentComponent = ref('desk')
 const isOpenPINDialog = ref(false)
+const owner = ref(null)
+const user = ref(null)
+const accounts = ref(false)
+const currentAccountID = ref(null)
 
 const dragOptions = ref({
   animation: 1,
@@ -57,6 +77,15 @@ const setCurrentComponent = (name) => {
 onMounted(() => {
   isOpenPINDialog.value = loginToken()
   isOpenPINDialog.value = settingsToken()
+  if (process.client) {
+    currentAccountID.value = $cookies.get('currentAccountID')
+    accounts.value = JSON.parse(localStorage.getItem('accounts'))
+    if (accounts.value[currentAccountID.value]) user.value = accounts.value[currentAccountID.value].email
+  }
+})
+
+watch(getMembersSuccess, (v) => {
+  owner.value = v.members[0].email
 })
 </script>
 
@@ -64,7 +93,7 @@ onMounted(() => {
 .main-dash {
   margin: 0 auto;
   width: 100%;
-  height: calc(100vh - 58px);
+  height: calc(100vh - 50px);
   padding: 16px 66px 0 21px;
   border-radius: 20px 0 0 20px;
   background-color: #f5f7fb;
