@@ -57,7 +57,7 @@
 import { computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import useWorkspaceStore from '@/stores/workspace'
-import defaultAvatar from '~/assets/images/icons/default-team-icon.jpg'
+import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
 
 const workspaceStore = useWorkspaceStore()
 const { getMembersSuccess, getMembersError } = storeToRefs(workspaceStore)
