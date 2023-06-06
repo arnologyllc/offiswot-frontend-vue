@@ -396,7 +396,7 @@ const onLogout = async (userID) => {
   }
 }
 
-const currentUser = (type, id) => {
+const currentUser = (type, id, email) => {
   switch (type) {
     case 'u':
       return id === +currentAccountID.value && !currentWorkspaceID.value ? 'currentUser' : false

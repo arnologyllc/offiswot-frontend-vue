@@ -322,10 +322,10 @@ const setAvailableMembers = () => {
       })
     })
   })
+
   availableMembers.value = usersList.value.filter(
     (el) =>
       !arr.find((elem) => {
-        console.log(elem.user.user_id === el.user.user_id)
         return elem.user.user_id === el.user.user_id
       })
   )
@@ -664,18 +664,22 @@ watch(getMembersError, (v) => {})
 watch(getSeatsSuccess, (v) => {
   AllUsersList.value = v.users
   setTables(v.seats)
+
+  setAvailableMembers()
 })
 
 watch(getSeatsError, (v) => {})
 
 watch(setSeatsSuccess, (v) => {
   setTables(v.seats)
+  setAvailableMembers()
 })
 
 watch(setSeatsError, (v) => {})
 
 watch(workspacesSuccessData, (v) => {
   setTables(getSeatsSuccess.value?.seats)
+  setAvailableMembers()
 })
 </script>
 
