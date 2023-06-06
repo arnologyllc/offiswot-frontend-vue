@@ -87,10 +87,15 @@ const useWorkspaceStore = defineStore('workspace', {
         })
     },
 
-    getUsersList(id) {
+    getUsersList(id, query) {
       const { $myFetch } = useNuxtApp()
       this.isLoadingIndustries = true
-      $myFetch(`/workspace/${id}/emails-list`)
+      $myFetch(`/workspace/${id}/emails-list`, {
+        method: 'POST',
+        body: {
+          email: query,
+        },
+      })
         .then((data) => {
           this.getUsersListSuccess = data
         })
@@ -147,12 +152,12 @@ const useWorkspaceStore = defineStore('workspace', {
         })
     },
 
-    setSeats(payload) {
+    setSeats(payload, workspaceID) {
       const { $myFetch } = useNuxtApp()
       this.isLoadingSubmit = true
-      $myFetch(`workspace/seats/${payload.id}`, {
+      $myFetch(`workspace/seats/${workspaceID}`, {
         method: 'post',
-        body: payload.seats,
+        body: payload,
       })
         .then((data) => {
           this.setSeatsSuccess = data

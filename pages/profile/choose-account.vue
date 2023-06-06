@@ -45,7 +45,6 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import { storeToRefs } from 'pinia'
 import $cookies from 'js-cookie'
 import settingsToken from '~/middleware/settingsToken'
 import loginToken from '~/middleware/loginToken'

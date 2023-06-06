@@ -14,7 +14,6 @@
 import cookies from 'js-cookie'
 import Header from '@/components/global/default/Header'
 import Sidebar from '@/components/global/default/Sidebar'
-import Footer from '@/components/global/Footer'
 import auth from '~/middleware/auth'
 import firstLogin from '~/middleware/firstLogin'
 import login from '~/middleware/login'

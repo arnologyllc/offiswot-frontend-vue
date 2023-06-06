@@ -367,3 +367,158 @@
     }
   }
 }
+
+.accept__modal {
+  border-radius: 20px !important;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  .el-dialog__body {
+    border-top: 1px solid #bbbcbd;
+    text-align: center;
+  }
+  .main__form--box {
+    text-align: center;
+    width: 320px;
+  }
+  .forgot-password {
+    text-align: left;
+    text-decoration: underline #6979f8;
+    font-size: 14px;
+    padding-bottom: 40px;
+    .el-button {
+      font-size: 12px;
+      font-weight: 500;
+      border: none;
+      background-color: inherit;
+      padding: 0;
+      color: #6979f8;
+
+      &:hover {
+        color: $ov-primary;
+        border: none;
+        background-color: inherit;
+      }
+
+      .el-button--text {
+        padding: 0;
+        margin-bottom: 40px;
+      }
+    }
+  }
+  .el-form-item {
+    margin-bottom: 15px;
+  }
+  .el-dialog__close {
+    color: black !important;
+  }
+
+  .el-dialog__header {
+    display: grid;
+    justify-content: center;
+
+    width: 100%;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 24px;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+
+    color: #0d1c2e;
+  }
+  .el-dialog__footer {
+    display: flex;
+    justify-content: center;
+  }
+  .el-dialog__body {
+    display: flex;
+    padding: 15px 35px 30px 35px;
+    color: $ov-text--title;
+    word-break: normal;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .dialog-footer {
+    &__action {
+      color: $ov-text--title;
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+  .title {
+    text-align: center;
+    display: flex;
+    word-break: break-word;
+
+    &__image {
+      display: flex;
+      justify-content: center;
+      margin-top: 33px;
+      margin-bottom: 42px;
+    }
+    &__text {
+      display: block;
+      padding: 0 60px;
+      font-family: 'Montserrat';
+      font-style: normal;
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 20px;
+      margin-bottom: 16px;
+      text-align: center;
+
+      color: #0d1c2e;
+    }
+  }
+
+  .submit-button {
+    background: $ov-primary;
+    color: white;
+    text-transform: uppercase;
+    width: 220px;
+    height: 48px;
+    padding: 0;
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    &__text {
+      width: 100%;
+      display: flex;
+      font-size: 17px;
+      font-weight: 700;
+      justify-content: center !important;
+    }
+    &__box {
+      display: flex;
+      flex: inherit !important;
+    }
+    &__back {
+      border: none;
+      background-color: inherit;
+      &:hover {
+        border: none;
+        background-color: inherit;
+      }
+      &--text {
+        display: block;
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 22px;
+        color: #6979f8;
+        margin-left: 13px;
+      }
+    }
+  }
+}

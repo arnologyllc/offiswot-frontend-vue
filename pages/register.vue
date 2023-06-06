@@ -260,7 +260,7 @@
 </template>
 
 <script setup>
-import { computed, getCurrentInstance, onMounted } from 'vue'
+import { getCurrentInstance, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import LoginButtons from '@/components/auth/LoginButtons.vue'
 import ConfirmEmail from '@/components/shared/OvConfirmEmailModal.vue'

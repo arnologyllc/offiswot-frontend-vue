@@ -1,266 +1,250 @@
 <template>
-  <div class="main">
-    <el-form
-      v-if="profileSuccessData"
-      ref="editForm"
-      class="main__form"
-      hide-required-asterisk
-      label-position="top"
-      :model="payload"
-      @submit.prevent="onSubmit"
-    >
-      <el-row>
-        <el-col :span="24">
-          <div :span="24" class="main__title">
-            <div class="main__title__div">
-              <img
-                src="@/assets/images/icons/chevron-dark-icon.svg"
-                class="go-back__icon"
-                alt=""
-                @click="navigateTo('/')"
-              />
-              <span class="main__title__span" @click="navigateTo('/profile')"> Edit your profile </span>
-            </div>
-            <span class="main__subtitle__span"> You can manage different accounts from one place </span>
-          </div>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }" class="main__form--picture">
-          <el-form-item prop="avatar">
-            <img :src="avatarUrl" alt="avatar" />
+  <el-dialog
+    v-model="props.dialogVisible"
+    width="80%"
+    height="500px"
+    :close-on-click-modal="false"
+    text-align="center"
+    :show-close="false"
+    top="150px"
+    class="accept__modal"
+    @close="$emit('close')"
+  >
+    <template #header>
+      <span class="header__title">Accept invitation</span>
+    </template>
+    <div class="main">
+      <el-form
+        v-if="profileSuccessData"
+        ref="editForm"
+        class="main__form"
+        hide-required-asterisk
+        label-position="top"
+        :model="payload"
+        @submit.prevent="onSubmit"
+      >
+        <el-row>
+          <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }" class="main__form--picture">
+            <el-form-item prop="avatar">
+              <img :src="avatarUrl" alt="avatar" />
 
-            <el-dropdown class="el-upload--text">
-              <img src="~/assets/images/icons/edit-button.svg" alt="edit" class="avatar-edit_button" />
+              <el-dropdown class="el-upload--text">
+                <img src="~/assets/images/icons/edit-button.svg" alt="edit" class="avatar-edit_button" />
 
-              <template #dropdown>
-                <el-dropdown-menu class="avatar-edit_actions">
-                  <el-upload
-                    v-model="payload.avatar"
-                    :show-file-list="false"
-                    class="main__form--upload"
-                    action="#"
-                    accept="image/*"
-                    :on-success="onAvatarUpload"
-                  >
+                <template #dropdown>
+                  <el-dropdown-menu class="avatar-edit_actions">
+                    <el-upload
+                      v-model="payload.avatar"
+                      :show-file-list="false"
+                      class="main__form--upload"
+                      action="#"
+                      accept="image/*"
+                      :on-success="onAvatarUpload"
+                    >
+                      <el-dropdown-item
+                        class="avatar-edit_actions-element"
+                        @mouseover="hoveringStart"
+                        @mouseout="hoveringEnd"
+                      >
+                        <span :class="isHovered"> Edit </span>
+                      </el-dropdown-item>
+                    </el-upload>
                     <el-dropdown-item
                       class="avatar-edit_actions-element"
                       @mouseover="hoveringStart"
                       @mouseout="hoveringEnd"
                     >
-                      <span :class="isHovered"> Edit </span>
+                      <span :class="isHovered" @click="handleDeleteAvatar"> Delete </span>
                     </el-dropdown-item>
-                  </el-upload>
-                  <el-dropdown-item
-                    class="avatar-edit_actions-element"
-                    @mouseover="hoveringStart"
-                    @mouseout="hoveringEnd"
-                  >
-                    <span :class="isHovered" @click="handleDeleteAvatar"> Delete </span>
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </el-form-item>
-          <div class="main__form--info">
-            <span v-if="fullName || displayName" class="main__form--info__title">{{
-              displayName ? displayName : fullName
-            }}</span>
-            <span v-if="email" class="main__form--info__subtitle">{{ email }}</span>
-          </div>
-        </el-col>
-      </el-row>
-      <el-row :gutter="70">
-        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
-          <el-form-item prop="name">
-            <el-input ref="full_name" v-model="payload.full_name" class="main__form--input" placeholder="Full Name">
-              <template #suffix>
-                <div v-if="payload.full_name" style="position: relative" @click="focusElement('full_name')">
-                  <span for="full_name" class="custom_placeholder"> Full Name </span>
-                </div>
-              </template>
-            </el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
-          <el-form-item prop="phone_number">
-            <MazPhoneNumberInput
-              ref="phoneNumber"
-              v-model="payload.phone_number"
-              class="main__form--phone-number"
-              default-country-code="AM"
-              no-example
-              no-validation
-              :no-country-selector="isCountrySelector"
-              countries-height="48"
-              border-radius="0"
-              width="320px"
-            />
-          </el-form-item>
-        </el-col>
-        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
-          <el-form-item prop="experience">
-            <el-input
-              ref="experience"
-              v-model="payload.experience"
-              type="number"
-              class="main__form--input"
-              placeholder="Years of experience"
-            >
-              <template #suffix>
-                <div v-if="payload.experience" style="position: relative" @click="focusElement('experience')">
-                  <span for="experience" class="custom_placeholder"> Years of experience </span>
-                </div>
-              </template>
-            </el-input>
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row :gutter="70">
-        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
-          <el-form-item prop="display_name">
-            <el-input
-              ref="display_name"
-              v-model="payload.display_name"
-              class="main__form--input"
-              placeholder="Display Name"
-            >
-              <template #suffix>
-                <div v-if="payload.display_name" style="position: relative" @click="focusElement('display_name')">
-                  <span for="display_name" class="custom_placeholder"> Display Name </span>
-                </div>
-              </template>
-            </el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
-          <el-form-item prop="languages">
-            <el-select
-              ref="languagesList"
-              v-model="payload.languagesList"
-              multiple
-              class="main__form--input select"
-              placeholder="Languages"
-              :filterable="true"
-            >
-              <el-option
-                v-for="(item, index) in languages"
-                :key="`lang_${index}`"
-                :value="item.id"
-                :label="item.name"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-        </el-col>
-        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
-          <el-form-item prop="cv" class="main__form--cv-item">
-            <div class="main__form--upload__cv-box">
-              <el-upload
-                v-model="payload.cv"
-                :show-file-list="false"
-                class="main__form--upload"
-                action="#"
-                :on-success="onCVUpload"
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </el-form-item>
+            <div class="main__form--info">
+              <span v-if="fullName" class="main__form--info__title">{{ fullName }}</span>
+              <span v-if="email" class="main__form--info__subtitle">{{ email }}</span>
+            </div>
+          </el-col>
+        </el-row>
+        <el-row :gutter="70">
+          <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
+            <el-form-item prop="name">
+              <el-input ref="full_name" v-model="payload.full_name" class="main__form--input" placeholder="Full Name">
+                <template #suffix>
+                  <div v-if="payload.full_name" style="position: relative" @click="focusElement('full_name')">
+                    <span for="full_name" class="custom_placeholder"> Full Name </span>
+                  </div>
+                </template>
+              </el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
+            <el-form-item prop="phone_number">
+              <MazPhoneNumberInput
+                ref="phoneNumber"
+                v-model="payload.phone_number"
+                class="main__form--phone-number"
+                default-country-code="AM"
+                no-example
+                no-validation
+                :no-country-selector="isCountrySelector"
+                countries-height="48"
+                border-radius="0"
+                width="320px"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
+            <el-form-item prop="experience">
+              <el-input
+                ref="experience"
+                v-model="payload.experience"
+                type="number"
+                class="main__form--input"
+                placeholder="Years of experience"
               >
-                <span> </span>
-                <el-button>
-                  <div class="main__form--upload__cv">
-                    <div>
-                      <span class="text-primary">{{ payload.cv ? payload.cv : '' }}</span>
-                    </div>
-                    <div>
+                <template #suffix>
+                  <div v-if="payload.experience" style="position: relative" @click="focusElement('experience')">
+                    <span for="experience" class="custom_placeholder"> Years of experience </span>
+                  </div>
+                </template>
+              </el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="70">
+          <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
+            <el-form-item prop="display_name">
+              <el-input
+                ref="display_name"
+                v-model="payload.display_name"
+                class="main__form--input"
+                placeholder="Display Name"
+              >
+                <template #suffix>
+                  <div v-if="payload.display_name" style="position: relative" @click="focusElement('display_name')">
+                    <span for="display_name" class="custom_placeholder"> Display Name </span>
+                  </div>
+                </template>
+              </el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
+            <el-form-item prop="languages">
+              <el-select
+                ref="languagesList"
+                v-model="payload.languagesList"
+                multiple
+                class="main__form--input select"
+                placeholder="Languages"
+                :filterable="true"
+              >
+                <el-option
+                  v-for="(item, index) in languages"
+                  :key="`lang_${index}`"
+                  :value="item.id"
+                  :label="item.name"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
+            <el-form-item prop="cv" class="main__form--cv-item">
+              <div class="main__form--upload__cv-box">
+                <el-upload
+                  v-model="payload.cv"
+                  class="main__form--upload"
+                  action="https://offiswot-api.arnologyapps.com/api/update-profile"
+                >
+                  <el-button>
+                    <div class="main__form--upload__cv">
                       <img src="@/assets/images/icons/download-icon.svg" alt="d" />
-
                       <span class="text-primary">Upload CV</span>
                       <span class="hint">(.pdf)</span>
                     </div>
-                  </div>
-                </el-button>
-              </el-upload>
-            </div>
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row :gutter="70">
-        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
-          <el-form-item prop="date_of_birth">
-            <el-date-picker
-              v-model="payload.date_of_birth"
-              class="main__form--input date-picker"
-              type="date"
-              value-format="YYYY-MM-DD"
-              placeholder="Date of birth"
-            >
-            </el-date-picker>
-          </el-form-item>
-        </el-col>
-        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
-          <el-form-item prop="timezone">
-            <el-select
-              v-model="payload.timezone"
-              class="main__form--input select"
-              placeholder="Timezone"
-              :filterable="true"
-            >
-              <el-option
-                v-for="zone in timeZonesList"
-                :key="`time_${zone.VALUE}`"
-                :value="zone.NAME.replace(', ', '/')"
+                  </el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="70">
+          <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
+            <el-form-item prop="date_of_birth">
+              <el-date-picker
+                v-model="payload.date_of_birth"
+                class="main__form--input date-picker"
+                type="date"
+                value-format="YYYY-MM-DD"
+                placeholder="Date of birth"
               >
-                {{ 'GMT' + (zone.VALUE === '0' ? '+' : '') + zone.VALUE + ' (' + zone.NAME + ')' }}
-              </el-option>
-            </el-select>
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row :gutter="70">
-        <el-col
-          :xs="{ span: 24 }"
-          :sm="{ span: 12 }"
-          :md="{ span: 8 }"
-          style="display: flex; align-items: center; justify-content: center"
-        >
-          <el-form-item prop="gender">
-            <el-radio-group v-model="payload.gender" class="main__form--radio-group">
-              <el-radio label="male">Male</el-radio>
-              <el-radio label="female">Female</el-radio>
-              <el-radio label="other">Other</el-radio>
-            </el-radio-group>
-          </el-form-item>
-        </el-col>
-        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
-          <el-form-item prop="speciality_id">
-            <el-select
-              v-model="payload.speciality_id"
-              class="main__form--input select"
-              :filterable="true"
-              placeholder="Speciality"
-            >
-              <el-option
-                v-for="(item, index) in profileSuccessData?.specialties"
-                :key="`spec_${index}`"
-                :value="item.id"
-                :label="item.name"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-        </el-col>
-      </el-row>
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
+            <el-form-item prop="timezone">
+              <el-select
+                v-model="payload.timezone"
+                class="main__form--input select"
+                placeholder="Timezone"
+                :filterable="true"
+              >
+                <el-option
+                  v-for="zone in timeZonesList"
+                  :key="`time_${zone.VALUE}`"
+                  :value="zone.NAME.replace(', ', '/')"
+                >
+                  {{ 'GMT' + (zone.VALUE === '0' ? '+' : '') + zone.VALUE + ' (' + zone.NAME + ')' }}
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="70">
+          <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
+            <el-form-item prop="gender">
+              <el-radio-group v-model="payload.gender" class="main__form--radio-group">
+                <el-radio label="male">Male</el-radio>
+                <el-radio label="female">Female</el-radio>
+                <el-radio label="other">Other</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
+            <el-form-item prop="speciality_id">
+              <el-select
+                v-model="payload.speciality_id"
+                class="main__form--input select"
+                :filterable="true"
+                placeholder="Speciality"
+              >
+                <el-option
+                  v-for="(item, index) in profileSuccessData?.specialties"
+                  :key="`spec_${index}`"
+                  :value="item.id"
+                  :label="item.name"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
 
-      <el-row class="main__form--actions">
-        <el-col :span="24" class="submit-button__box">
-          <el-button class="submit-button" native-type="submit" :loading="isLoadingSubmit">
-            <span class="submit-button__text">{{ isLoadingSubmit ? '' : 'Save' }}</span>
-          </el-button>
-        </el-col>
-      </el-row>
-    </el-form>
-    <check-modal
-      v-if="isOpenPINDialog"
-      :dialog-visible="isOpenPINDialog"
-      @close="isOpenPINDialog = false"
-    ></check-modal>
-  </div>
+        <el-row class="main__form--actions">
+          <el-col :span="12" class="submit-button__box">
+            <el-button class="submit-button__back" @click="$emit('close')">
+              <img src="@/assets/images/icons/chevron-dark-icon.svg" class="go-back__icon" alt="" />
+              <span class="submit-button__back--text">Back</span>
+            </el-button>
+          </el-col>
+          <el-col :span="12" class="submit-button__box">
+            <el-button class="submit-button" native-type="submit" :loading="isLoadingSubmit" :disabled="isValid">
+              <span class="submit-button__text">{{ isLoadingSubmit ? '' : 'Save' }}</span>
+            </el-button>
+          </el-col>
+        </el-row>
+      </el-form>
+    </div>
+  </el-dialog>
 </template>
 
 <script setup>
@@ -268,12 +252,19 @@ import { storeToRefs } from 'pinia'
 import { getCurrentInstance, onMounted } from 'vue'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
-import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import auth from '~/middleware/auth'
 import settingsToken from '~/middleware/settingsToken'
 import loginToken from '~/middleware/loginToken'
 import timeZonesList from '@/data/timezones.json'
 import useProfileStore from '@/stores/profile'
+
+const props = defineProps({
+  dialogVisible: {
+    type: Boolean,
+    required: false,
+  },
+})
+
 const instance = getCurrentInstance()
 
 const profileStore = useProfileStore()
@@ -305,11 +296,10 @@ const languages = ref([
 
 const email = ref(null)
 const fullName = ref(null)
-const displayName = ref(null)
 const isHovered = ref(false)
+const isValid = ref(false)
 
 const avatarSrc = ref(null)
-const cvScr = ref(null)
 const isOpenPINDialog = ref(null)
 const avatarUrl = ref(defaultAvatar)
 const config = useRuntimeConfig()
@@ -320,9 +310,6 @@ const setProfileData = (v) => {
   }
   if (v?.user.full_name) {
     fullName.value = v.user.full_name
-  }
-  if (v?.user.display_name) {
-    displayName.value = v.user.display_name
   }
   if (v?.user.avatar) {
     avatarUrl.value = v.avatarPath.includes(config.public.env.serverUrl)
@@ -388,12 +375,6 @@ const onAvatarUpload = (e, file) => {
   profileStore.editProfile(payload.value)
 }
 
-const onCVUpload = (e, file) => {
-  payload.value.cv = file.raw
-  cvScr.value = URL.createObjectURL(file.raw)
-  profileStore.editProfile(payload.value)
-}
-
 const handleDeleteAvatar = () => {
   payload.value.avatar = 'default'
   avatarSrc.value = 'default'
@@ -410,16 +391,18 @@ const hoveringStart = () => {
 const hoveringEnd = () => {
   isHovered.value = false
 }
+
+watch(payload, (v) => {
+  isValid.value = true
+})
 </script>
 
 <style scoped lang="scss">
 .main {
   padding: 0;
-  background-color: #f5f7fb !important;
-  padding-top: 50px;
+  padding-top: 20px;
   padding-bottom: 50px;
   border-radius: 20px 0 0 20px;
-  min-height: calc(100vh - 50px);
   &__title {
     font-size: 20px;
     font-weight: 600;
@@ -442,12 +425,14 @@ const hoveringEnd = () => {
     }
   }
   &__form {
-    min-height: calc(100vh - 170px);
     display: flex;
     flex-direction: column;
     width: 100%;
-    border-left: 1px solid #d0c9d6;
     padding: 0 45px 21px 45px;
+    &--actions {
+      justify-content: space-between;
+      align-items: center;
+    }
     .el-input__inner {
       min-width: 100% !important;
       max-width: 320px !important;
@@ -480,6 +465,7 @@ const hoveringEnd = () => {
       padding-left: 16px;
       display: flex;
       flex-direction: column;
+      text-align: left;
       &__title {
         font-weight: 500;
         font-size: 16px;
@@ -495,7 +481,6 @@ const hoveringEnd = () => {
     }
     &--upload {
       display: flex;
-      justify-content: center;
       width: 100%;
 
       button {
@@ -510,7 +495,6 @@ const hoveringEnd = () => {
       }
       &__cv {
         display: flex;
-        flex-direction: column;
         align-items: center;
         gap: 0 4px;
       }
@@ -631,9 +615,6 @@ const hoveringEnd = () => {
         }
       }
     }
-    &--actions {
-      margin-top: 120px;
-    }
     &--cv-item {
       .el-form-item__label {
         display: flex;
@@ -688,7 +669,6 @@ const hoveringEnd = () => {
     }
     &__box {
       display: flex;
-      justify-content: flex-start;
     }
   }
 }

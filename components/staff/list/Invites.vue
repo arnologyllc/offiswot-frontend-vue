@@ -8,7 +8,7 @@
       <div v-for="user in paginatedElements" :key="user" class="invites__container--element">
         <div class="invites__container--element__info">
           <img
-            :src="user.avatarUrl ? user.avatarUrl : defaultAvatar"
+            :src="user.avatar ? getAvatar(user.avatar) : defaultAvatar"
             alt="Avatar"
             class="invites__container--element__info--avatar"
           />
@@ -86,6 +86,7 @@ const isOpenInviteDialog = ref(null)
 const inviteDialogType = ref('resend')
 const userInformation = ref({})
 const workspaceID = ref(null)
+const config = useRuntimeConfig()
 
 const getColor = (status) => {
   switch (status) {
@@ -164,6 +165,10 @@ const openInviteDialog = (type, email, inviteID) => {
     inviteID,
   }
 }
+
+const getAvatar = (url) => {
+  return `${config.public.env.serverUrl}/storage/images/users/${url}`
+}
 </script>
 
 <style scoped lang="scss">
@@ -194,6 +199,7 @@ const openInviteDialog = (type, email, inviteID) => {
           width: 45px;
           height: 45px;
           border-radius: 12px;
+          object-fit: cover;
         }
         &--span {
           display: flex;
