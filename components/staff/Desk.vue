@@ -55,7 +55,7 @@
                         </div>
                         <el-badge v-if="element.online" is-dot class="badge">
                           <img
-                            :src="element.user.avatar ? element.user.avatar : defaultAvatar"
+                            :src="element.user.avatar ? getAvatar(element.user.avatar) : defaultAvatar"
                             :style="{
                               border: `1px solid rgb(65, 86, 246)`,
                             }"
@@ -64,7 +64,7 @@
                         </el-badge>
                         <img
                           v-else
-                          :src="element.user.avatar ? element.user.avatar : defaultAvatar"
+                          :src="element.user.avatar ? getAvatar(element.user.avatar) : defaultAvatar"
                           :style="{
                             border: `1px solid rgb(65, 86, 246)`,
                           }"
@@ -107,7 +107,7 @@
                         </div>
                         <el-badge v-if="element.online" is-dot class="badge">
                           <img
-                            :src="element.user.avatar ? element.user.avatar : defaultAvatar"
+                            :src="element.user.avatar ? getAvatar(element.user.avatar) : defaultAvatar"
                             :style="{
                               border: `1px solid rgb(65, 86, 246)`,
                             }"
@@ -116,7 +116,7 @@
                         </el-badge>
                         <img
                           v-else
-                          :src="element.user.avatar ? element.user.avatar : defaultAvatar"
+                          :src="element.user.avatar ? getAvatar(element.user.avatar) : defaultAvatar"
                           :style="{
                             border: `1px solid rgb(65, 86, 246)`,
                           }"
@@ -191,12 +191,12 @@
         <template #item="{ element }">
           <div class="desk__edit-footer--members">
             <div
-              :id="`footer-user_${element.user.pivot.user_id}`"
-              :key="`footer-member_${element.user.pivot.user_id}`"
+              :id="`footer-user_${element.user.user_id}`"
+              :key="`footer-member_${element.user.user_id}`"
               class="desk__edit-footer--members__member"
             >
               <div class="desk__edit-footer--members__member--left">
-                <img :src="element.user.avatar ? element.user.avatar : defaultAvatar" alt="Avatar" />
+                <img :src="element.user.avatar ? getAvatar(element.user.avatar) : defaultAvatar" alt="Avatar" />
               </div>
               <div class="desk__edit-footer--members__member--right">
                 <div class="user-name">{{ element.user.full_name }}</div>
@@ -208,7 +208,11 @@
       <div v-else class="desk__edit-footer--members__outer"></div>
       <el-button class="desk__edit-footer--save" @click="onSave"> Save </el-button>
     </div>
-    <div v-if="!dragOptions.disabled" class="tutorial-box">
+    <div
+      v-if="!dragOptions.disabled"
+      class="tutorial-box"
+      :style="{ display: !Object.entries(getSeatsSuccess?.seats) ? 'block' : 'none' }"
+    >
       <img src="@/assets/images/drag-tutorial/tutorial-cursor.svg" alt="^" class="tutorial-box__cursor" />
       <img src="@/assets/images/drag-tutorial/tutorial-top-arrow.svg" alt="|" class="tutorial-box__top-line" />
       <img src="@/assets/images/drag-tutorial/tutorial-user.svg" alt="User" class="tutorial-box__user" />
@@ -228,19 +232,19 @@ import { getCurrentInstance, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
 import draggable from 'vuedraggable'
 import OvInviteMemberModal from '@/components/shared/OvInviteMemberModal'
-import AllTablesList from '@/data/tablesList.json'
 import tableTopLeft from '@/assets/images/tables/table-top-left.svg'
 import tableTopRigth from '@/assets/images/tables/table-top-right.svg'
 import tableBottomLeft from '@/assets/images/tables/table-bottom-left.svg'
 import tableBottomRigth from '@/assets/images/tables/table-bottom-right.svg'
 import useWorkspaceStore from '@/stores/workspace'
+import useProfileStore from '@/stores/profile'
 import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
 
 const workspaceStore = useWorkspaceStore()
 const { getSeatsSuccess, getSeatsError, setSeatsSuccess, setSeatsError, getMembersSuccess, getMembersError } =
   storeToRefs(workspaceStore)
-const route = useRoute()
-
+const profileStore = useProfileStore()
+const { workspacesSuccessData } = storeToRefs(profileStore)
 const props = defineProps({
   dragOptions: {
     type: Object,
@@ -259,12 +263,14 @@ const isInsideFooter = ref(false)
 const reloadFooter = ref(true)
 const workspaceID = ref(null)
 const instance = getCurrentInstance()
+const config = useRuntimeConfig()
+const tablesCount = ref(1)
+const columnsCount = ref(1)
 
-// const AllTablesList = ref([])
 const AllUsersList = ref([])
 const usersList = ref([])
 
-const tablesList = ref(JSON.parse(JSON.stringify(AllTablesList)))
+const tablesList = ref([])
 
 const tableIcons = ref([
   {
@@ -295,7 +301,6 @@ const isOpenInviteModal = ref(false)
 const availableMembers = ref([])
 
 onMounted(() => {
-  setLastTableId()
   if (process.client) {
     const path = window.location.pathname.split('/')
     if (!isNaN(+path[path.length - 1])) {
@@ -310,22 +315,26 @@ const setAvailableMembers = () => {
   const arr = []
   ;[...tablesList.value].forEach((row, index) => {
     row.forEach((col, idx) => {
-      col.forEach((user, i) => {
-        if (user.user) {
-          arr.push(user)
+      col.forEach((seat, i) => {
+        if (seat.user) {
+          arr.push(seat)
         }
       })
     })
   })
   availableMembers.value = usersList.value.filter(
-    (el) => !arr.find((elem) => elem.user.user_id === el.user.pivot.user_id)
+    (el) =>
+      !arr.find((elem) => {
+        console.log(elem.user.user_id === el.user.user_id)
+        return elem.user.user_id === el.user.user_id
+      })
   )
 }
 
 const handleDeleteUser = (index, subIndex, deleteIndex) => {
   const tableList = JSON.parse(JSON.stringify(tablesList.value))
   availableMembers.value.push(tableList[index][subIndex][deleteIndex])
-  delete tablesList.value[index][subIndex][deleteIndex].user
+  tablesList.value[index][subIndex][deleteIndex].user = null
   delete tablesList.value[index][subIndex][deleteIndex].disabled
 }
 
@@ -343,34 +352,23 @@ const setLastTableId = () => {
 
 const onAddRow = () => {
   const arr = []
-  if (tablesList.value[0]) {
-    for (const i in Array(tablesList.value[0]?.length + 1).fill('')) {
-      lastTableId.value += +i + 2
+  const length = tablesList.value[0] ? tablesList.value[0]?.length : 0
+  Array(length + 1)
+    .fill('')
+    .forEach(() => {
       arr.push([
-        { id: lastTableId.value + +i + 2 },
-        { id: lastTableId.value + +i + 3 },
-        { id: lastTableId.value + +i + 4 },
-        { id: lastTableId.value + +i + 5 },
+        { id: lastTableId.value, dragzone: false, user: null, row_col: '0_0' },
+        { id: lastTableId.value + 1, dragzone: false, user: null, row_col: '0_1' },
+        { id: lastTableId.value + 2, dragzone: false, user: null, row_col: '1_0' },
+        { id: lastTableId.value + 3, dragzone: false, user: null, row_col: '1_1' },
       ])
-    }
-  } else {
-    for (const i in Array(1).fill('')) {
-      lastTableId.value += +i + 2
-      arr.push([
-        { id: lastTableId.value + +i + 2 },
-        { id: lastTableId.value + +i + 3 },
-        { id: lastTableId.value + +i + 4 },
-        { id: lastTableId.value + +i + 5 },
-      ])
-    }
-  }
-
+      lastTableId.value += 4
+    })
   tablesList.value.push(arr)
   setLastTableId()
 }
 
 const onDeleteRow = () => {
-  const arr = []
   tablesList.value.forEach((row, index) => {
     row.forEach((table, i) => {
       for (const userID in table) {
@@ -387,13 +385,13 @@ const onDeleteRow = () => {
 
 const onAddCol = () => {
   tablesList.value.forEach((row, index) => {
-    lastTableId.value += index + 2
     row.push([
-      { id: lastTableId.value + index + 2 },
-      { id: lastTableId.value + index + 3 },
-      { id: lastTableId.value + index + 4 },
-      { id: lastTableId.value + index + 5 },
+      { id: lastTableId.value, dragzone: false, user: null, row_col: '0_0' },
+      { id: lastTableId.value + 1, dragzone: false, user: null, row_col: '0_1' },
+      { id: lastTableId.value + 2, dragzone: false, user: null, row_col: '1_0' },
+      { id: lastTableId.value + 3, dragzone: false, user: null, row_col: '1_1' },
     ])
+    lastTableId.value += 4
   })
 }
 
@@ -429,8 +427,8 @@ const handleDragEnd = (index, subIndex) => {
     return
   }
 
-  const futureTemp = { ...futureItem.value }
-  const movingTemp = { ...movingItem.value }
+  const futureTemp = { ...futureItem.value.user }
+  const movingTemp = { ...movingItem.value.user }
 
   if (isInsideFooter.value) {
     const availableTemp = Object.assign([], availableMembers.value)
@@ -438,7 +436,7 @@ const handleDragEnd = (index, subIndex) => {
     availableMembers.value = availableTemp
 
     const tablesTemp = Object.assign([], tablesList.value)
-    tablesTemp[index][subIndex][movingIndex.value] = futureTemp
+    tablesTemp[index][subIndex][movingIndex.value].user = futureTemp
     tablesList.value = tablesTemp
 
     movingIndex.value = null
@@ -452,10 +450,10 @@ const handleDragEnd = (index, subIndex) => {
   _items.forEach((el) => {
     el.forEach((col) => {
       if (col[col.indexOf(futureItem.value)]) {
-        col[col.indexOf(futureItem.value)] = movingTemp
+        col[col.indexOf(futureItem.value)].user = movingTemp
       }
       if (col[col.indexOf(movingItem.value)]) {
-        col[col.indexOf(movingItem.value)] = futureTemp
+        col[col.indexOf(movingItem.value)].user = futureTemp.user_id ? futureTemp : null
       }
     })
   })
@@ -469,7 +467,7 @@ const handleDragEnd = (index, subIndex) => {
 }
 
 const handleMove = (e) => {
-  const { index, element, futureIndex } = e.draggedContext
+  const { index, element } = e.draggedContext
   movingItem.value = element
   movingIndex.value = index
   futureItem.value = e.relatedContext.element
@@ -545,7 +543,7 @@ const handleFooterDragEnd = () => {
       row.forEach((col) => {
         if (col.includes(footerFutureItem.value)) {
           col.splice(col.indexOf(footerFutureItem.value), 1, {
-            id: footerFutureItem.value.id,
+            ...footerFutureItem.value,
             ...footerMovingElement.value,
           })
         }
@@ -568,17 +566,89 @@ const today = computed(() => {
 })
 
 const onSave = () => {
+  columnsCount.value = tablesList.value[0]?.length
+  tablesCount.value = (columnsCount.value + 1) * tablesList.value.length - 1
+  const filledSeats = {}
+  tablesList.value.forEach((row, rowIndex) => {
+    row.forEach((table, colIndex) => {
+      table.forEach((seat) => {
+        if (seat.user) {
+          filledSeats[seat.user.user_id] = `${rowIndex}_${colIndex}_${seat.row_col}`
+        }
+      })
+    })
+  })
+  const payload = {
+    seats: filledSeats,
+    tables_count: tablesCount.value,
+    columns_count: columnsCount.value,
+  }
+
+  workspaceStore.setSeats(payload, workspaceID.value)
   instance.emit('save')
 }
 
 const setTables = (seats) => {
-  const tables = []
-  seats.forEach((elem) => {
-    tables[elem.table_num] = {
-      position: elem.row_col,
-      user: elem.user,
+  if (workspacesSuccessData.value) {
+    const currentWorkspace = workspacesSuccessData.value.myWorkspaces.find((w) => w.id === +workspaceID.value)
+      ? workspacesSuccessData.value.myWorkspaces.find((w) => w.id === +workspaceID.value)
+      : workspacesSuccessData.value.inviteWorkspaces.find((w) => w.id === +workspaceID.value)
+    const rowCount = (currentWorkspace.tables_count + 1) / (currentWorkspace.columns_count + 1)
+    const tables = []
+    let rowCol
+    let seatID = 0
+    for (let i = 0; i < rowCount; i++) {
+      const row = []
+      const colCount = !i ? currentWorkspace.columns_count : currentWorkspace.columns_count + 1
+      for (let j = 0; j < colCount; j++) {
+        const table = []
+        for (let seatNumber = 0; seatNumber < 4; seatNumber++) {
+          seatID++
+          switch (seatNumber) {
+            case 0:
+              rowCol = '0_0'
+              break
+            case 1:
+              rowCol = '0_1'
+              break
+            case 2:
+              rowCol = '1_0'
+              break
+            case 3:
+              rowCol = '1_1'
+              break
+          }
+          table.push({
+            id: seatID,
+            row_col: rowCol,
+            dragzone: false,
+            user: null,
+          })
+        }
+        row.push(table)
+      }
+      tables.push(row)
     }
-  })
+    if (getMembersSuccess.value && seats) {
+      const selectedUsers = Object.entries(seats)
+      selectedUsers.forEach((user) => {
+        const userID = +user[0]
+        const position = user[1].split('_')
+        const [tableRow, tableCol] = [position[0], position[1]]
+        const userSeatPosition = `${position[2]}_${position[3]}`
+        const seatPosition = tables[tableRow][tableCol].find((seat) => seat.row_col === userSeatPosition)
+        const currentUser = getMembersSuccess.value.members.find((user) => user.user_id === userID)
+        seatPosition.user = currentUser
+      })
+    }
+
+    tablesList.value = tables
+    setLastTableId()
+  }
+}
+
+const getAvatar = (url) => {
+  return `${config.public.env.serverUrl}/storage/images/users/${url}`
 }
 
 watch(getMembersSuccess, (v) => {
@@ -598,9 +668,15 @@ watch(getSeatsSuccess, (v) => {
 
 watch(getSeatsError, (v) => {})
 
-watch(setSeatsSuccess, (v) => {})
+watch(setSeatsSuccess, (v) => {
+  setTables(v.seats)
+})
 
 watch(setSeatsError, (v) => {})
+
+watch(workspacesSuccessData, (v) => {
+  setTables(getSeatsSuccess.value?.seats)
+})
 </script>
 
 <style scoped lang="scss">
@@ -975,6 +1051,7 @@ watch(setSeatsError, (v) => {})
     display: grid;
     opacity: 1;
     animation: hint 4s 1 forwards;
+
     &__bottom-line {
       margin-left: 100px;
       height: 135px;
@@ -1005,7 +1082,7 @@ watch(setSeatsError, (v) => {})
       }
       100% {
         opacity: 0;
-        z-index: -1;
+        display: none;
       }
     }
   }

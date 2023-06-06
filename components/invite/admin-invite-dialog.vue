@@ -48,22 +48,12 @@
 </template>
 
 <script setup>
-import { onMounted, watchEffect } from 'vue'
+import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import useWorkspaceStore from '~/stores/workspace'
-import useProfileStore from '~/stores/profile'
 
 const workspaceStore = useWorkspaceStore()
-const profileStore = useProfileStore()
-const {
-  isLoadingSubmit,
-  inviteUsersSuccess,
-  inviteUsersError,
-  revokeInviteSuccess,
-  revokeInviteError,
-  deleteInviteSuccess,
-  deleteInviteError,
-} = storeToRefs(workspaceStore)
+const { isLoadingSubmit, inviteUsersSuccess, revokeInviteSuccess, deleteInviteSuccess } = storeToRefs(workspaceStore)
 
 const props = defineProps({
   dialogVisible: {

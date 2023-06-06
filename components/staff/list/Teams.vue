@@ -60,23 +60,12 @@ import useWorkspaceStore from '@/stores/workspace'
 import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
 
 const workspaceStore = useWorkspaceStore()
-const { getMembersSuccess, getMembersError } = storeToRefs(workspaceStore)
+const { getMembersSuccess } = storeToRefs(workspaceStore)
 
 const teamsList = ref([])
 const currentPage = ref(1)
 const elementsPerPage = ref(7)
 const totalPages = ref(null)
-
-const getColor = (status) => {
-  switch (status) {
-    case 'pending':
-      return '#FFCF5C'
-    case 'declined':
-    case 'expired':
-    case 'revoked':
-      return '#FF647C'
-  }
-}
 
 onMounted(() => {
   if (getMembersSuccess.value) {
@@ -157,6 +146,7 @@ const goToPage = (page) => {
           width: 45px;
           height: 45px;
           border-radius: 12px;
+          object-fit: cover;
         }
         &--span {
           display: flex;

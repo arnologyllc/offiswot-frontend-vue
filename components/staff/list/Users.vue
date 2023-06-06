@@ -14,7 +14,7 @@
         <tr v-for="user in paginatedElements" :key="user" class="users__container--element">
           <td class="users__container--element__info">
             <img
-              :src="user.avatarUrl ? user.avatarUrl : defaultAvatar"
+              :src="user.avatar ? getAvatar(user.avatar) : defaultAvatar"
               alt="Avatar"
               class="users__container--element__info--avatar"
             />
@@ -60,23 +60,13 @@ import useWorkspaceStore from '@/stores/workspace'
 import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
 
 const workspaceStore = useWorkspaceStore()
-const { getMembersSuccess, getMembersError } = storeToRefs(workspaceStore)
+const { getMembersSuccess } = storeToRefs(workspaceStore)
 
 const memberUsersList = ref([])
 const currentPage = ref(1)
 const elementsPerPage = ref(7)
 const totalPages = ref(null)
-
-const getColor = (status) => {
-  switch (status) {
-    case 'pending':
-      return '#FFCF5C'
-    case 'declined':
-    case 'expired':
-    case 'revoked':
-      return '#FF647C'
-  }
-}
+const config = useRuntimeConfig()
 
 onMounted(() => {
   if (getMembersSuccess.value) {
@@ -123,6 +113,10 @@ const visiblePages = computed(() => {
 const goToPage = (page) => {
   if (!isNaN(page)) currentPage.value = page
 }
+
+const getAvatar = (url) => {
+  return `${config.public.env.serverUrl}/storage/images/users/${url}`
+}
 </script>
 
 <style scoped lang="scss">
@@ -157,6 +151,7 @@ const goToPage = (page) => {
           width: 45px;
           height: 45px;
           border-radius: 12px;
+          object-fit: cover;
         }
         &--span {
           display: flex;

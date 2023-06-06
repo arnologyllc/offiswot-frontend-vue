@@ -55,7 +55,7 @@
         >
           <template v-if="!error.value" #default="{ item }">
             <span v-html="showingEmail(item, userEmail.length)"></span>
-            <span v-if="item.link" class="list_item_isMember">Member</span>
+            <span v-if="item.status === 'accepted'" class="list_item_isMember">Member</span>
           </template>
 
           <template v-else #suffix>
@@ -103,10 +103,9 @@
 </template>
 
 <script setup>
-import { computed, getCurrentInstance, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import useWorkspaceStore from '@/stores/workspace'
-import useProfileStore from '@/stores/profile'
 
 const props = defineProps({
   dialogVisible: {
@@ -116,9 +115,7 @@ const props = defineProps({
 })
 
 const workspaceStore = useWorkspaceStore()
-const profileStore = useProfileStore()
-const { getUsersListSuccess, getUsersListError, inviteUsersSuccess, inviteUsersError, isLoadingSubmit } =
-  storeToRefs(workspaceStore)
+const { getUsersListSuccess, inviteUsersSuccess, inviteUsersError, isLoadingSubmit } = storeToRefs(workspaceStore)
 
 const error = ref({
   value: null,
@@ -128,6 +125,7 @@ const error = ref({
 
 const emails = ref([])
 const workspaceID = ref(null)
+const typing = ref(Date.now())
 
 const checkboxItems = ref([
   { name: 'Display Name', value: 'displayName' },
@@ -145,7 +143,6 @@ const userEmail = ref('')
 const selectedEmails = ref([])
 const showPage = ref(1)
 const checkList = ref([])
-const instance = getCurrentInstance()
 
 const dialogWidth = computed(() => (showPage.value === 1 ? '918px' : '432px'))
 
@@ -154,29 +151,41 @@ const goNextPage = () => {
 }
 
 const handleSelect = (item) => {
-  if (!selectedEmails.value.includes(item)) {
-    selectedEmails.value.push(item)
-    userEmail.value = ''
+  if (!item.status) {
+    if (!selectedEmails.value.includes(item)) {
+      selectedEmails.value.push(item)
+      userEmail.value = ''
+    }
+    emails.value = emails.value.filter((el) => el.email !== item.email)
   }
-  emails.value = emails.value.filter((el) => el.email !== item.email)
 }
 
 const querySearch = (queryString, cb) => {
-  const allEmails = emails.value
-  const results = queryString && !error.value.value ? allEmails.filter(createFilter(queryString)) : []
-  if (!results[0] && queryString.includes('@')) {
-    validateEmail(queryString)
-    if (!error.value.value) {
-      results.push({ email: queryString, status: null })
-    }
-  }
+  if (queryString) {
+    const saving = setTimeout(async () => {
+      await workspaceStore.getUsersList(workspaceID.value, queryString)
 
-  cb(results)
-}
+      if (getUsersListSuccess.value) {
+        emails.value = getUsersListSuccess.value
+        const allEmails = emails.value
+        const results = queryString && !error.value.value && allEmails ? allEmails : []
+        if (!results[0] && queryString.includes('@')) {
+          validateEmail(queryString)
+          if (!error.value.value) {
+            results.push({ email: queryString, status: null })
+          }
+        }
 
-const createFilter = (queryString) => {
-  return (user) => {
-    return user.email.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+        cb(results)
+      } else {
+        cb()
+      }
+    }, 3000)
+
+    if (Date.now() - typing.value < 2000) clearTimeout(saving)
+    typing.value = Date.now()
+  } else {
+    cb()
   }
 }
 
@@ -219,7 +228,6 @@ onMounted(() => {
       workspaceID.value = path[path.length - 1]
     }
   }
-  workspaceStore.getUsersList(workspaceID.value)
 })
 
 const inviteUsers = () => {

@@ -2,12 +2,12 @@
   <nav class="main">
     <div class="users">
       <div v-if="accounts" class="main__top">
-        <template v-for="item in activeUsers" :key="item.ID">
+        <template v-for="(item, index) in activeUsers" :key="item.ID">
           <el-dropdown
             class="main__user-actions"
-            :class="{ currentUser: currentUser('u', item.ID), bordered: item.workspaces?.length }"
+            :class="{ currentUser: currentUser('u', index), bordered: item.workspaces?.length }"
           >
-            <div class="main__user-actions--user" @click="changeAccount(item.ID)">
+            <div class="main__user-actions--user" @click="changeAccount(item.email)">
               <div class="current__user-selector"></div>
               <img
                 :src="item.avatarUrl ? item.avatarUrl : defaultAvatar"
@@ -37,7 +37,7 @@
               alt="Avatar"
               class="main__user-workspaces--avatar"
               :title="workspace.name"
-              @click="changeWorkspace(workspace.id, item.ID)"
+              @click="changeWorkspace(workspace.id, item.email)"
             />
           </div>
         </template>
@@ -98,7 +98,6 @@
 import { onMounted, watch, ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import $cookies from 'js-cookie'
-import { Search } from '@element-plus/icons-vue'
 import { storeToRefs } from 'pinia'
 import useProfileStore from '@/stores/profile'
 import usePinStore from '@/stores/pin'
@@ -114,7 +113,6 @@ const { profileSuccessData, profileFailureData, editProfileData, editFailureData
   storeToRefs(profileStore)
 const { $myFetch } = useNuxtApp()
 const config = useRuntimeConfig()
-const avatarUrl = ref(defaultAvatar)
 const isOpen = ref(false)
 const instance = getCurrentInstance()
 
@@ -143,12 +141,12 @@ const getAvatar = (v) => {
 const setWorkspaceData = (v) => {
   if (process.client) {
     accounts.value = JSON.parse(localStorage.getItem('accounts'))
-    if (accounts.value[currentAccountID.value]) accounts.value[currentAccountID.value].workspaces = v?.myWorkspaces
+    if (accounts.value[currentAccountID.value])
+      accounts.value[currentAccountID.value].workspaces = [...v?.myWorkspaces, ...v?.inviteWorkspaces]
 
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
   }
 }
-watch(workspacesSuccessData, (v) => setWorkspaceData(v))
 
 watch(profileSuccessData, (v) => {
   if (process.client) {
@@ -214,8 +212,10 @@ onMounted(async () => {
     } else {
       getAvatar(profileSuccessData.value)
     }
+
     if (!workspacesSuccessData.value) {
       await profileStore.getWorkSpaces()
+      setWorkspaceData(workspacesSuccessData.value)
     } else {
       setWorkspaceData(workspacesSuccessData.value)
     }
@@ -243,10 +243,11 @@ const handleResize = () => {
   instance.update()
 }
 
-const changeAccount = async (userID, isWorkspace) => {
-  currentWorkspaceID.value = -1
-  currentAccountID.value = accounts.value.findIndex((user) => user.ID === userID)
+const changeAccount = async (email, isWorkspace, ...props) => {
+  currentWorkspaceID.value = ''
+  currentAccountID.value = accounts.value.findIndex((user) => user.email === email)
   $cookies.set('currentAccountID', currentAccountID.value)
+
   if (accounts.value[currentAccountID.value].token === $cookies.get('token')) {
     navigateTo(`/`)
     return
@@ -257,7 +258,7 @@ const changeAccount = async (userID, isWorkspace) => {
   workspaceStore.$reset()
 
   if ((Date.parse(accounts.value[currentAccountID.value].token_expires) - Date.now()) / 86400000 < 0) {
-    accounts.value.splice(userID, 1)
+    accounts.value.splice(currentAccountID.value, 1)
 
     if (process.client) {
       localStorage.setItem('accounts', JSON.stringify(accounts.value))
@@ -305,16 +306,15 @@ const changeAccount = async (userID, isWorkspace) => {
   }
 
   profileStore.getProfile()
-  await profileStore.getWorkSpaces()
 
+  await profileStore.getWorkSpaces()
   if (!isWorkspace) {
     navigateTo(`/`)
   }
 }
 
-const changeWorkspace = async (workspaceID, userID) => {
-  currentAccountID.value = userID
-  await changeAccount(userID)
+const changeWorkspace = async (workspaceID, email) => {
+  await changeAccount(email)
   currentAccountID.value = -1
   currentWorkspaceID.value = workspaceID
   openWorkspace(workspaceID, true)
@@ -368,7 +368,9 @@ const onLogout = async (userID) => {
         })
       $cookies.set('currentAccountID', newIndex)
       profileStore.getProfile()
-      await profileStore.getWorkSpaces()
+      if (!initAccountValue?.workspaces[0]) {
+        await profileStore.getWorkSpaces()
+      }
       accounts.value = initAccountValue
 
       if (process.client) {
@@ -397,7 +399,7 @@ const onLogout = async (userID) => {
 const currentUser = (type, id) => {
   switch (type) {
     case 'u':
-      return id === currentAccountID.value ? 'currentUser' : false
+      return id === +currentAccountID.value && !currentWorkspaceID.value ? 'currentUser' : false
     default:
       return id === +currentWorkspaceID.value ? 'currentWorkspace' : false
   }
@@ -635,13 +637,17 @@ const resizeSidebar = (e) => {
 
 .currentWorkspace {
   background: linear-gradient(51.28deg, rgba(48, 110, 154, 0.5) -1.56%, #94cef9 118.35%);
+  .main__user-workspaces--avatar {
+    position: relative;
+    left: -2px;
+  }
   .current__workspace-selector {
     background: linear-gradient(270deg, #94cef9 -62.5%, rgba(48, 110, 154, 0.5) 275%);
     width: 4px;
     height: 45px;
     border-radius: 0px 2px 2px 0px;
-    position: absolute;
-    left: 0;
+    position: relative;
+    left: -12px;
   }
 }
 

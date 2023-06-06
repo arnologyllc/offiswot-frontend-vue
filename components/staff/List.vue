@@ -54,7 +54,7 @@ import useWorkspaceStore from '@/stores/workspace'
 import OvInviteMemberModal from '@/components/shared/OvInviteMemberModal'
 
 const workspaceStore = useWorkspaceStore()
-const { getMembersSuccess, getMembersError } = storeToRefs(workspaceStore)
+const { getMembersSuccess } = storeToRefs(workspaceStore)
 const currentComponent = ref('invites')
 
 const invites = resolveDynamicComponent(Invites)

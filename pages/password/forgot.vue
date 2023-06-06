@@ -82,14 +82,11 @@ import LoginButtons from '@/components/auth/LoginButtons.vue'
 import ConfirmModal from '@/components/shared/OvConfirmPasswordChangeModal.vue'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import useAuthStore from '@/stores/auth'
-import useProfileStore from '@/stores/profile'
 definePageMeta({ layout: 'auth' })
 
 const instance = getCurrentInstance()
 const authStore = useAuthStore()
-const profileStore = useProfileStore()
 const { forgotSuccessData, forgotErrorData, forgotLoading } = storeToRefs(authStore)
-const { profileSuccessData } = storeToRefs(profileStore)
 const payload = ref({
   email: null,
 })

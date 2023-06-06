@@ -46,6 +46,12 @@
         />
       </div>
     </template>
+    <EditProfile
+      v-if="isOpenEditModal"
+      :dialog-visible="isOpenEditModal"
+      :append-to-body="true"
+      @close="isOpenEditModal = false"
+    ></EditProfile>
   </el-dialog>
 </template>
 
@@ -56,11 +62,11 @@ import $cookies from 'js-cookie'
 import defaultAvatar from '@/assets/images/icons/default-user-icon.jpg'
 import useWorkspaceStore from '~/stores/workspace'
 import useProfileStore from '~/stores/profile'
+import EditProfile from '@/components/invite/edit-profile.vue'
 
 const workspaceStore = useWorkspaceStore()
 const profileStore = useProfileStore()
-const { inviteAcceptSuccess, inviteAcceptError, inviteDeclineSuccess, inviteDeclineError, isLoadingSubmit } =
-  storeToRefs(workspaceStore)
+const { inviteAcceptSuccess, inviteAcceptError, inviteDeclineSuccess, isLoadingSubmit } = storeToRefs(workspaceStore)
 
 const props = defineProps({
   dialogVisible: {
@@ -82,6 +88,7 @@ const inviteTitle = ref('You are going to join')
 const workspaceAvatar = ref(null)
 const workspaceName = ref(null)
 const finalPage = ref(false)
+const isOpenEditModal = ref(false)
 const payload = ref({})
 
 onMounted(() => {
@@ -118,6 +125,10 @@ const nextPage = () => {
 watch(inviteAcceptSuccess, async (v) => {
   await profileStore.getWorkSpaces()
   finalPage.value = true
+})
+
+watch(inviteAcceptError, (v) => {
+  isOpenEditModal.value = true
 })
 
 watch(inviteDeclineSuccess, async (v) => {

@@ -1,5 +1,5 @@
 <template>
-  <div v-loading.fullscreen.lock="profileLoading" class="main">
+  <div class="main">
     <el-form
       v-if="profileSuccessData"
       ref="editForm"
@@ -63,7 +63,9 @@
             </el-dropdown>
           </el-form-item>
           <div class="main__form--info">
-            <span v-if="fullName" class="main__form--info__title">{{ fullName }}</span>
+            <span v-if="fullName || displayName" class="main__form--info__title">{{
+              displayName ? displayName : fullName
+            }}</span>
             <span v-if="email" class="main__form--info__subtitle">{{ email }}</span>
           </div>
         </el-col>
@@ -155,14 +157,23 @@
             <div class="main__form--upload__cv-box">
               <el-upload
                 v-model="payload.cv"
+                :show-file-list="false"
                 class="main__form--upload"
-                action="https://offiswot-api.arnologyapps.com/api/update-profile"
+                action="#"
+                :on-success="onCVUpload"
               >
+                <span> </span>
                 <el-button>
                   <div class="main__form--upload__cv">
-                    <img src="@/assets/images/icons/download-icon.svg" alt="d" />
-                    <span class="text-primary">Upload CV</span>
-                    <span class="hint">(.pdf)</span>
+                    <div>
+                      <span class="text-primary">{{ payload.cv ? payload.cv : '' }}</span>
+                    </div>
+                    <div>
+                      <img src="@/assets/images/icons/download-icon.svg" alt="d" />
+
+                      <span class="text-primary">Upload CV</span>
+                      <span class="hint">(.pdf)</span>
+                    </div>
                   </div>
                 </el-button>
               </el-upload>
@@ -203,7 +214,12 @@
         </el-col>
       </el-row>
       <el-row :gutter="70">
-        <el-col :xs="{ span: 24 }" :sm="{ span: 12 }" :md="{ span: 8 }">
+        <el-col
+          :xs="{ span: 24 }"
+          :sm="{ span: 12 }"
+          :md="{ span: 8 }"
+          style="display: flex; align-items: center; justify-content: center"
+        >
           <el-form-item prop="gender">
             <el-radio-group v-model="payload.gender" class="main__form--radio-group">
               <el-radio label="male">Male</el-radio>
@@ -261,7 +277,7 @@ import useProfileStore from '@/stores/profile'
 const instance = getCurrentInstance()
 
 const profileStore = useProfileStore()
-const { profileLoading, profileSuccessData, profileFailureData, isLoadingSubmit, editProfileData, editFailureData } =
+const { profileSuccessData, profileFailureData, isLoadingSubmit, editProfileData, editFailureData } =
   storeToRefs(profileStore)
 
 auth()
@@ -289,9 +305,11 @@ const languages = ref([
 
 const email = ref(null)
 const fullName = ref(null)
+const displayName = ref(null)
 const isHovered = ref(false)
 
 const avatarSrc = ref(null)
+const cvScr = ref(null)
 const isOpenPINDialog = ref(null)
 const avatarUrl = ref(defaultAvatar)
 const config = useRuntimeConfig()
@@ -302,6 +320,9 @@ const setProfileData = (v) => {
   }
   if (v?.user.full_name) {
     fullName.value = v.user.full_name
+  }
+  if (v?.user.display_name) {
+    displayName.value = v.user.display_name
   }
   if (v?.user.avatar) {
     avatarUrl.value = v.avatarPath.includes(config.public.env.serverUrl)
@@ -364,6 +385,12 @@ onMounted(() => {
 const onAvatarUpload = (e, file) => {
   payload.value.avatar = file.raw
   avatarSrc.value = URL.createObjectURL(file.raw)
+  profileStore.editProfile(payload.value)
+}
+
+const onCVUpload = (e, file) => {
+  payload.value.cv = file.raw
+  cvScr.value = URL.createObjectURL(file.raw)
   profileStore.editProfile(payload.value)
 }
 
@@ -468,6 +495,7 @@ const hoveringEnd = () => {
     }
     &--upload {
       display: flex;
+      justify-content: center;
       width: 100%;
 
       button {
@@ -482,6 +510,7 @@ const hoveringEnd = () => {
       }
       &__cv {
         display: flex;
+        flex-direction: column;
         align-items: center;
         gap: 0 4px;
       }

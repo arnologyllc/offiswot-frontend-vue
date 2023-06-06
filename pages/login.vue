@@ -226,7 +226,7 @@ watch(loginSuccessData, (v) => {
 
   if (expirationDate !== 365) {
     const loginPinTokenExpires = new Date()
-    loginPinTokenExpires.setMinutes(loginPinTokenExpires.getMinutes() + 10)
+    loginPinTokenExpires.setHours(loginPinTokenExpires.getHours() + 1)
     Date.parse(loginPinTokenExpires)
     accountTokens.value.token_expires = loginPinTokenExpires
   } else {

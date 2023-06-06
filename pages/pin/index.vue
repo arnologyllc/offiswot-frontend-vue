@@ -95,7 +95,7 @@
             <div></div>
           </template>
         </el-form-item>
-        <el-button class="submit-button" native-type="submit" :loading="isLoadingSubmit">
+        <el-button class="submit-button" native-type="submit" :loading="isLoadingSubmit" :disabled="!isValid">
           <span class="submit-button__text">Save</span>
         </el-button>
 
@@ -118,7 +118,6 @@
 
 <script setup>
 import { getCurrentInstance, watch } from 'vue'
-import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import $cookies from 'js-cookie'
 import usePINStore from '~/stores/pin'
@@ -133,9 +132,9 @@ const accounts = ref(false)
 const pinStore = usePINStore()
 const profileStore = useProfileStore()
 const { setPinData, setPinFailureData, isLoadingSubmit } = storeToRefs(pinStore)
+const isValid = ref(false)
 
 const instance = getCurrentInstance()
-const $route = useRoute()
 
 const validateRepeatPIN = (rule, value, callback) => {
   if (value === '') {
@@ -259,6 +258,8 @@ const validateField = (fieldName) => {
       errors.value[fieldName].value = ''
     }
   })
+
+  if (Object.values(payload.value).every((item) => item)) instance.refs.pinForm.validate((res) => (isValid.value = res))
 }
 
 const isWeb = () => {
