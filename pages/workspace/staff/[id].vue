@@ -85,7 +85,7 @@ onMounted(() => {
 })
 
 watch(getMembersSuccess, (v) => {
-  owner.value = v.members[0].email
+  if (v) owner.value = v.members[0].email
 })
 </script>
 

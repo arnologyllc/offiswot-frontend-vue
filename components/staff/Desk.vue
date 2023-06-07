@@ -590,6 +590,8 @@ const onSave = () => {
 
 const setTables = (seats) => {
   if (workspacesSuccessData.value) {
+    console.log(workspacesSuccessData.value.inviteWorkspaces)
+    console.log(workspaceID.value)
     const currentWorkspace = workspacesSuccessData.value.myWorkspaces.find((w) => w.id === +workspaceID.value)
       ? workspacesSuccessData.value.myWorkspaces.find((w) => w.id === +workspaceID.value)
       : workspacesSuccessData.value.inviteWorkspaces.find((w) => w.id === +workspaceID.value)
@@ -652,34 +654,42 @@ const getAvatar = (url) => {
 }
 
 watch(getMembersSuccess, (v) => {
-  AllUsersList.value = v.members.map((item) => ({
-    user: item,
-  }))
-  usersList.value = JSON.parse(JSON.stringify(AllUsersList.value))
-  setAvailableMembers()
+  if (v) {
+    AllUsersList.value = v.members.map((item) => ({
+      user: item,
+    }))
+    usersList.value = JSON.parse(JSON.stringify(AllUsersList.value))
+    setAvailableMembers()
+  }
 })
 
 watch(getMembersError, (v) => {})
 
 watch(getSeatsSuccess, (v) => {
-  AllUsersList.value = v.users
-  setTables(v.seats)
+  if (v) {
+    AllUsersList.value = v.users
+    setTables(v.seats)
 
-  setAvailableMembers()
+    setAvailableMembers()
+  }
 })
 
 watch(getSeatsError, (v) => {})
 
 watch(setSeatsSuccess, (v) => {
-  setTables(v.seats)
-  setAvailableMembers()
+  if (v) {
+    setTables(v.seats)
+    setAvailableMembers()
+  }
 })
 
 watch(setSeatsError, (v) => {})
 
 watch(workspacesSuccessData, (v) => {
-  setTables(getSeatsSuccess.value?.seats)
-  setAvailableMembers()
+  if (v) {
+    setTables(getSeatsSuccess.value?.seats)
+    setAvailableMembers()
+  }
 })
 </script>
 
