@@ -5,7 +5,7 @@
         <template v-for="(item, index) in activeUsers" :key="item.ID">
           <el-dropdown
             class="main__user-actions"
-            :class="{ currentUser: currentUser('u', index), bordered: item.workspaces?.length }"
+            :class="{ currentUser: currentUser('u', index, item.email), bordered: item.workspaces?.length }"
           >
             <div class="main__user-actions--user" @click="changeAccount(item.email)">
               <div class="current__user-selector"></div>
@@ -406,7 +406,7 @@ const currentUser = (type, id, email) => {
   const currentUser = activeUsers.value.findIndex((item) => item.ID === currentAccount)
   switch (type) {
     case 'u':
-      return id === +currentAccountID.value && !currentWorkspaceID.value ? 'currentUser' : false
+      return activeUsers.value[currentUser].email === email && !currentWorkspaceID.value ? 'currentUser' : false
     default:
       return id === +currentWorkspaceID.value && activeUsers.value[currentUser].email === email
         ? 'currentWorkspace'
