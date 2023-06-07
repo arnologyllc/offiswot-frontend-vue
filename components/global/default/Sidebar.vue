@@ -29,7 +29,7 @@
             v-for="workspace in item.workspaces"
             :key="workspace.id"
             class="main__user-workspaces"
-            :class="currentUser('w', workspace.id)"
+            :class="currentUser('w', workspace.id, item.email)"
           >
             <div class="current__workspace-selector"></div>
             <img
@@ -281,6 +281,7 @@ const changeAccount = async (email, isWorkspace, ...props) => {
     expires: (Date.parse(accounts.value[currentAccountID.value].token_expires) - Date.now()) / 86400000,
   })
 
+  $cookies.set('remember_token', accounts.value[currentAccountID.value].remember_token)
   $cookies.set('first_login', accounts.value[currentAccountID.value].first_login)
   if (accounts.value[currentAccountID.value].settings_pin_token) {
     $cookies.set('settings_pin_token', accounts.value[currentAccountID.value].settings_pin_token)
@@ -321,7 +322,11 @@ const changeWorkspace = async (workspaceID, email) => {
 }
 
 const openWorkspace = (id) => {
-  navigateTo(`/workspace/staff/${id}`)
+  if (id === +$route.path.split('/').pop()) {
+    navigateTo(`/workspace/staff/${id}`)
+  } else {
+    navigateTo(`/workspace/staff/${id}`)
+  }
 }
 
 const addAccount = () => {
@@ -397,11 +402,15 @@ const onLogout = async (userID) => {
 }
 
 const currentUser = (type, id, email) => {
+  const currentAccount = +$cookies.get('currentAccountID')
+  const currentUser = activeUsers.value.findIndex((item) => item.ID === currentAccount)
   switch (type) {
     case 'u':
       return id === +currentAccountID.value && !currentWorkspaceID.value ? 'currentUser' : false
     default:
-      return id === +currentWorkspaceID.value ? 'currentWorkspace' : false
+      return id === +currentWorkspaceID.value && activeUsers.value[currentUser].email === email
+        ? 'currentWorkspace'
+        : false
   }
 }
 

@@ -7,6 +7,8 @@ const useProfileStore = defineStore('profile', {
       profileSuccessData: null,
       profileFailureData: null,
       profileLoading: true,
+      rememberProfileSuccessData: null,
+      rememberProfileFailureData: null,
       isLoadingSubmit: false,
       editProfileData: null,
       editFailureData: null,
@@ -41,6 +43,27 @@ const useProfileStore = defineStore('profile', {
             this.profileLoading = false
           })
       }
+    },
+
+    async getRemember(payload) {
+      const { $myFetch } = useNuxtApp()
+      this.profileLoading = true
+      await $myFetch(`autologin/${payload}`, { retry: 5, method: 'POST' })
+        .then((data) => {
+          this.rememberProfileSuccessData = data
+        })
+        .catch((e) => {
+          try {
+            JSON.parse(e.data)
+          } catch {
+            this.rememberProfileFailureData = e.data
+          }
+          this.rememberProfileFailureData = JSON.parse(e.data)
+        })
+        .finally(() => {
+          this.profileLoading = false
+        })
+      return this.rememberProfileSuccessData
     },
 
     async getWorkSpaces() {

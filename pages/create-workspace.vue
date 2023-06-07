@@ -1,5 +1,12 @@
 <template>
   <div class="main">
+    <div class="main__header">
+      <div class="main__form--title">
+        <img src="@/assets/images/icons/chevron-left.svg" alt="chevron-left" @click="$router.go(-1)" />
+        <div class="main__title">Create workspace as {{ email }}</div>
+      </div>
+      <div class="main__subtitle">Please fill the form to create workspace.</div>
+    </div>
     <el-form
       ref="createForm"
       class="main__form"
@@ -8,11 +15,6 @@
       :model="payload"
       @submit.prevent="onSubmit"
     >
-      <div class="main__form--title">
-        <img src="@/assets/images/icons/chevron-left.svg" alt="chevron-left" @click="$router.go(-1)" />
-        <div class="main__title">Create workspace as {{ email }}</div>
-      </div>
-      <div class="main__subtitle">Please fill the form to create workspace.</div>
       <div v-if="errors.global.value" class="el-form-item__global-error-container">
         <div class="el-form-item__global-error">
           <img src="@/assets/images/icons/error.svg" alt="" />
@@ -252,7 +254,11 @@ const clearError = () => {
     color: $ov-text--subtitle;
     margin-bottom: 47px;
   }
-
+  &__header {
+    display: flex;
+    flex-direction: column;
+    padding: 21px 45px;
+  }
   &__form {
     min-height: calc(100vh - 170px);
     display: flex;
@@ -261,12 +267,12 @@ const clearError = () => {
     .el-form-item {
       min-width: 220px;
       max-width: 390px;
-      width: 390px;
+      width: 100%;
     }
     &--input {
       min-width: 220px;
       max-width: 390px;
-      width: 390px;
+      width: 100%;
       .el-input__inner {
         height: 48px;
         border-radius: 6px;

@@ -68,7 +68,10 @@
           </div>
         </div>
         <div class="user-workspaces">
-          <div class="user-workspaces__header">
+          <div
+            v-if="(!isWithWorkspaces && !pendingWorkspaces?.length && !inviteWorkspaces?.length) || isWithWorkspaces"
+            class="user-workspaces__header"
+          >
             <div class="user-workspaces__title">your workspaces</div>
             <el-button
               v-if="isWithWorkspaces"
@@ -103,7 +106,10 @@
               </div>
             </div>
           </div>
-          <div v-else-if="!isWithWorkspaces" class="user-workspaces__container--text">
+          <div
+            v-else-if="!isWithWorkspaces && !pendingWorkspaces?.length && !inviteWorkspaces?.length"
+            class="user-workspaces__container--text"
+          >
             <el-button
               class="user-workspaces__text-create-btn"
               style="position: absolute"
@@ -115,8 +121,10 @@
               <span v-html="formattedText"> </span>
             </div>
           </div>
-          <div v-if="pendingWorkspaces?.length" class="user-workspaces__header-bottom">
+          <div v-if="pendingWorkspaces?.length" class="user-workspaces__header">
             <div class="user-workspaces__title">workspaces (Invites)</div>
+          </div>
+          <div v-if="pendingWorkspaces?.length" class="user-workspaces__body">
             <div v-for="(item, i) in pendingWorkspaces" :key="`workspace_${i}`" class="user-workspaces__container">
               <div class="user-workspaces__element">
                 <img class="user-workspaces__picture" :src="avatarUrl" alt="user_avatar" />
@@ -145,8 +153,11 @@
               </div>
             </div>
           </div>
-          <div v-if="inviteWorkspaces?.length" class="user-workspaces__header-bottom">
-            <div class="user-workspaces__title">workspaces (Invites)</div>
+          <div v-if="inviteWorkspaces?.length" class="user-workspaces__header">
+            <div v-if="inviteWorkspaces?.length" class="user-workspaces__title">workspaces (Invites)</div>
+          </div>
+
+          <div v-if="inviteWorkspaces?.length" class="user-workspaces__body">
             <div
               v-for="(item, i) in inviteWorkspaces"
               :key="`workspace_${i}`"
@@ -197,6 +208,7 @@ import { Search } from '@element-plus/icons-vue'
 import defaultAvatar from '@/assets/images/icons/default-user-icon.jpg'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import loginToken from '~/middleware/loginToken'
+import settingsToken from '~/middleware/settingsToken'
 import useProfileStore from '~/stores/profile'
 import usePINStore from '~/stores/pin'
 import auth from '~/middleware/auth'
@@ -262,6 +274,7 @@ onMounted(() => {
   auth()
 
   isOpenPINDialog.value = loginToken()
+  isOpenPINDialog.value = settingsToken()
   if (editProfileData.value) {
     setProfileData(editProfileData.value)
   } else if (profileSuccessData.value) {
@@ -459,6 +472,7 @@ const openInviteDialog = (type, name, avatar, token) => {
   &__header {
     display: flex;
     justify-content: space-between;
+    height: 32px;
     width: 100%;
   }
   &__body {
@@ -466,9 +480,12 @@ const openInviteDialog = (type, name, avatar, token) => {
     justify-content: space-between;
     flex-wrap: wrap;
     width: 100%;
+    margin-bottom: 40px;
   }
   &__header-bottom {
-    margin-top: 40px;
+    max-width: 495px;
+    min-width: 220px;
+    width: 100%;
   }
   &__title {
     display: flex;

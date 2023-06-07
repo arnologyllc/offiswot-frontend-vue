@@ -80,7 +80,14 @@
           </div>
         </div>
         <div class="dialog__invite">
-          <el-button class="dialog__invite--btn" :loading="isLoadingSubmit" @click="inviteUsers"> INVITE </el-button>
+          <el-button
+            class="dialog__invite--btn"
+            :loading="isLoadingSubmit"
+            :disabled="!selectedEmails.length"
+            @click="inviteUsers"
+          >
+            INVITE
+          </el-button>
           <el-button class="dialog__invite--skip-btn" @click="$emit('close')"> SKIP </el-button>
         </div>
       </el-form>

@@ -162,6 +162,7 @@ const accountTokens = ref({
   settings_pin_token: null,
   login_pin_token: null,
   login_pin_token_expires: null,
+  remember_token: null,
   workspaces: null,
 })
 
@@ -206,6 +207,7 @@ watch(loginSuccessData, (v) => {
   $cookies.remove('token')
   $cookies.remove('first_login')
   $cookies.remove('settings_pin_token')
+  $cookies.remove('remember_token')
   $cookies.remove('login_pin_token')
   $cookies.remove('addAccount')
 
@@ -222,21 +224,17 @@ watch(loginSuccessData, (v) => {
   })
 
   const [accessToken, isFirstLogin] = [v.access_token, v.is_first_login]
-  const expirationDate = payload.value.remember_me ? 365 : 1 / 24
+  const expirationDate = 1 / 24
 
-  if (expirationDate !== 365) {
+
     const loginPinTokenExpires = new Date()
     loginPinTokenExpires.setHours(loginPinTokenExpires.getHours() + 1)
     Date.parse(loginPinTokenExpires)
     accountTokens.value.token_expires = loginPinTokenExpires
-  } else {
-    const loginPinTokenExpires = new Date()
-    loginPinTokenExpires.setMonth(loginPinTokenExpires.getMonth() + 12)
-    Date.parse(loginPinTokenExpires)
-    accountTokens.value.token_expires = loginPinTokenExpires
-  }
+  
 
   $cookies.set('token', accessToken, { expires: expirationDate })
+  $cookies.set('remember_token', v.remember_token)
   const loginTokenExpires = (Date.parse(accountTokens.value.login_pin_token_expires) - Date.now()) / 86400000
   if (accountTokens.value.login_pin_token) {
     $cookies.set('login_pin_token', accountTokens.value.login_pin_token, {
@@ -247,6 +245,7 @@ watch(loginSuccessData, (v) => {
   accountTokens.value.email = v.user.email
   accountTokens.value.token = accessToken
   accountTokens.value.first_login = isFirstLogin
+  accountTokens.value.remember_token = v.remember_token
   accounts.value.push(accountTokens.value)
   accounts.value.forEach((elem, index) => (elem.ID = index))
   $cookies.set('currentAccountID', accounts.value.length - 1)
