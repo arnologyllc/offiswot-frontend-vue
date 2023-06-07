@@ -124,6 +124,7 @@ const changeAccount = async (userID) => {
     expires: (Date.parse(accounts.value[userID].token_expires) - Date.now()) / 86400000,
   })
 
+  $cookies.set('remember_token', accounts.value[userID].remember_token)
   $cookies.set('first_login', accounts.value[userID].first_login)
   if (accounts.value[userID].settings_pin_token)
     $cookies.set('settings_pin_token', accounts.value[userID].settings_pin_token)

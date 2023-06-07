@@ -237,14 +237,11 @@ import tableTopRigth from '@/assets/images/tables/table-top-right.svg'
 import tableBottomLeft from '@/assets/images/tables/table-bottom-left.svg'
 import tableBottomRigth from '@/assets/images/tables/table-bottom-right.svg'
 import useWorkspaceStore from '@/stores/workspace'
-import useProfileStore from '@/stores/profile'
 import defaultAvatar from '~/assets/images/icons/default-user-icon.jpg'
 
 const workspaceStore = useWorkspaceStore()
 const { getSeatsSuccess, getSeatsError, setSeatsSuccess, setSeatsError, getMembersSuccess, getMembersError } =
   storeToRefs(workspaceStore)
-const profileStore = useProfileStore()
-const { workspacesSuccessData } = storeToRefs(profileStore)
 const props = defineProps({
   dragOptions: {
     type: Object,
@@ -588,65 +585,58 @@ const onSave = () => {
   instance.emit('save')
 }
 
-const setTables = (seats) => {
-  if (workspacesSuccessData.value) {
-    console.log(workspacesSuccessData.value.inviteWorkspaces)
-    console.log(workspaceID.value)
-    const currentWorkspace = workspacesSuccessData.value.myWorkspaces.find((w) => w.id === +workspaceID.value)
-      ? workspacesSuccessData.value.myWorkspaces.find((w) => w.id === +workspaceID.value)
-      : workspacesSuccessData.value.inviteWorkspaces.find((w) => w.id === +workspaceID.value)
-    const rowCount = (currentWorkspace.tables_count + 1) / (currentWorkspace.columns_count + 1)
-    const tables = []
-    let rowCol
-    let seatID = 0
-    for (let i = 0; i < rowCount; i++) {
-      const row = []
-      const colCount = !i ? currentWorkspace.columns_count : currentWorkspace.columns_count + 1
-      for (let j = 0; j < colCount; j++) {
-        const table = []
-        for (let seatNumber = 0; seatNumber < 4; seatNumber++) {
-          seatID++
-          switch (seatNumber) {
-            case 0:
-              rowCol = '0_0'
-              break
-            case 1:
-              rowCol = '0_1'
-              break
-            case 2:
-              rowCol = '1_0'
-              break
-            case 3:
-              rowCol = '1_1'
-              break
-          }
-          table.push({
-            id: seatID,
-            row_col: rowCol,
-            dragzone: false,
-            user: null,
-          })
+const setTables = ({ seats, counts }) => {
+  const rowCount = (counts.tables_count + 1) / (counts.columns_count + 1)
+  const tables = []
+  let rowCol
+  let seatID = 0
+  for (let i = 0; i < rowCount; i++) {
+    const row = []
+    const colCount = !i ? counts.columns_count : counts.columns_count + 1
+    for (let j = 0; j < colCount; j++) {
+      const table = []
+      for (let seatNumber = 0; seatNumber < 4; seatNumber++) {
+        seatID++
+        switch (seatNumber) {
+          case 0:
+            rowCol = '0_0'
+            break
+          case 1:
+            rowCol = '0_1'
+            break
+          case 2:
+            rowCol = '1_0'
+            break
+          case 3:
+            rowCol = '1_1'
+            break
         }
-        row.push(table)
+        table.push({
+          id: seatID,
+          row_col: rowCol,
+          dragzone: false,
+          user: null,
+        })
       }
-      tables.push(row)
+      row.push(table)
     }
-    if (getMembersSuccess.value && seats) {
-      const selectedUsers = Object.entries(seats)
-      selectedUsers.forEach((user) => {
-        const userID = +user[0]
-        const position = user[1].split('_')
-        const [tableRow, tableCol] = [position[0], position[1]]
-        const userSeatPosition = `${position[2]}_${position[3]}`
-        const seatPosition = tables[tableRow][tableCol].find((seat) => seat.row_col === userSeatPosition)
-        const currentUser = getMembersSuccess.value.members.find((user) => user.user_id === userID)
-        seatPosition.user = currentUser
-      })
-    }
-
-    tablesList.value = tables
-    setLastTableId()
+    tables.push(row)
   }
+  if (getMembersSuccess.value && seats) {
+    const selectedUsers = Object.entries(seats)
+    selectedUsers.forEach((user) => {
+      const userID = +user[0]
+      const position = user[1].split('_')
+      const [tableRow, tableCol] = [position[0], position[1]]
+      const userSeatPosition = `${position[2]}_${position[3]}`
+      const seatPosition = tables[tableRow][tableCol].find((seat) => seat.row_col === userSeatPosition)
+      const currentUser = getMembersSuccess.value.members.find((user) => user.user_id === userID)
+      seatPosition.user = currentUser
+    })
+  }
+
+  tablesList.value = tables
+  setLastTableId()
 }
 
 const getAvatar = (url) => {
@@ -668,7 +658,7 @@ watch(getMembersError, (v) => {})
 watch(getSeatsSuccess, (v) => {
   if (v) {
     AllUsersList.value = v.users
-    setTables(v.seats)
+    setTables(v)
 
     setAvailableMembers()
   }
@@ -678,19 +668,12 @@ watch(getSeatsError, (v) => {})
 
 watch(setSeatsSuccess, (v) => {
   if (v) {
-    setTables(v.seats)
+    setTables(v)
     setAvailableMembers()
   }
 })
 
 watch(setSeatsError, (v) => {})
-
-watch(workspacesSuccessData, (v) => {
-  if (v) {
-    setTables(getSeatsSuccess.value?.seats)
-    setAvailableMembers()
-  }
-})
 </script>
 
 <style scoped lang="scss">

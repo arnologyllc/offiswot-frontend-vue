@@ -75,11 +75,11 @@ const setCurrentComponent = (name) => {
   currentComponent.value = name
 }
 onMounted(() => {
-  isOpenPINDialog.value = loginToken()
-  isOpenPINDialog.value = settingsToken()
   if (process.client) {
     currentAccountID.value = $cookies.get('currentAccountID')
     accounts.value = JSON.parse(localStorage.getItem('accounts'))
+    isOpenPINDialog.value = loginToken()
+    isOpenPINDialog.value = settingsToken()
     if (accounts.value[currentAccountID.value]) user.value = accounts.value[currentAccountID.value].email
   }
 })
