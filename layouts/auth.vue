@@ -1,5 +1,5 @@
 <template>
-  <div class="main-layout-aut__outer">
+  <div class="main-layout-auth__outer">
     <Header />
     <div class="main-layout-auth" :class="checkPage() === '/expired' ? '' : 'main-layout-auth__background'">
       <slot />
@@ -43,6 +43,7 @@ const checkPage = () => {
   &__outer {
     display: flex;
     flex-direction: column;
+    overflow: auto;
   }
   .main {
     display: flex;

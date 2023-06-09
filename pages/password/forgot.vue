@@ -23,6 +23,7 @@
             v-model="payload.email"
             class="main__form--box__input"
             placeholder="Email"
+            @input="validateField('email')"
             @blur="validateField('email')"
           >
             <template #prefix>
@@ -132,8 +133,11 @@ const validateField = (fieldName) => {
     }
   })
 
-  if (Object.values(payload.value).every((item) => item))
+  if (Object.values(payload.value).every((item) => item)) {
     instance.refs.forgotForm.validate((res) => (isValid.value = res))
+  } else {
+    isValid.value = false
+  }
 }
 
 const showError = (fieldName, event) => {

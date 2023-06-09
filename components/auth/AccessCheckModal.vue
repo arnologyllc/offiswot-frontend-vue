@@ -45,6 +45,7 @@
           class="main__form--box__input"
           placeholder="Enter PIN"
           autofocus
+          @input="validateField('pin')"
           @blur="validateField('pin')"
         >
           <template #suffix>
@@ -58,7 +59,7 @@
       <div class="forgot-password">
         <el-button style="font-size: 14px; font-weight: 400" @click="onForgot">Forgot PIN?</el-button>
       </div>
-      <el-button class="submit-button" native-type="submit" :loading="isLoadingSubmit">
+      <el-button class="submit-button" native-type="submit" :loading="isLoadingSubmit" :disabled="!payload.pin">
         <span class="submit-button__text">{{ isLoadingSubmit ? '' : 'NEXT' }}</span>
       </el-button>
     </el-form>

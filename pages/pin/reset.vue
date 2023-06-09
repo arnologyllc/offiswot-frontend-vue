@@ -65,6 +65,7 @@
             :type="showPINConfirmation ? 'text' : 'password'"
             class="main__form--box__input"
             placeholder="Repeat PIN"
+            @input="validateField('pin_confirmation')"
             @blur="validateField('pin_confirmation')"
           >
             <template #suffix>
@@ -258,8 +259,11 @@ const validateField = (fieldName) => {
     }
   })
 
-  if (Object.values(payload.value).every((item) => item))
+  if (Object.values(payload.value).every((item) => item)) {
     instance.refs.resetForm.validate((res) => (isValid.value = res))
+  } else {
+    isValid.value = false
+  }
 }
 
 const isWeb = () => {
