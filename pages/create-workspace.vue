@@ -27,6 +27,7 @@
           v-model="payload.name"
           class="main__form--input"
           placeholder="Workspace name"
+          @input="validateField('name')"
           @blur="validateField('name')"
         >
           <template #suffix>
@@ -68,7 +69,7 @@
       </el-form-item>
       <el-form-item class="main__form--footer">
         <div class="main__form--actions">
-          <el-button native-type="submit" :loading="isLoadingSubmit" class="submit-button">
+          <el-button native-type="submit" :loading="isLoadingSubmit" class="submit-button" :disabled="!payload.name">
             <span>
               <span class="submit-button__text">{{ isLoadingSubmit ? '' : 'Next' }}</span>
               <img src="@/assets/images/icons/chevron-icon.svg" alt="arrow" />
@@ -103,12 +104,14 @@ import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 
 import useWorkspacesStore from '~/stores/workspace'
+import useProfileStore from '~/stores/profile'
 import settingsToken from '~/middleware/settingsToken'
 import loginToken from '~/middleware/loginToken'
 import auth from '~/middleware/auth'
 definePageMeta({ layout: 'default' })
 
 const workspacesStore = useWorkspacesStore()
+const profileStore = useProfileStore()
 const {
   isLoadingIndustries,
   industriesList,
@@ -146,8 +149,9 @@ const isOpenPINDialog = ref(false)
 const email = ref(false)
 
 watch(createWorkspaceSuccess, (v) => {
+  profileStore.getWorkSpaces()
   if (v) {
-    navigateTo(`/workspace/staff/${v.workspace.id}`)
+    navigateTo(`/`)
   }
 })
 
@@ -179,7 +183,7 @@ const onSubmit = () => {
     if (valid) {
       workspacesStore.createWorkspace(payload.value)
     } else {
-      errors.value.global.value = 'Please fill empty areas'
+      errors.value.global.value = 'Please fill workspace name'
       return false
     }
   })
@@ -226,6 +230,7 @@ const clearError = () => {
   width: 100%;
   display: flex;
   position: relative;
+  flex-direction: column;
   min-height: calc(100vh - 170px);
   background-color: $ov-background;
   border-radius: 20px 0 0 20px;
@@ -263,6 +268,7 @@ const clearError = () => {
     min-height: calc(100vh - 170px);
     display: flex;
     flex-direction: column;
+    width: 480px;
     padding: 21px 45px;
     .el-form-item {
       min-width: 220px;

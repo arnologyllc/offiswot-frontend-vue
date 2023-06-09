@@ -2,12 +2,7 @@
   <div class="submit-buttons-container">
     <el-form-item class="submit-form-item">
       <div class="submit-button__outer">
-        <el-button
-          class="submit-button"
-          native-type="submit"
-          :loading="props.loginLoading"
-          :class="{ active: !props.isValid }"
-        >
+        <el-button class="submit-button" native-type="submit" :loading="props.loginLoading" :disabled="!props.isValid">
           <span class="submit-button__text">
             {{ !props.loginLoading ? props.loginTitle : '' }}
           </span>

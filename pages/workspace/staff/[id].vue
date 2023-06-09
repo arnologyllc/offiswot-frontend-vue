@@ -17,6 +17,7 @@
         </el-button-group>
         <el-button
           v-if="user === owner"
+          ref="editButton"
           class="main-dash__header--edit-button"
           circle
           @click="dragOptions.disabled = false"
@@ -82,6 +83,7 @@ onMounted(() => {
     isOpenPINDialog.value = settingsToken()
     if (accounts.value[currentAccountID.value]) user.value = accounts.value[currentAccountID.value].email
   }
+  dragOptions.value.disabled = false
 })
 
 watch(getMembersSuccess, (v) => {

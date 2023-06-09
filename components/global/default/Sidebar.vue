@@ -148,6 +148,10 @@ const setWorkspaceData = (v) => {
   }
 }
 
+watch(workspacesSuccessData, (v) => {
+  setWorkspaceData(workspacesSuccessData.value)
+})
+
 watch(profileSuccessData, (v) => {
   if (process.client) {
     currentAccountID.value = +$cookies.get('currentAccountID')
@@ -247,7 +251,6 @@ const changeAccount = async (email, isWorkspace, ...props) => {
   currentWorkspaceID.value = ''
   currentAccountID.value = accounts.value.findIndex((user) => user.email === email)
   $cookies.set('currentAccountID', currentAccountID.value)
-
   if (accounts.value[currentAccountID.value].token === $cookies.get('token')) {
     navigateTo(`/`)
     return
@@ -494,7 +497,7 @@ const resizeSidebar = (e) => {
       }
     }
     &-actions {
-      margin: 14px;
+      margin: 17px;
       padding-bottom: 14px;
       &--user {
         display: flex;
@@ -637,7 +640,7 @@ const resizeSidebar = (e) => {
     height: 45px;
     border-radius: 0px 2px 2px 0px;
     position: absolute;
-    left: -7px;
+    left: -11px;
   }
   .main__user-actions--user {
     background: linear-gradient(51.28deg, rgba(48, 110, 154, 0.5) -1.56%, #94cef9 118.35%);
@@ -661,7 +664,7 @@ const resizeSidebar = (e) => {
 }
 
 .bordered {
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid rgba(240, 240, 240, 0.3);
 }
 
 .cursorbefore {

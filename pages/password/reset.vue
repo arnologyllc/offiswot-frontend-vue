@@ -76,6 +76,7 @@
             class="main__form--box__input"
             placeholder="Confirm password"
             :type="showConfirmPassword ? 'text' : 'password'"
+            @input="validateField('password_confirmation')"
             @blur="validateField('password_confirmation')"
           >
             <template #prefix>
@@ -250,8 +251,11 @@ const validateField = (fieldName) => {
     }
   })
 
-  if (Object.values(payload.value).every((item) => item))
+  if (Object.values(payload.value).every((item) => item)) {
     instance.refs.resetForm.validate((res) => (isValid.value = res))
+  } else {
+    isValid.value = false
+  }
 }
 
 const showError = (fieldName, event) => {

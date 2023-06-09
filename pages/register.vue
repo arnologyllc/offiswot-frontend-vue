@@ -164,6 +164,7 @@
             class="main__form--box__input"
             placeholder="Confirm password"
             :type="showConfirmPassword ? 'text' : 'password'"
+            @input="validateField('password_confirmation')"
             @blur="validateField('password_confirmation')"
           >
             <template #prefix>
@@ -207,7 +208,7 @@
           <span>By signing up you agree on our <u>Term and Conditions</u></span>
         </div>
         <login-buttons
-          login-title="Register"
+          login-title="Sign Up"
           :is-valid="isValid"
           :login-loading="authStore.registerLoading"
           social-title="Sign up with Google"
@@ -398,8 +399,11 @@ const validateField = (fieldName) => {
       }
     }
   })
-  if (Object.values(payload.value).every((item) => item))
+  if (Object.values(payload.value).every((item) => item)) {
     instance.refs.registerForm.validate((res) => (isValid.value = res))
+  } else {
+    isValid.value = false
+  }
 }
 
 const showError = (fieldName, event) => {

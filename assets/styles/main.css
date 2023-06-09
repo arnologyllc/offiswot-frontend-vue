@@ -212,3 +212,11 @@ input[type='number'] {
   background: #4156f6 !important;
   color: white !important;
 }
+
+.main-layout-auth__outer > .footer {
+  border-radius: 0px !important;
+}
+
+*:focus-visible {
+  outline: none;
+}

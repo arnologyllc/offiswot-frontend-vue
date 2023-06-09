@@ -208,11 +208,7 @@
       <div v-else class="desk__edit-footer--members__outer"></div>
       <el-button class="desk__edit-footer--save" @click="onSave"> Save </el-button>
     </div>
-    <div
-      v-if="!dragOptions.disabled"
-      class="tutorial-box"
-      :style="{ display: !Object.entries(getSeatsSuccess?.seats) ? 'block' : 'none' }"
-    >
+    <div v-if="!dragOptions.disabled" class="tutorial-box">
       <img src="@/assets/images/drag-tutorial/tutorial-cursor.svg" alt="^" class="tutorial-box__cursor" />
       <img src="@/assets/images/drag-tutorial/tutorial-top-arrow.svg" alt="|" class="tutorial-box__top-line" />
       <img src="@/assets/images/drag-tutorial/tutorial-user.svg" alt="User" class="tutorial-box__user" />

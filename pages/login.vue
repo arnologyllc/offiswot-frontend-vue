@@ -24,6 +24,7 @@
             v-model="payload.email"
             class="main__form--box__input"
             placeholder="Email"
+            @input="validateField('email')"
             @blur="validateField('email')"
           >
             <template #prefix>
@@ -62,6 +63,7 @@
             :type="showPassword ? 'text' : 'password'"
             class="main__form--box__input"
             placeholder="Password"
+            @input="validateField('password')"
             @blur="validateField('password')"
           >
             <template #prefix>
@@ -104,7 +106,8 @@
         </el-form-item>
         <login-buttons
           :login-loading="authStore.loginLoading"
-          login-title="Log In"
+          :is-valid="isValid"
+          login-title="Sign in"
           social-title="Sign in with Google"
         ></login-buttons>
       </el-form>
@@ -151,6 +154,7 @@ const instance = getCurrentInstance()
 const showPassword = ref(false)
 const isOpenEmailDialog = ref(false)
 const accounts = ref(false)
+const isValid = ref(false)
 
 const accountTokens = ref({
   ID: null,
@@ -193,6 +197,11 @@ const rules = ref({
       message: 'This field is required.',
       trigger: 'blur',
     },
+    {
+      type: 'email',
+      message: 'Email is not valid.',
+      trigger: 'blur',
+    },
   ],
   password: [
     {
@@ -226,12 +235,10 @@ watch(loginSuccessData, (v) => {
   const [accessToken, isFirstLogin] = [v.access_token, v.is_first_login]
   const expirationDate = 1 / 24
 
-
-    const loginPinTokenExpires = new Date()
-    loginPinTokenExpires.setHours(loginPinTokenExpires.getHours() + 1)
-    Date.parse(loginPinTokenExpires)
-    accountTokens.value.token_expires = loginPinTokenExpires
-  
+  const loginPinTokenExpires = new Date()
+  loginPinTokenExpires.setHours(loginPinTokenExpires.getHours() + 1)
+  Date.parse(loginPinTokenExpires)
+  accountTokens.value.token_expires = loginPinTokenExpires
 
   $cookies.set('token', accessToken, { expires: expirationDate })
   $cookies.set('remember_token', v.remember_token)
@@ -335,6 +342,16 @@ const validateField = (fieldName) => {
       errors.value[fieldName].value = ''
     }
   })
+
+  if (
+    Object.values(payload.value).every((item, index) => {
+      return index === 2 || item
+    })
+  ) {
+    instance.refs.loginForm.validate((res) => (isValid.value = res))
+  } else {
+    isValid.value = false
+  }
 }
 
 const showError = (fieldName, event) => {

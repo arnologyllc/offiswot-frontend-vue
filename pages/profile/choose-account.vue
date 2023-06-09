@@ -31,7 +31,7 @@
       <div class="main__user-actions" @click="addAccount">
         <div class="main__user-actions--add">
           <span>+</span>
-          <span class="main__user-actions--add__title">Create new account</span>
+          <span class="main__user-actions--add__title">Add new account</span>
         </div>
       </div>
     </div>
@@ -185,7 +185,7 @@ const changeAccount = async (userID) => {
     align-items: center;
     padding: 8px;
     width: 364px;
-    height: 56px;
+    height: 64px;
     background: #ffffff;
     box-shadow: 0px 7px 64px rgba(0, 0, 0, 0.07);
     border-radius: 8px;
@@ -218,6 +218,7 @@ const changeAccount = async (userID) => {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      gap: 6px;
       &__email {
         font-weight: 500;
         font-size: 15px;

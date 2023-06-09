@@ -546,7 +546,7 @@ const openInviteDialog = (type, name, avatar, token) => {
     max-width: 200px;
   }
   &__text-create-btn {
-    top: 75px;
+    top: 90px;
     right: 20px;
     width: 100%;
     max-width: 137px;

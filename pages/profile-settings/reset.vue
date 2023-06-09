@@ -30,6 +30,7 @@
             :type="showPrevious ? 'text' : 'password'"
             class="main__form--box__input"
             placeholder="Old password"
+            @input="validateField('old_password')"
             @blur="validateField('old_password')"
           >
             <template #suffix>
@@ -124,6 +125,7 @@
             :type="showPasswordConfirmation ? 'text' : 'password'"
             class="main__form--box__input"
             placeholder="Repeat password"
+            @input="validateField('password_confirmation')"
             @blur="validateField('password_confirmation')"
           >
             <template #suffix>
@@ -379,8 +381,11 @@ const validateField = (fieldName) => {
       errors.value[fieldName].value = ''
     }
   })
-  if (Object.values(payload.value).every((item) => item))
+  if (Object.values(payload.value).every((item) => item)) {
     instance.refs.passwordForm.validate((res) => (isValid.value = res))
+  } else {
+    isValid.value = false
+  }
 }
 
 const showError = (fieldName, event) => {
