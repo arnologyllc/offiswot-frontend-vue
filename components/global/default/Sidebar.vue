@@ -18,7 +18,7 @@
             </div>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item class="main__user-actions--add_element" @click="onLogout(item.ID)">
+                <el-dropdown-item class="main__user-actions--add_element" @click="onLogout(item.email)">
                   <span>Logout</span>
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -29,7 +29,7 @@
             v-for="workspace in item.workspaces"
             :key="workspace.id"
             class="main__user-workspaces"
-            :class="currentUser('w', workspace.id, item.email)"
+            :class="currentUser('w', item.ID, item.email, workspace.id)"
           >
             <div class="current__workspace-selector"></div>
             <img
@@ -111,6 +111,7 @@ const authStore = useAuthStore()
 const workspaceStore = useWorkspaceStore()
 const { profileSuccessData, profileFailureData, editProfileData, editFailureData, workspacesSuccessData } =
   storeToRefs(profileStore)
+// const { getMembersSuccess } = storeToRefs(workspaceStore)
 const { $myFetch } = useNuxtApp()
 const config = useRuntimeConfig()
 const isOpen = ref(false)
@@ -123,6 +124,7 @@ const accounts = ref(false)
 const $route = useRoute()
 const currentAccountID = ref(null)
 const currentWorkspaceID = ref(false)
+const currentEmail = ref(null)
 const sidebarWidth = ref(68)
 
 const getAvatar = (v) => {
@@ -141,7 +143,7 @@ const getAvatar = (v) => {
 const setWorkspaceData = (v) => {
   if (process.client) {
     accounts.value = JSON.parse(localStorage.getItem('accounts'))
-    if (accounts.value[currentAccountID.value])
+    if (accounts.value[currentAccountID.value] && (v?.myWorkspaces.length || v?.inviteWorkspaces.length))
       accounts.value[currentAccountID.value].workspaces = [...v?.myWorkspaces, ...v?.inviteWorkspaces]
 
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
@@ -153,17 +155,24 @@ watch(workspacesSuccessData, (v) => {
 })
 
 watch(profileSuccessData, (v) => {
-  if (process.client) {
-    currentAccountID.value = +$cookies.get('currentAccountID')
-  }
-  if (v?.user.avatar && currentAccountID.value >= 0) {
-    accounts.value[currentAccountID.value].avatarUrl = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
-  } else if (currentAccountID.value >= 0) {
-    accounts.value[currentAccountID.value].avatarUrl = `${defaultAvatar}`
-  }
+  if (v) {
+    if (process.client) {
+      currentAccountID.value = +$cookies.get('currentAccountID')
+    }
+    if (v?.user.avatar && currentAccountID.value >= 0) {
+      accounts.value[
+        currentAccountID.value
+      ].avatarUrl = `${config.public.env.serverUrl}${v.avatarPath}/${v.user.avatar}`
+    } else if (currentAccountID.value >= 0) {
+      accounts.value[currentAccountID.value].avatarUrl = `${defaultAvatar}`
+    }
 
-  if (process.client) {
-    localStorage.setItem('accounts', JSON.stringify(accounts.value))
+    if (process.client) {
+      localStorage.setItem('accounts', JSON.stringify(accounts.value))
+    }
+    if (v.user.email) {
+      currentEmail.value = v.user.email
+    }
   }
 })
 watch(editFailureData, (v) => {
@@ -202,14 +211,9 @@ onMounted(async () => {
     const path = window.location.pathname.split('/')
     if (!isNaN(+path[path.length - 1])) {
       currentWorkspaceID.value = path[path.length - 1]
-      currentAccountID.value = null
     }
   }
-  if (!currentWorkspaceID.value && $cookies.get('currentAccountID')) {
-    currentAccountID.value = +$cookies.get('currentAccountID')
-  } else if (!currentWorkspaceID.value) {
-    currentAccountID.value = 0
-  }
+  currentAccountID.value = +$cookies.get('currentAccountID')
   if ($cookies.get('login_pin_token')) {
     if (!profileSuccessData.value) {
       profileStore.getProfile()
@@ -256,9 +260,6 @@ const changeAccount = async (email, isWorkspace, ...props) => {
     return
   }
   profileStore.$reset()
-  pinStore.$reset()
-  authStore.$reset()
-  workspaceStore.$reset()
 
   if ((Date.parse(accounts.value[currentAccountID.value].token_expires) - Date.now()) / 86400000 < 0) {
     accounts.value.splice(currentAccountID.value, 1)
@@ -316,11 +317,10 @@ const changeAccount = async (email, isWorkspace, ...props) => {
     navigateTo(`/`)
   }
 }
-
 const changeWorkspace = async (workspaceID, email) => {
   await changeAccount(email)
-  currentAccountID.value = -1
   currentWorkspaceID.value = workspaceID
+
   openWorkspace(workspaceID, true)
 }
 
@@ -338,16 +338,16 @@ const addAccount = () => {
   window.open('/login', '_blank')
 }
 
-const onLogout = async (userID) => {
+const onLogout = async (email) => {
   accounts.value.forEach((elem, index) => (elem.ID = index))
 
-  changeAccount(userID)
+  changeAccount(email)
   await $myFetch('logout', {
     method: 'post',
   })
 
   const initAccountValue = accounts.value.map((elem) => {
-    if (elem.ID === userID) {
+    if (elem.email === email) {
       elem.token = null
       elem.token_expires = null
       elem.first_login = null
@@ -376,7 +376,7 @@ const onLogout = async (userID) => {
         })
       $cookies.set('currentAccountID', newIndex)
       profileStore.getProfile()
-      if (!initAccountValue?.workspaces[0]) {
+      if (!initAccountValue?.workspaces || !initAccountValue?.workspaces[0]) {
         await profileStore.getWorkSpaces()
       }
       accounts.value = initAccountValue
@@ -404,14 +404,14 @@ const onLogout = async (userID) => {
   }
 }
 
-const currentUser = (type, id, email) => {
-  const currentAccount = +$cookies.get('currentAccountID')
-  const currentUser = activeUsers.value.findIndex((item) => item.ID === currentAccount)
+const currentUser = (type, userID, email, workspaceID) => {
   switch (type) {
     case 'u':
-      return activeUsers.value[currentUser].email === email && !currentWorkspaceID.value ? 'currentUser' : false
+      return activeUsers.value[currentAccountID.value]?.email === email && !currentWorkspaceID.value
+        ? 'currentUser'
+        : false
     default:
-      return id === +currentWorkspaceID.value && activeUsers.value[currentUser].email === email
+      return workspaceID === +currentWorkspaceID.value && activeUsers.value[currentAccountID.value]?.email === email
         ? 'currentWorkspace'
         : false
   }

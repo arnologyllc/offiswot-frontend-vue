@@ -220,3 +220,12 @@ input[type='number'] {
 *:focus-visible {
   outline: none;
 }
+
+.el-button:focus-visible {
+  outline: 0 !important;
+  outline-offset: 0 !important;
+}
+
+.create-workspace .el-form-item__content {
+  justify-content: flex-start !important;
+}
