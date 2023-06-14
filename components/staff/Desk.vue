@@ -2,20 +2,20 @@
   <div class="desk">
     <div class="desk__main" :class="{ 'edit-mode': !props.dragOptions.disabled }">
       <div>
-        <div class="dailyEventsContainer" :class="{ 'edit-mode': !props.dragOptions.disabled }">
-          <span class="todayDate"> {{ today }}</span>
-          <div class="eventsList">
-            <div class="todayEvent">
-              <div></div>
-              <span>Today is Tony’s birthday 🎂</span>
-            </div>
-            <div class="todayEvent">
-              <div></div>
-              <span>Shout out to Grace for amazing progress on AI integration. 🎉</span>
+        <div v-for="(item, i) in tablesList" :key="`row_${i}`" class="desk__row">
+          <div v-if="i === 0" class="dailyEventsContainer" :class="{ 'edit-mode': !props.dragOptions.disabled }">
+            <span class="todayDate"> {{ today }}</span>
+            <div class="eventsList">
+              <div class="todayEvent">
+                <div></div>
+                <span>Today is Tony’s birthday 🎂</span>
+              </div>
+              <div class="todayEvent">
+                <div></div>
+                <span>Shout out to Grace for amazing progress on AI integration. 🎉</span>
+              </div>
             </div>
           </div>
-        </div>
-        <div v-for="(item, i) in tablesList" :key="`row_${i}`" class="desk__row">
           <div v-for="(col, idx) in item" :key="`col_${idx}`" class="desk__table">
             <draggable
               class="desk__row--col"
@@ -200,6 +200,9 @@
               </div>
               <div class="desk__edit-footer--members__member--right">
                 <div class="user-name">{{ element.user.full_name }}</div>
+                <div class="user-status">
+                  {{ element.user.email === AllUsersList[0].user.email ? 'You' : 'Member' }}
+                </div>
               </div>
             </div>
           </div>
@@ -208,7 +211,14 @@
       <div v-else class="desk__edit-footer--members__outer"></div>
       <el-button class="desk__edit-footer--save" @click="onSave"> Save </el-button>
     </div>
-    <div v-if="!dragOptions.disabled" class="tutorial-box">
+    <div v-if="dragOptions.disabled" class="desk__hint">
+      <span class="desk__hint--title">Teams:</span>
+      <div v-for="(item, index) in hints" :key="`hint_${index}`" class="desk__hint--item">
+        <div class="desk__hint--circle" :style="{ background: item.color }"></div>
+        <span>{{ item.name }}</span>
+      </div>
+    </div>
+    <div v-if="!dragOptions.disabled && isEmpty" class="tutorial-box">
       <img src="@/assets/images/drag-tutorial/tutorial-cursor.svg" alt="^" class="tutorial-box__cursor" />
       <img src="@/assets/images/drag-tutorial/tutorial-top-arrow.svg" alt="|" class="tutorial-box__top-line" />
       <img src="@/assets/images/drag-tutorial/tutorial-user.svg" alt="User" class="tutorial-box__user" />
@@ -254,11 +264,16 @@ const movingIndex = ref(null)
 const futureItem = ref(null)
 const isInsideFooter = ref(false)
 const reloadFooter = ref(true)
+const isEmpty = ref(true)
 const workspaceID = ref(null)
 const instance = getCurrentInstance()
 const config = useRuntimeConfig()
 const tablesCount = ref(1)
 const columnsCount = ref(1)
+const hints = ref([
+  { name: 'Marketing', color: '#4156F6', id: 1 },
+  { name: 'Team Marketing', color: '#E4AC1A', id: 2 },
+])
 
 const AllUsersList = ref([])
 const usersList = ref([])
@@ -626,7 +641,9 @@ const setTables = ({ seats, counts }) => {
       const [tableRow, tableCol] = [position[0], position[1]]
       const userSeatPosition = `${position[2]}_${position[3]}`
       const seatPosition = tables[tableRow][tableCol].find((seat) => seat.row_col === userSeatPosition)
-      const currentUser = getMembersSuccess.value.members.find((user) => user.user_id === userID)
+      const currentUser = getMembersSuccess.value.members.find((user) => {
+        return user.user_id === userID
+      })
       seatPosition.user = currentUser
     })
   }
@@ -645,6 +662,7 @@ watch(getMembersSuccess, (v) => {
       user: item,
     }))
     usersList.value = JSON.parse(JSON.stringify(AllUsersList.value))
+    setTables(getSeatsSuccess.value)
     setAvailableMembers()
   }
 })
@@ -653,9 +671,8 @@ watch(getMembersError, (v) => {})
 
 watch(getSeatsSuccess, (v) => {
   if (v) {
-    AllUsersList.value = v.users
     setTables(v)
-
+    isEmpty.value = !Object.keys(v.seats).some((i) => i)
     setAvailableMembers()
   }
 })
@@ -665,6 +682,8 @@ watch(getSeatsError, (v) => {})
 watch(setSeatsSuccess, (v) => {
   if (v) {
     setTables(v)
+
+    isEmpty.value = !Object.keys(v.seats).some((i) => i)
     setAvailableMembers()
   }
 })
@@ -704,7 +723,6 @@ watch(setSeatsError, (v) => {})
       width: 344px;
       cursor: default;
       &.horizontal {
-        width: 0px;
         span {
           text-orientation: upright;
           writing-mode: vertical-lr;
@@ -721,6 +739,7 @@ watch(setSeatsError, (v) => {})
 
   &__row {
     display: flex;
+    width: max-content;
 
     &--col {
       padding: 65px 125px 65px 125px;
@@ -759,7 +778,7 @@ watch(setSeatsError, (v) => {})
   &__hint {
     padding-top: 8px;
     display: flex;
-    gap: 0 28px;
+    gap: 0 14px;
     align-items: center;
 
     &--item {
@@ -768,6 +787,34 @@ watch(setSeatsError, (v) => {})
       gap: 0 13px;
       font-size: 15px;
       color: black;
+    }
+    &--circle {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+    }
+  }
+  &__hint {
+    padding-top: 8px;
+    display: flex;
+    gap: 0 28px;
+    align-items: center;
+    &--title {
+      font-weight: 600;
+      font-size: 15px;
+      line-height: 18px;
+
+      color: #4156f6;
+    }
+    &--item {
+      display: flex;
+      align-items: center;
+      gap: 0 6px;
+      font-weight: 400;
+      font-size: 15px;
+      line-height: 18px;
+
+      color: #000000;
     }
     &--circle {
       width: 14px;
@@ -938,6 +985,7 @@ watch(setSeatsError, (v) => {})
         max-width: calc(100% - 397px);
         display: flex;
         overflow-x: auto;
+        gap: 25px;
       }
 
       &__member {
@@ -963,9 +1011,19 @@ watch(setSeatsError, (v) => {})
         }
         &--right {
           .user-name {
-            font-weight: 500;
-            font-size: 15px;
-            color: black;
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 17px;
+            /* identical to box height */
+
+            color: #515151;
+          }
+          .user-status {
+            font-weight: 400;
+            font-size: 11px;
+            line-height: 13px;
+
+            color: #787878;
           }
           .user-profession {
             font-size: 10px;
@@ -1075,6 +1133,7 @@ watch(setSeatsError, (v) => {})
       }
       100% {
         opacity: 0;
+        width: 0;
         display: none;
       }
     }

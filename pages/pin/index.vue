@@ -135,6 +135,7 @@ const pinStore = usePINStore()
 const profileStore = useProfileStore()
 const { setPinData, setPinFailureData, isLoadingSubmit } = storeToRefs(pinStore)
 const isValid = ref(false)
+const currentAccountID = ref(0)
 
 const instance = getCurrentInstance()
 
@@ -231,7 +232,8 @@ watch(setPinFailureData, (v) => {
 
 watch(setPinData, (v) => {
   if (process.client) {
-    accounts.value[0].first_login = null
+    currentAccountID.value = +$cookies.get('currentAccountID')
+    accounts.value[currentAccountID.value].first_login = null
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
   }
   $cookies.remove('first_login')

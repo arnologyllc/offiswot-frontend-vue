@@ -46,7 +46,7 @@ const useWorkspaceStore = defineStore('workspace', {
     getIndustries() {
       const { $myFetch } = useNuxtApp()
       this.isLoadingIndustries = true
-      $myFetch('industry')
+      $myFetch('industry', { retry: 5 })
         .then((data) => {
           this.industriesList = data
         })
@@ -92,6 +92,7 @@ const useWorkspaceStore = defineStore('workspace', {
       this.isLoadingIndustries = true
       $myFetch(`/workspace/${id}/emails-list`, {
         method: 'POST',
+        retry: 5,
         body: {
           email: query,
         },
@@ -115,7 +116,7 @@ const useWorkspaceStore = defineStore('workspace', {
     getMembers(id) {
       const { $myFetch } = useNuxtApp()
       this.isLoadingIndustries = true
-      $myFetch(`/workspace/${id}/members`)
+      $myFetch(`/workspace/${id}/members`, { retry: 5 })
         .then((data) => {
           this.getMembersSuccess = data
         })
@@ -135,7 +136,7 @@ const useWorkspaceStore = defineStore('workspace', {
     getSeats(id) {
       const { $myFetch } = useNuxtApp()
       this.isLoadingIndustries = true
-      $myFetch(`workspace/seats/${id}`)
+      $myFetch(`workspace/seats/${id}`, { retry: 5 })
         .then((data) => {
           this.getSeatsSuccess = data
         })

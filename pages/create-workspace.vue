@@ -56,6 +56,7 @@
         <el-select
           v-model="payload.industry_id"
           :loading="isLoadingIndustries"
+          filterable
           class="main__form--input"
           placeholder="Select Industry"
         >
@@ -67,7 +68,7 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item class="main__form--footer">
+      <el-form-item class="main__form--footer create-workspace">
         <div class="main__form--actions">
           <el-button native-type="submit" :loading="isLoadingSubmit" class="submit-button" :disabled="!payload.name">
             <span>

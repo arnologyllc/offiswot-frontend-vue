@@ -52,9 +52,12 @@ import settingsToken from '~/middleware/settingsToken'
 import loginToken from '~/middleware/loginToken'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
 import useWorkspaceStore from '@/stores/workspace'
+import useProfileStore from '@/stores/profile'
 
 const workspaceStore = useWorkspaceStore()
 const { getMembersSuccess } = storeToRefs(workspaceStore)
+const profileStore = useProfileStore()
+const { profileSuccessData } = storeToRefs(profileStore)
 
 const desk = resolveDynamicComponent(Desk)
 const list = resolveDynamicComponent(List)
@@ -83,11 +86,18 @@ onMounted(() => {
     isOpenPINDialog.value = settingsToken()
     if (accounts.value[currentAccountID.value]) user.value = accounts.value[currentAccountID.value].email
   }
-  dragOptions.value.disabled = false
 })
 
 watch(getMembersSuccess, (v) => {
   if (v) owner.value = v.members[0].email
+  if (owner.value === user.value) dragOptions.value.disabled = false
+})
+
+watch(profileSuccessData, (v) => {
+  if (v) {
+    user.value = v.user.email
+    dragOptions.value.disabled = !(owner.value === user.value)
+  }
 })
 </script>
 
@@ -104,7 +114,7 @@ watch(getMembersSuccess, (v) => {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    width: 100%;
+    width: 95%;
     height: 50px;
     gap: 0 26px;
 
