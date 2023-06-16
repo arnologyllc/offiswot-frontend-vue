@@ -67,14 +67,11 @@
             </div>
           </div>
         </div>
-        <div class="user-workspaces">
-          <div
-            v-if="(!isWithWorkspaces && !pendingWorkspaces?.length && !inviteWorkspaces?.length) || isWithWorkspaces"
-            class="user-workspaces__header"
-          >
-            <div class="user-workspaces__title">your workspaces</div>
+        <div v-if="!loading" class="user-workspaces">
+          <div class="user-workspaces__header">
+            <div class="user-workspaces__title"><span v-if="isWithWorkspaces">your workspaces</span></div>
             <el-button
-              v-if="isWithWorkspaces"
+              v-if="isWithWorkspaces || pendingWorkspaces?.length || inviteWorkspaces?.length"
               class="user-workspaces__create-btn-outline"
               @click="navigateTo('/profile/choose-account')"
             >
@@ -156,7 +153,6 @@
           <div v-if="inviteWorkspaces?.length" class="user-workspaces__header">
             <div v-if="inviteWorkspaces?.length" class="user-workspaces__title">workspaces (Invites)</div>
           </div>
-
           <div v-if="inviteWorkspaces?.length" class="user-workspaces__body">
             <div
               v-for="(item, i) in inviteWorkspaces"
@@ -232,6 +228,7 @@ const pendingWorkspaces = ref(null)
 const inviteWorkspaces = ref(null)
 const userEmail = ref(null)
 const formattedText = ref(null)
+const loading = ref(null)
 
 const avatarUrl = ref(defaultAvatar)
 
@@ -245,13 +242,16 @@ const setProfileData = (v) => {
       avatarUrl.value = defaultAvatar
     }
     userEmail.value = v.user.email
+  } else {
+    loading.value = true
   }
 }
 
 const setWorkspaceData = (v) => {
   responseWorkspaces.value = v
-  if (v?.pendingWorkspaces) pendingWorkspaces.value = v.pendingWorkspaces
-  if (v?.inviteWorkspaces) inviteWorkspaces.value = v.inviteWorkspaces
+  pendingWorkspaces.value = v?.pendingWorkspaces
+  inviteWorkspaces.value = v?.inviteWorkspaces
+  if (v) loading.value = false
 }
 
 watch(profileSuccessData, (v) => setProfileData(v))
@@ -271,6 +271,7 @@ watch(checkPinData, async (v) => {
 })
 
 onMounted(() => {
+  loading.value = true
   auth()
 
   isOpenPINDialog.value = loginToken()

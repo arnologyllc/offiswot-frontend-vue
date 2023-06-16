@@ -171,7 +171,9 @@ watch(industriesError, (v) => {
 onMounted(async () => {
   auth()
   if (process.client) {
-    email.value = JSON.parse(localStorage.getItem('accounts'))[$cookies.get('currentAccountID')].email
+    email.value = JSON.parse(localStorage.getItem('accounts')).find(
+      (user) => user.token === $cookies.get('token')
+    ).email
   }
   isOpenPINDialog.value = loginToken()
   isOpenPINDialog.value = settingsToken()

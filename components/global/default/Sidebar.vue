@@ -142,6 +142,7 @@ const getAvatar = (v) => {
 
 const setWorkspaceData = (v) => {
   if (process.client) {
+    currentAccountID.value = +$cookies.get('currentAccountID')
     accounts.value = JSON.parse(localStorage.getItem('accounts'))
     if (accounts.value[currentAccountID.value] && (v?.myWorkspaces.length || v?.inviteWorkspaces.length))
       accounts.value[currentAccountID.value].workspaces = [...v?.myWorkspaces, ...v?.inviteWorkspaces]
@@ -407,11 +408,11 @@ const onLogout = async (email) => {
 const currentUser = (type, userID, email, workspaceID) => {
   switch (type) {
     case 'u':
-      return activeUsers.value[currentAccountID.value]?.email === email && !currentWorkspaceID.value
+      return accounts.value[currentAccountID.value]?.email === email && !currentWorkspaceID.value
         ? 'currentUser'
         : false
     default:
-      return workspaceID === +currentWorkspaceID.value && activeUsers.value[currentAccountID.value]?.email === email
+      return workspaceID === +currentWorkspaceID.value && accounts.value[currentAccountID.value]?.email === email
         ? 'currentWorkspace'
         : false
   }
