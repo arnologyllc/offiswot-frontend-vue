@@ -10,7 +10,7 @@
     <div class="main__users">
       <div v-if="accounts" class="main__top">
         <template v-for="item in activeUsers" :key="item.ID">
-          <div class="main__user-actions" @click="changeAccount(item.ID)">
+          <div class="main__user-actions" @click="changeAccount(item.email)">
             <img
               :src="item.avatarUrl ? item.avatarUrl : defaultAvatar"
               alt="Avatar"
@@ -45,6 +45,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import $cookies from 'js-cookie'
 import settingsToken from '~/middleware/settingsToken'
 import loginToken from '~/middleware/loginToken'
@@ -52,20 +53,15 @@ import auth from '~/middleware/auth'
 import CheckModal from '@/components/auth/AccessCheckModal.vue'
 
 import useProfileStore from '@/stores/profile'
-import usePinStore from '@/stores/pin'
-import useAuthStore from '@/stores/auth'
-import useWorkspaceStore from '@/stores/workspace'
 definePageMeta({ layout: 'default' })
 auth()
 
 const profileStore = useProfileStore()
-const pinStore = usePinStore()
-const authStore = useAuthStore()
-const workspaceStore = useWorkspaceStore()
 
 const accounts = ref(false)
 const isOpenPINDialog = ref(false)
 const currentAccountID = ref(null)
+const $router = useRouter()
 
 onMounted(() => {
   isOpenPINDialog.value = loginToken()
@@ -89,20 +85,17 @@ const addAccount = () => {
   window.open('/login', '_blank')
 }
 
-const changeAccount = async (userID) => {
-  currentAccountID.value = userID
-  $cookies.set('currentAccountID', userID)
-  if (accounts.value[userID].token === $cookies.get('token')) {
+const changeAccount = async (email) => {
+  currentAccountID.value = accounts.value.findIndex((user) => user.email === email)
+  $cookies.set('currentAccountID', currentAccountID.value)
+  if (accounts.value[currentAccountID.value].token === $cookies.get('token')) {
     navigateTo(`/create-workspace`)
     return
   }
   profileStore.$reset()
-  pinStore.$reset()
-  authStore.$reset()
-  workspaceStore.$reset()
 
-  if ((Date.parse(accounts.value[userID].token_expires) - Date.now()) / 86400000 < 0) {
-    accounts.value.splice(userID, 1)
+  if ((Date.parse(accounts.value[currentAccountID.value].token_expires) - Date.now()) / 86400000 < 0) {
+    accounts.value.splice(currentAccountID.value, 1)
 
     if (process.client) {
       localStorage.setItem('accounts', JSON.stringify(accounts.value))
@@ -116,32 +109,40 @@ const changeAccount = async (userID) => {
       })
       $router.go()
     }
+    // NOTIFY ABOUT TOKEN
 
     return
   }
 
-  $cookies.set('token', accounts.value[userID].token, {
-    expires: (Date.parse(accounts.value[userID].token_expires) - Date.now()) / 86400000,
+  $cookies.set('token', accounts.value[currentAccountID.value].token, {
+    expires: (Date.parse(accounts.value[currentAccountID.value].token_expires) - Date.now()) / 86400000,
   })
 
-  $cookies.set('remember_token', accounts.value[userID].remember_token)
-  $cookies.set('first_login', accounts.value[userID].first_login)
-  if (accounts.value[userID].settings_pin_token)
-    $cookies.set('settings_pin_token', accounts.value[userID].settings_pin_token)
-  if (accounts.value[userID].login_pin_token)
-    $cookies.set('login_pin_token', accounts.value[userID].login_pin_token, {
-      expires: (Date.parse(accounts.value[userID].login_pin_token_expires) - new Date()) / 86400000,
+  $cookies.set('remember_token', accounts.value[currentAccountID.value].remember_token)
+  $cookies.set('first_login', accounts.value[currentAccountID.value].first_login)
+  if (accounts.value[currentAccountID.value].settings_pin_token) {
+    $cookies.set('settings_pin_token', accounts.value[currentAccountID.value].settings_pin_token)
+  } else {
+    $cookies.remove('settings_pin_token')
+  }
+  if (accounts.value[currentAccountID.value].login_pin_token) {
+    $cookies.set('login_pin_token', accounts.value[currentAccountID.value].login_pin_token, {
+      expires: (Date.parse(accounts.value[currentAccountID.value].login_pin_token_expires) - new Date()) / 86400000,
     })
+  } else {
+    $cookies.remove('login_pin_token')
+  }
 
   if (process.client) {
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
 
-    if (accounts.value[userID].first_login === true) {
+    if (accounts.value[currentAccountID.value].first_login === true) {
       navigateTo('/pin')
     }
   }
 
   profileStore.getProfile()
+
   await profileStore.getWorkSpaces()
 
   navigateTo(`/create-workspace`)

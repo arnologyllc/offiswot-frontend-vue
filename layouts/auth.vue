@@ -34,8 +34,6 @@ const checkPage = () => {
   background-position: right;
   background-attachment: fixed;
   width: 100%;
-  min-height: calc(100vh - 170px);
-  overflow-y: auto;
   position: relative;
   &__background {
     background-image: url('@/assets/images/auth-background.svg');
@@ -44,6 +42,7 @@ const checkPage = () => {
     display: flex;
     flex-direction: column;
     overflow: auto;
+    height: 100vh;
   }
   .main {
     display: flex;
@@ -139,7 +138,7 @@ const checkPage = () => {
     background: #f5f7fb;
     padding: 0;
     .main {
-      margin: 180px auto 0;
+      margin: 180px auto 100px;
       width: max-content;
       .form-item__label {
         background: #f5f7fb;
