@@ -334,7 +334,6 @@ const openWorkspace = (id) => {
 }
 
 const addAccount = () => {
-  $cookies.set('currentAccountID', accounts.value.length)
   $cookies.set('addAccount', true)
   window.open('/login', '_blank')
 }

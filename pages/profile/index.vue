@@ -418,7 +418,7 @@ const hoveringEnd = () => {
   background-color: #f5f7fb !important;
   padding-top: 50px;
   padding-bottom: 50px;
-  border-radius: 20px 0 0 20px;
+  border-radius: 20px 0 0 0;
   min-height: calc(100vh - 50px);
   &__title {
     font-size: 20px;

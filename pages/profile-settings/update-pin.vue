@@ -400,7 +400,7 @@ const focusElement = (elem) => {
   height: 100vh;
   background-color: $ov-background;
   width: 100%;
-  border-radius: 20px 0 0 20px;
+  border-radius: 20px 0 0 0;
   padding: 37px 0 82px 50px;
 
   &__form {

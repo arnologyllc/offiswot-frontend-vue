@@ -164,15 +164,15 @@
           <el-button v-if="!dragOptions.disabled && i === 0" class="desk__main--add-col horizontal">
             <div class="desk__main--add-buttons horizontal">
               <span class="addSeats" @click="onAddCol">+ More Seats</span>
-              <span v-if="item.length" class="removeSeats" @click="onDeleteCol">- Remove Seats</span>
+              <span v-if="activeTablesCount" class="removeSeats" @click="onDeleteCol">- Remove Seats</span>
             </div>
           </el-button>
         </div>
       </div>
-      <el-button v-if="!dragOptions.disabled" class="desk__main--add-col">
+      <el-button v-if="!dragOptions.disabled" class="desk__main--add-col" style="margin-top: -25px; margin-left: 40px">
         <div class="desk__main--add-buttons">
           <span class="addSeats" @click="onAddRow">+ More Seats</span>
-          <span v-if="tablesList.length" class="removeSeats" @click="onDeleteRow">- Remove Seats</span>
+          <span v-if="activeTablesCount" class="removeSeats" @click="onDeleteRow">- Remove Seats</span>
         </div>
       </el-button>
     </div>
@@ -229,6 +229,7 @@
       v-if="isOpenInviteModal"
       :dialog-visible="isOpenInviteModal"
       @close="isOpenInviteModal = false"
+      @save="onSave"
     ></OvInviteMemberModal>
   </div>
 </template>
@@ -387,19 +388,29 @@ const onDeleteRow = () => {
     })
   })
   tablesList.value.pop()
+  if (!tablesList.value.length) {
+    tablesList.value = [[]]
+  }
 
   setLastTableId()
 }
 
+const handleAddTable = (row) => {
+  row.push([
+    { id: lastTableId.value, dragzone: false, user: null, row_col: '0_0' },
+    { id: lastTableId.value + 1, dragzone: false, user: null, row_col: '0_1' },
+    { id: lastTableId.value + 2, dragzone: false, user: null, row_col: '1_0' },
+    { id: lastTableId.value + 3, dragzone: false, user: null, row_col: '1_1' },
+  ])
+  lastTableId.value += 4
+}
+
 const onAddCol = () => {
+  if (tablesList.value.length > 1 && tablesList.value[0].length === tablesList.value[1].length) {
+    tablesList.value = [[]]
+  }
   tablesList.value.forEach((row, index) => {
-    row.push([
-      { id: lastTableId.value, dragzone: false, user: null, row_col: '0_0' },
-      { id: lastTableId.value + 1, dragzone: false, user: null, row_col: '0_1' },
-      { id: lastTableId.value + 2, dragzone: false, user: null, row_col: '1_0' },
-      { id: lastTableId.value + 3, dragzone: false, user: null, row_col: '1_1' },
-    ])
-    lastTableId.value += 4
+    handleAddTable(row)
   })
 }
 
@@ -417,9 +428,6 @@ const onDeleteCol = () => {
     })
     row.pop()
   })
-  if (!tablesList.value[0].length) {
-    tablesList.value.pop()
-  }
 }
 
 const handleDragEnd = (index, subIndex) => {
@@ -689,6 +697,10 @@ watch(setSeatsSuccess, (v) => {
 })
 
 watch(setSeatsError, (v) => {})
+
+const activeTablesCount = computed(() => {
+  return tablesList.value.reduce((acc, elem) => acc + elem.length, 0)
+})
 </script>
 
 <style scoped lang="scss">
@@ -714,6 +726,7 @@ watch(setSeatsError, (v) => {})
       }
     }
     &--add-col {
+      position: relative;
       border: none;
       background: transparent;
       display: flex;
@@ -722,6 +735,7 @@ watch(setSeatsError, (v) => {})
       justify-content: flex-start;
       width: 344px;
       cursor: default;
+      margin-top: 41px;
       &.horizontal {
         span {
           text-orientation: upright;
@@ -873,7 +887,7 @@ watch(setSeatsError, (v) => {})
         }
         &-top {
           border-top: 13px solid white;
-          margin-top: -13px;
+          margin-top: -14px;
           margin-left: -12px;
         }
         &-bottom {
@@ -1219,7 +1233,7 @@ watch(setSeatsError, (v) => {})
   border-radius: 13px;
   width: 330px;
   height: 159px;
-  margin: 50px 50px 5px 50px;
+  margin: 50px 50px 80px 50px;
   padding: 8px 18px 20px 18px;
   float: left;
   .todayDate {

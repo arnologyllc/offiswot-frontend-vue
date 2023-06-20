@@ -330,7 +330,7 @@ const openInviteDialog = (type, name, avatar, token) => {
   width: 100%;
   background-color: $ov-background;
   padding-bottom: 186px;
-  border-radius: 20px 0 0 20px;
+  border-radius: 20px 0 0 0;
   padding: 37px 0 82px 0;
   overflow: auto;
   height: calc(100vh - 48px);
@@ -457,7 +457,7 @@ const openInviteDialog = (type, name, avatar, token) => {
     flex-direction: row-reverse;
     gap: 20px;
     justify-content: space-between;
-    background-image: url('@/assets/images/workspace-background.svg');
+    background-image: linear-gradient(90.09deg, #bd7ae3 2.21%, #4156f6 98.06%);
     background-size: cover;
     background-position: top;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);

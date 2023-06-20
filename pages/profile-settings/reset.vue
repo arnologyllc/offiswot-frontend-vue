@@ -452,7 +452,7 @@ const getColor = () => {
   position: relative;
   height: 100vh;
   background-color: $ov-background;
-  border-radius: 20px 0 0 20px;
+  border-radius: 20px 0 0 0;
   padding: 37px 0 82px 50px;
 
   &__form {

@@ -236,7 +236,7 @@ const clearError = () => {
   flex-direction: column;
   min-height: calc(100vh - 170px);
   background-color: $ov-background;
-  border-radius: 20px 0 0 20px;
+  border-radius: 20px 0 0 0;
   padding: 37px 0 82px 50px;
   height: 100vh;
   &__form--title {

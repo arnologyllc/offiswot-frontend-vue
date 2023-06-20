@@ -80,7 +80,6 @@ const activeUsers = computed(() => {
 })
 
 const addAccount = () => {
-  $cookies.set('currentAccountID', accounts.value.length)
   $cookies.set('addAccount', true)
   window.open('/login', '_blank')
 }
@@ -157,7 +156,7 @@ const changeAccount = async (email) => {
   height: 100vh;
   background-color: $ov-background;
   width: 100%;
-  border-radius: 20px 0 0 20px;
+  border-radius: 20px 0 0 0;
   padding: 37px 0 82px 50px;
   &__users {
     display: flex;
