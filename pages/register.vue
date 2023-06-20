@@ -493,7 +493,6 @@ watch(registerFailureData, (v) => {
 .main {
   position: relative;
   display: flex;
-  margin-bottom: 60px !important;
 
   &__form {
     width: 390px;

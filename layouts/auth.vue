@@ -49,7 +49,7 @@ const checkPage = () => {
     position: relative;
     height: 100%;
     margin-top: 180px;
-    margin-bottom: 100px;
+    margin-bottom: 150px;
     margin-left: 290px;
     width: 390px;
 

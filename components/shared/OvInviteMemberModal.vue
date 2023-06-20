@@ -110,7 +110,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, getCurrentInstance, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import useWorkspaceStore from '@/stores/workspace'
 
@@ -132,6 +132,7 @@ const error = ref({
 
 const emails = ref([])
 const workspaceID = ref(null)
+const instance = getCurrentInstance()
 const typing = ref(Date.now())
 
 const checkboxItems = ref([
@@ -171,22 +172,19 @@ const querySearch = (queryString, cb) => {
   if (queryString) {
     const saving = setTimeout(async () => {
       await workspaceStore.getUsersList(workspaceID.value, queryString)
-
+      let results = []
       if (getUsersListSuccess.value) {
         emails.value = getUsersListSuccess.value
         const allEmails = emails.value
-        const results = queryString && !error.value.value && allEmails ? allEmails : []
+        results = queryString && !error.value.value && allEmails ? allEmails : []
         if (!results[0] && queryString.includes('@')) {
           validateEmail(queryString)
           if (!error.value.value) {
             results.push({ email: queryString, status: null })
           }
         }
-
-        cb(results)
-      } else {
-        cb()
       }
+      cb(results)
     }, 3000)
 
     if (Date.now() - typing.value < 2000) clearTimeout(saving)
@@ -250,6 +248,7 @@ watch(getUsersListSuccess, (v) => {
 })
 
 watch(inviteUsersSuccess, async (v) => {
+  instance.emit('save')
   await workspaceStore.getMembers(workspaceID.value)
   showPage.value = 3
 })

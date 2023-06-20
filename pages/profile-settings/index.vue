@@ -84,7 +84,7 @@ onMounted(() => {
   width: 100%;
   background-color: $ov-background;
   padding-bottom: 186px;
-  border-radius: 20px 0 0 20px;
+  border-radius: 20px 0 0 0;
   padding: 37px 0 82px 0;
   height: 100vh;
 }

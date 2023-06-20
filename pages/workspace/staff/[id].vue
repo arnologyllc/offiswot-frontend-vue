@@ -90,7 +90,7 @@ onMounted(() => {
 
 watch(getMembersSuccess, (v) => {
   if (v) owner.value = v.members[0].email
-  if (owner.value === user.value) dragOptions.value.disabled = false
+  if (owner.value === user.value && currentComponent.value === 'desk') dragOptions.value.disabled = false
 })
 
 watch(profileSuccessData, (v) => {
@@ -107,7 +107,7 @@ watch(profileSuccessData, (v) => {
   width: 100%;
   height: calc(100vh - 50px);
   padding: 16px 66px 0 21px;
-  border-radius: 20px 0 0 20px;
+  border-radius: 20px 0 0 0;
   background-color: #f5f7fb;
 
   &__header {
