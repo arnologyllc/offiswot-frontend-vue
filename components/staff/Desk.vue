@@ -33,7 +33,11 @@
                   class="desk__row--col__table"
                   :class="{ disabled: element.disabled }"
                 >
-                  <div v-if="element.user" class="outer-box">
+                  <div
+                    v-if="element.user"
+                    class="outer-box"
+                    :style="{ cursor: element.user.user_id && !props.dragOptions.disabled ? 'grab' : 'pointer' }"
+                  >
                     <div
                       v-if="index % 2 === 0"
                       class="left-box"
@@ -194,6 +198,7 @@
               :id="`footer-user_${element.user.user_id}`"
               :key="`footer-member_${element.user.user_id}`"
               class="desk__edit-footer--members__member"
+              :style="{ cursor: element.user.user_id ? 'grab' : 'arrow' }"
             >
               <div class="desk__edit-footer--members__member--left">
                 <img :src="element.user.avatar ? getAvatar(element.user.avatar) : defaultAvatar" alt="Avatar" />
@@ -438,8 +443,7 @@ const handleDragEnd = (index, subIndex) => {
       })
     })
   })
-
-  if (!movingItem.value || !futureItem.value) {
+  if (!movingItem.value.user) {
     return
   }
 
@@ -762,7 +766,6 @@ const activeTablesCount = computed(() => {
       position: relative;
       &__table {
         position: relative;
-        cursor: grab;
         width: 90px;
         height: 79px;
         z-index: 999;

@@ -4,7 +4,7 @@
       <div class="main-dash__header">
         <el-button-group class="main-dash__header--button-group">
           <el-button round :class="{ active: currentComponent === 'desk' }" @click="setCurrentComponent('desk')">
-            Desk
+            Map
           </el-button>
           <el-button
             v-if="user === owner"

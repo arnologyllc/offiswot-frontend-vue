@@ -137,7 +137,7 @@
               <div class="user-workspaces__buttons">
                 <el-button
                   class="user-workspaces__element-create-btn"
-                  @click="openInviteDialog('accept', item?.name, item.avatar, item.token)"
+                  @click="openInviteDialog('accept', item.workspace?.name, item.workspace?.avatar, item.token)"
                 >
                   <span>Accept</span>
                 </el-button>
@@ -478,7 +478,7 @@ const openInviteDialog = (type, name, avatar, token) => {
   }
   &__body {
     display: flex;
-    justify-content: space-between;
+    column-gap: 20px;
     flex-wrap: wrap;
     width: 100%;
     margin-bottom: 40px;
