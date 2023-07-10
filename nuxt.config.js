@@ -39,8 +39,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       env: {
-        apiUrl: 'https://offiswot-api.arnologyapps.com/api/',
-        serverUrl: 'https://offiswot-api.arnologyapps.com',
+        apiUrl: 'http://93.188.164.8:8088/',
+        serverUrl: 'http://93.188.164.8:8088/',
       },
     },
   },
