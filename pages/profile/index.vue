@@ -237,7 +237,7 @@
               placeholder="Speciality"
             >
               <el-option
-                v-for="(item, index) in profileSuccessData?.specialties"
+                v-for="(item, index) in profileSuccessData?.specialities"
                 :key="`spec_${index}`"
                 :value="item.id"
                 :label="item.name"

@@ -90,12 +90,9 @@ const useWorkspaceStore = defineStore('workspace', {
     getUsersList(id, query) {
       const { $myFetch } = useNuxtApp()
       this.isLoadingIndustries = true
-      $myFetch(`/workspace/${id}/emails-list`, {
-        method: 'POST',
+      $myFetch(`/workspace/${id}/emails-list?s=${query}`, {
+        method: 'GET',
         retry: 5,
-        body: {
-          email: query,
-        },
       })
         .then((data) => {
           this.getUsersListSuccess = data

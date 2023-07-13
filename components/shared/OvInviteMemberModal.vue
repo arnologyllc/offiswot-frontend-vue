@@ -14,13 +14,11 @@
     <div v-if="showPage === 1" class="dialog__first-page">
       <div class="dialog__first-page--title">What info must your workspace members provide to join?</div>
       <div class="dialog__first-page--checkobox-container">
-        <el-checkbox-group v-model="checkList">
-          <div class="dialog__first-page--checkbox">
-            <div v-for="(item, index) in checkboxItems" :key="`checkbox_${index}`">
-              <el-checkbox :label="item.value"> {{ item.name }}</el-checkbox>
-            </div>
+        <div class="dialog__first-page--checkbox">
+          <div v-for="(item, index) in checkboxItems" :key="`checkbox_${index}`">
+            <el-checkbox v-model="item.value" :label="item.name"> {{ item.name }}</el-checkbox>
           </div>
-        </el-checkbox-group>
+        </div>
       </div>
       <div class="dialog__first-page--small-text">
         You will be able to edit requried information abour memebers of the workspace in settings (click
@@ -119,6 +117,10 @@ const props = defineProps({
     type: Boolean,
     required: false,
   },
+  isFirst: {
+    type: Boolean,
+    required: true,
+  },
 })
 
 const workspaceStore = useWorkspaceStore()
@@ -136,24 +138,22 @@ const instance = getCurrentInstance()
 const typing = ref(Date.now())
 
 const checkboxItems = ref([
-  { name: 'Display Name', value: 'displayName' },
-  { name: 'Picture', value: 'picture' },
-  { name: 'Full Name', value: 'fullName' },
-  { name: 'Languages', value: 'languages' },
-  { name: 'Phone number', value: 'phoneNumber' },
-  { name: 'Years of experience', value: 'experience' },
-  { name: 'Date of birth', value: 'birthday' },
-  { name: 'Specialty', value: 'specialty' },
-  { name: 'Upload CV', value: 'cv' },
+  { name: 'Display Name', key: 'display_name', value: false },
+  { name: 'Picture', key: 'avatar', value: false },
+  { name: 'Gender', key: 'gender', value: false },
+  { name: 'Languages', key: 'languages', value: false },
+  { name: 'Phone number', key: 'phone_number', value: false },
+  { name: 'Years of experience', key: 'experience', value: false },
+  { name: 'Date of birth', key: 'date_of_birth', value: false },
+  { name: 'Specialty', key: 'speciality', value: false },
+  { name: 'Upload CV', key: 'cv', value: false },
 ])
 
 const userEmail = ref('')
 const selectedEmails = ref([])
-const showPage = ref(1)
-const checkList = ref([])
+const showPage = ref(props.isFirst ? 1 : 2)
 
 const dialogWidth = computed(() => (showPage.value === 1 ? '918px' : '432px'))
-
 const goNextPage = () => {
   showPage.value = 2
 }
@@ -169,14 +169,13 @@ const handleSelect = (item) => {
 }
 
 const querySearch = (queryString, cb) => {
-  if (queryString) {
-    const saving = setTimeout(async () => {
-      await workspaceStore.getUsersList(workspaceID.value, queryString)
-      let results = []
+  let results = [...emails.value]
+  const saving = setTimeout(async () => {
+    await workspaceStore.getUsersList(workspaceID.value, queryString)
+    setTimeout(() => {
       if (getUsersListSuccess.value) {
-        emails.value = getUsersListSuccess.value
-        const allEmails = emails.value
-        results = queryString && !error.value.value && allEmails ? allEmails : []
+        const allEmails = getUsersListSuccess.value
+        results = queryString && !error.value.value && allEmails ? allEmails : results
         if (!results[0] && queryString.includes('@')) {
           validateEmail(queryString)
           if (!error.value.value) {
@@ -185,13 +184,10 @@ const querySearch = (queryString, cb) => {
         }
       }
       cb(results)
-    }, 3000)
-
-    if (Date.now() - typing.value < 2000) clearTimeout(saving)
-    typing.value = Date.now()
-  } else {
-    cb()
-  }
+    }, 1000)
+  }, 1000)
+  if (Date.now() - typing.value < 2000) clearTimeout(saving)
+  typing.value = Date.now()
 }
 
 const removeChip = (item) => {
@@ -226,18 +222,25 @@ const showingEmail = (user, size) => {
   return `<span class="list_item_value">${part1}<span style="opacity: 0.3">${part2}</span></span>`
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (process.client) {
     const path = window.location.pathname.split('/')
     if (!isNaN(+path[path.length - 1])) {
       workspaceID.value = path[path.length - 1]
     }
   }
+  await workspaceStore.getUsersList(workspaceID.value, '')
 })
 
 const inviteUsers = () => {
   const payload = {
     emails: [...selectedEmails.value.map((user) => user.email)],
+    required_fields: checkboxItems.value.reduce((acc, elem) => {
+      if (elem.value) {
+        acc[elem.key] = elem.value
+      }
+      return acc
+    }, {}),
     workspace_id: workspaceID.value,
   }
   workspaceStore.inviteUsers(payload)

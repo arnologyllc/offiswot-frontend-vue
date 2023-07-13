@@ -90,7 +90,7 @@ onMounted(() => {
 
 watch(getMembersSuccess, (v) => {
   if (v) owner.value = v.members[0].email
-  if (owner.value === user.value && currentComponent.value === 'desk') dragOptions.value.disabled = false
+  if (owner.value === user.value && currentComponent.value === 'desk' && v.is_first) dragOptions.value.disabled = false
 })
 
 watch(profileSuccessData, (v) => {

@@ -36,7 +36,7 @@
                   <div
                     v-if="element.user"
                     class="outer-box"
-                    :style="{ cursor: element.user.user_id && !props.dragOptions.disabled ? 'grab' : 'pointer' }"
+                    :style="{ cursor: element.user.id && !props.dragOptions.disabled ? 'grab' : 'pointer' }"
                   >
                     <div
                       v-if="index % 2 === 0"
@@ -195,10 +195,10 @@
         <template #item="{ element }">
           <div class="desk__edit-footer--members">
             <div
-              :id="`footer-user_${element.user.user_id}`"
-              :key="`footer-member_${element.user.user_id}`"
+              :id="`footer-user_${element.user.id}`"
+              :key="`footer-member_${element.user.id}`"
               class="desk__edit-footer--members__member"
-              :style="{ cursor: element.user.user_id ? 'grab' : 'arrow' }"
+              :style="{ cursor: element.user.id ? 'grab' : 'arrow' }"
             >
               <div class="desk__edit-footer--members__member--left">
                 <img :src="element.user.avatar ? getAvatar(element.user.avatar) : defaultAvatar" alt="Avatar" />
@@ -223,7 +223,7 @@
         <span>{{ item.name }}</span>
       </div>
     </div>
-    <div v-if="!dragOptions.disabled && isEmpty" class="tutorial-box">
+    <div v-if="!dragOptions.disabled && isFirstEnter" class="tutorial-box">
       <img src="@/assets/images/drag-tutorial/tutorial-cursor.svg" alt="^" class="tutorial-box__cursor" />
       <img src="@/assets/images/drag-tutorial/tutorial-top-arrow.svg" alt="|" class="tutorial-box__top-line" />
       <img src="@/assets/images/drag-tutorial/tutorial-user.svg" alt="User" class="tutorial-box__user" />
@@ -233,6 +233,7 @@
     <OvInviteMemberModal
       v-if="isOpenInviteModal"
       :dialog-visible="isOpenInviteModal"
+      :is-first="isFirstEnter"
       @close="isOpenInviteModal = false"
       @save="onSave"
     ></OvInviteMemberModal>
@@ -270,12 +271,12 @@ const movingIndex = ref(null)
 const futureItem = ref(null)
 const isInsideFooter = ref(false)
 const reloadFooter = ref(true)
-const isEmpty = ref(true)
 const workspaceID = ref(null)
 const instance = getCurrentInstance()
 const config = useRuntimeConfig()
 const tablesCount = ref(1)
 const columnsCount = ref(1)
+const isFirstEnter = ref(true)
 const hints = ref([
   { name: 'Marketing', color: '#4156F6', id: 1 },
   { name: 'Team Marketing', color: '#E4AC1A', id: 2 },
@@ -340,7 +341,7 @@ const setAvailableMembers = () => {
   availableMembers.value = usersList.value.filter(
     (el) =>
       !arr.find((elem) => {
-        return elem.user.user_id === el.user.user_id
+        return elem.user.id === el.user.id
       })
   )
 }
@@ -473,7 +474,7 @@ const handleDragEnd = (index, subIndex) => {
         col[col.indexOf(futureItem.value)].user = movingTemp
       }
       if (col[col.indexOf(movingItem.value)]) {
-        col[col.indexOf(movingItem.value)].user = futureTemp.user_id ? futureTemp : null
+        col[col.indexOf(movingItem.value)].user = futureTemp.id ? futureTemp : null
       }
     })
   })
@@ -593,7 +594,7 @@ const onSave = () => {
     row.forEach((table, colIndex) => {
       table.forEach((seat) => {
         if (seat.user) {
-          filledSeats[seat.user.user_id] = `${rowIndex}_${colIndex}_${seat.row_col}`
+          filledSeats[seat.user.id] = `${rowIndex}_${colIndex}_${seat.row_col}`
         }
       })
     })
@@ -646,15 +647,15 @@ const setTables = ({ seats, counts }) => {
     tables.push(row)
   }
   if (getMembersSuccess.value && seats) {
-    const selectedUsers = Object.entries(seats)
+    const selectedUsers = Object.values(seats)
     selectedUsers.forEach((user) => {
-      const userID = +user[0]
-      const position = user[1].split('_')
+      const userID = user.id
+      const position = user.seat.split('_')
       const [tableRow, tableCol] = [position[0], position[1]]
       const userSeatPosition = `${position[2]}_${position[3]}`
       const seatPosition = tables[tableRow][tableCol].find((seat) => seat.row_col === userSeatPosition)
       const currentUser = getMembersSuccess.value.members.find((user) => {
-        return user.user_id === userID
+        return user.id === userID
       })
       seatPosition.user = currentUser
     })
@@ -684,7 +685,7 @@ watch(getMembersError, (v) => {})
 watch(getSeatsSuccess, (v) => {
   if (v) {
     setTables(v)
-    isEmpty.value = !Object.keys(v.seats).some((i) => i)
+    isFirstEnter.value = v.is_first
     setAvailableMembers()
   }
 })
@@ -694,8 +695,6 @@ watch(getSeatsError, (v) => {})
 watch(setSeatsSuccess, (v) => {
   if (v) {
     setTables(v)
-
-    isEmpty.value = !Object.keys(v.seats).some((i) => i)
     setAvailableMembers()
   }
 })
@@ -710,7 +709,7 @@ const activeTablesCount = computed(() => {
 <style scoped lang="scss">
 .desk {
   &__main {
-    height: calc(100vh - 236px);
+    height: calc(100vh - 220px);
     border: 1px solid $ov-border--light;
     overflow: auto;
     overflow-x: auto;
@@ -718,9 +717,6 @@ const activeTablesCount = computed(() => {
     position: relative;
     background: url('~/assets/images/tables-background.svg');
     background-repeat: repeat;
-    &.edit-mode {
-      height: calc(100vh - 296px);
-    }
     &--add-buttons {
       display: flex;
       flex-direction: column;

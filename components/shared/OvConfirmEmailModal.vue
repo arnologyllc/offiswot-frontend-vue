@@ -25,7 +25,9 @@
     <template #footer>
       <span class="dialog-footer">
         <span v-if="timer && !error">0:{{ timer > 9 ? timer : `0${timer}` }}</span>
-        <a v-if="!error && !timer" href="" class="dialog-footer__action" @click="onSubmit">Resend Verification Email</a>
+        <button v-if="!error && !timer" class="dialog-footer__action" @click="onSubmit">
+          Resend Verification Email
+        </button>
         <span v-if="error" class="later"> Please try again later. </span>
       </span>
     </template>
