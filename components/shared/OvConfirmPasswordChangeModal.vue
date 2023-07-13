@@ -24,7 +24,7 @@
     <template #footer
       ><span class="dialog-footer">
         <span v-if="timer && !error">0:{{ timer > 9 ? timer : `0${timer}` }}</span>
-        <a v-if="!error && !timer" href="" class="dialog-footer__action" @click="onSubmit">Resend Email</a>
+        <button v-if="!error && !timer" class="dialog-footer__action" @click="onSubmit">Resend Email</button>
         <span v-if="error" class="later"> Please try again later. </span>
       </span></template
     >
@@ -50,7 +50,7 @@ const props = defineProps({
 })
 
 const dialogWidth = ref('560px')
-const timer = ref(59)
+const timer = ref(0)
 const error = ref(null)
 
 watch(forgotSuccessData, (v) => {})
