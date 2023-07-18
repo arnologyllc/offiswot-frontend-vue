@@ -96,6 +96,7 @@ const useWorkspaceStore = defineStore('workspace', {
       })
         .then((data) => {
           this.getUsersListSuccess = data
+          return data
         })
         .catch((e) => {
           try {

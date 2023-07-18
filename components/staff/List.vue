@@ -39,7 +39,7 @@
     <OvInviteMemberModal
       v-if="isOpenInviteModal"
       :dialog-visible="isOpenInviteModal"
-      :is-first="isFirstEnter"
+      :is-first="hasRequirements"
       @close="isOpenInviteModal = false"
     ></OvInviteMemberModal>
   </div>
@@ -65,7 +65,7 @@ const users = resolveDynamicComponent(Users)
 const inviteUsersCount = ref(0)
 const memberUsersCount = ref(0)
 const isOpenInviteModal = ref(false)
-const isFirstEnter = ref(true)
+const hasRequirements = ref(true)
 
 const setCurrentComponent = (componentName) => {
   currentComponent.value = componentName
@@ -91,7 +91,7 @@ onMounted(() => {
 
 watch(getMembersSuccess, (v) => {
   inviteUsersCount.value = v.invites_list.filter((item) => item.status !== 'accepted').length
-  isFirstEnter.value = v.is_first
+  hasRequirements.value = v.hasRequirements
   memberUsersCount.value = v.members.length
 })
 </script>
