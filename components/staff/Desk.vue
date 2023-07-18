@@ -173,7 +173,11 @@
           </el-button>
         </div>
       </div>
-      <el-button v-if="!dragOptions.disabled" class="desk__main--add-col" style="margin-top: -25px; margin-left: 40px">
+      <el-button
+        v-if="!dragOptions.disabled"
+        class="desk__main--add-col"
+        style="margin-top: -25px; margin-left: 40px; margin-bottom: 100px"
+      >
         <div class="desk__main--add-buttons">
           <span class="addSeats" @click="onAddRow">+ More Seats</span>
           <span v-if="activeTablesCount" class="removeSeats" @click="onDeleteRow">- Remove Seats</span>
@@ -233,7 +237,7 @@
     <OvInviteMemberModal
       v-if="isOpenInviteModal"
       :dialog-visible="isOpenInviteModal"
-      :is-first="isFirstEnter"
+      :is-first="hasRequirements"
       @close="isOpenInviteModal = false"
       @save="onSave"
     ></OvInviteMemberModal>
@@ -277,6 +281,7 @@ const config = useRuntimeConfig()
 const tablesCount = ref(1)
 const columnsCount = ref(1)
 const isFirstEnter = ref(true)
+const hasRequirements = ref(false)
 const hints = ref([
   { name: 'Marketing', color: '#4156F6', id: 1 },
   { name: 'Team Marketing', color: '#E4AC1A', id: 2 },
@@ -675,6 +680,7 @@ watch(getMembersSuccess, (v) => {
       user: item,
     }))
     usersList.value = JSON.parse(JSON.stringify(AllUsersList.value))
+    hasRequirements.value = v.hasRequirements
     setTables(getSeatsSuccess.value)
     setAvailableMembers()
   }
@@ -693,10 +699,7 @@ watch(getSeatsSuccess, (v) => {
 watch(getSeatsError, (v) => {})
 
 watch(setSeatsSuccess, (v) => {
-  if (v) {
-    setTables(v)
-    setAvailableMembers()
-  }
+  alert('Success')
 })
 
 watch(setSeatsError, (v) => {})
@@ -717,6 +720,7 @@ const activeTablesCount = computed(() => {
     position: relative;
     background: url('~/assets/images/tables-background.svg');
     background-repeat: repeat;
+    width: calc(100vw - 225px);
     &--add-buttons {
       display: flex;
       flex-direction: column;

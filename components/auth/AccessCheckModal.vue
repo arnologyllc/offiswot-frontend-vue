@@ -156,7 +156,6 @@ watch(checkPinData, ({ data: v }) => {
   }
 
   instance.emit('close')
-  // $router.go()
 })
 
 watch(checkPinFailureData, (v) => {

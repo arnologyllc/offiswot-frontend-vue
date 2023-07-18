@@ -338,6 +338,14 @@ const setProfileData = (v) => {
       payload.value[i] = v?.user[i]
     }
   }
+
+  if (v?.user.speciality) {
+    payload.value.speciality_id = v?.user.speciality.id
+  }
+
+  if (v?.user.cv) {
+    payload.value.cv = v?.user.cv
+  }
   if (v?.user.languages) {
     payload.value.languagesList = v?.user.languages.split(',')
   }

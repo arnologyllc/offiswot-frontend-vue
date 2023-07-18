@@ -16,7 +16,7 @@
           </el-button>
         </el-button-group>
         <el-button
-          v-if="user === owner"
+          v-if="user === owner && currentComponent === 'desk'"
           ref="editButton"
           class="main-dash__header--edit-button"
           circle
@@ -55,7 +55,7 @@ import useWorkspaceStore from '@/stores/workspace'
 import useProfileStore from '@/stores/profile'
 
 const workspaceStore = useWorkspaceStore()
-const { getMembersSuccess } = storeToRefs(workspaceStore)
+const { getMembersSuccess, getSeatsSuccess } = storeToRefs(workspaceStore)
 const profileStore = useProfileStore()
 const { profileSuccessData } = storeToRefs(profileStore)
 
@@ -90,6 +90,9 @@ onMounted(() => {
 
 watch(getMembersSuccess, (v) => {
   if (v) owner.value = v.members[0].email
+})
+
+watch(getSeatsSuccess, (v) => {
   if (owner.value === user.value && currentComponent.value === 'desk' && v.is_first) dragOptions.value.disabled = false
 })
 

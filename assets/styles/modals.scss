@@ -27,6 +27,7 @@
   color: #0d1c2e;
   font-size: 14px;
   font-weight: 500;
+  cursor: pointer;
 }
 
 .customModal .title {
@@ -145,6 +146,7 @@
       color: $ov-text--title;
       font-size: 14px;
       font-weight: 500;
+      cursor: pointer;
     }
   }
   .title {
@@ -362,6 +364,9 @@
 
   &__input {
     width: 100%;
+    .el-input__inner {
+      height: 44px;
+    }
     .el-input__prefix {
       display: none !important;
     }

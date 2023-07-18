@@ -135,7 +135,6 @@ const pinStore = usePINStore()
 const profileStore = useProfileStore()
 const { setPinData, setPinFailureData, isLoadingSubmit } = storeToRefs(pinStore)
 const isValid = ref(false)
-const currentAccountID = ref(0)
 
 const instance = getCurrentInstance()
 
@@ -230,11 +229,22 @@ watch(setPinFailureData, (v) => {
   }
 })
 
-watch(setPinData, (v) => {
+watch(setPinData, ({ data }) => {
   if (process.client) {
-    currentAccountID.value = +$cookies.get('currentAccountID')
-    accounts.value[currentAccountID.value].first_login = null
-    localStorage.setItem('accounts', JSON.stringify(accounts.value))
+    const initAccountValue = JSON.parse(localStorage.getItem('accounts'))
+    const userID = $cookies.get('currentAccountID') ? $cookies.get('currentAccountID') : 0
+    initAccountValue[userID].first_login = null
+    const loginPinTokenExpires = new Date()
+    loginPinTokenExpires.setDate(loginPinTokenExpires.getDate() + 30)
+    $cookies.set('login_pin_token', data.login_pin_token, {
+      expires: (Date.parse(loginPinTokenExpires) - new Date()) / 86400000,
+    })
+    initAccountValue[userID].login_pin_token = data.login_pin_token
+    initAccountValue[userID].login_pin_token_expires = loginPinTokenExpires
+    $cookies.set('settings_pin_token', data.settings_pin_token, 0)
+    initAccountValue[userID].settings_pin_token = data.settings_pin_token
+
+    localStorage.setItem('accounts', JSON.stringify(initAccountValue))
   }
   $cookies.remove('first_login')
   navigateTo('/')

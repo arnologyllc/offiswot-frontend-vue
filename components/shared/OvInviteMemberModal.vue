@@ -39,24 +39,28 @@
           </div>
           <span class="clear-error" @click="clearError">X</span>
         </div>
-        <el-autocomplete
-          ref="email"
-          v-model="userEmail"
-          popper-class="custom-style-popup"
-          class="invite-dialog__input"
-          :class="error.value ? 'is-error' : ''"
-          :fetch-suggestions="querySearch"
-          placeholder="Enter email"
-          @select="handleSelect"
-          @input="validateEmail"
-          @keydown.enter="addEmail"
-        >
-          <template v-if="!error.value" #default="{ item }">
-            <span v-html="showingEmail(item, userEmail.length)"></span>
-            <span v-if="item.status === 'accepted'" class="list_item_isMember">Member</span>
-          </template>
+        <div style="position: relative">
+          <el-autocomplete
+            ref="email"
+            v-model="userEmail"
+            popper-class="custom-style-popup"
+            class="invite-dialog__input"
+            :class="error.value ? 'is-error' : ''"
+            :fetch-suggestions="querySearch"
+            debounce="300"
+            height="44"
+            placeholder="Enter email"
+            @select="handleSelect"
+            @input="validateEmail"
+            @keydown.enter="addEmail"
+          >
+            <template v-if="!error.value" #default="{ item }">
+              <span v-html="showingEmail(item, userEmail.length)"></span>
+              <span v-if="item.status === 'accepted'" class="list_item_isMember">Member</span>
+            </template>
+          </el-autocomplete>
 
-          <template v-else #suffix>
+          <template v-if="error.value">
             <img
               src="@/assets/images/icons/error.svg"
               alt=""
@@ -64,11 +68,11 @@
               @mouseover="showError()"
               @mouseout="hideError()"
             />
-            <div v-if="error.isShow" class="el-form-item__error">
+            <div v-if="error.isShow" class="el-form-item__error" style="position: absolute; right: 7px">
               <span v-html="error.value"></span>
             </div>
           </template>
-        </el-autocomplete>
+        </div>
         <div class="dialog__chips-box">
           <div v-for="(item, index) in selectedEmails" :key="`email_${index}`" class="dialog__chip">
             <div class="dialog__chip--text">{{ item.email }}</div>
@@ -135,7 +139,6 @@ const error = ref({
 const emails = ref([])
 const workspaceID = ref(null)
 const instance = getCurrentInstance()
-const typing = ref(Date.now())
 
 const checkboxItems = ref([
   { name: 'Display Name', key: 'display_name', value: false },
@@ -151,7 +154,7 @@ const checkboxItems = ref([
 
 const userEmail = ref('')
 const selectedEmails = ref([])
-const showPage = ref(props.isFirst ? 1 : 2)
+const showPage = ref(props.isFirst ? 2 : 1)
 
 const dialogWidth = computed(() => (showPage.value === 1 ? '918px' : '432px'))
 const goNextPage = () => {
@@ -168,26 +171,34 @@ const handleSelect = (item) => {
   }
 }
 
-const querySearch = (queryString, cb) => {
-  let results = [...emails.value]
-  const saving = setTimeout(async () => {
-    await workspaceStore.getUsersList(workspaceID.value, queryString)
-    setTimeout(() => {
-      if (getUsersListSuccess.value) {
-        const allEmails = getUsersListSuccess.value
-        results = queryString && !error.value.value && allEmails ? allEmails : results
-        if (!results[0] && queryString.includes('@')) {
-          validateEmail(queryString)
-          if (!error.value.value) {
-            results.push({ email: queryString, status: null })
-          }
-        }
-      }
-      cb(results)
-    }, 1000)
-  }, 1000)
-  if (Date.now() - typing.value < 2000) clearTimeout(saving)
-  typing.value = Date.now()
+const querySearch = async (queryString, cb) => {
+  const suggestions = []
+  const responseDelay = 1000
+
+  await workspaceStore.getUsersList(workspaceID.value, queryString)
+  setTimeout(() => {
+    autocompleteSearch(queryString)
+  }, responseDelay)
+
+  function autocompleteSearch(queryString) {
+    const emailValidationResult = validateEmail(queryString)
+    if (getUsersListSuccess.value && getUsersListSuccess.value.length && !emailValidationResult) {
+      suggestions.push(...getUsersListSuccess.value)
+    } else if (emailValidationResult) {
+      suggestions.push({ email: queryString, status: null })
+    }
+    cb(suggestions)
+  }
+
+  function validateEmail(value) {
+    const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/
+    if (value?.includes('@') && !emailRegex.test(value)) {
+      error.value.value = 'Email is not valid.'
+    } else {
+      error.value.value = ''
+    }
+    return value?.includes('@') && !emailRegex.test(value)
+  }
 }
 
 const removeChip = (item) => {
@@ -195,14 +206,7 @@ const removeChip = (item) => {
   emails.value.push(item)
 }
 
-const validateEmail = (value) => {
-  const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/
-  if (value?.includes('@') && !emailRegex.test(value)) {
-    error.value.value = 'Email is not valid.'
-  } else {
-    error.value.value = ''
-  }
-}
+const validateEmail = (value) => {}
 
 const showError = () => {
   error.value.isShow = true

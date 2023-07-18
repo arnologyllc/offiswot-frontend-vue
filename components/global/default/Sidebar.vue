@@ -151,6 +151,16 @@ const setWorkspaceData = (v) => {
   }
 }
 
+watch(
+  () => $route.params.id,
+  (v) => {
+    if (v) {
+      currentWorkspaceID.value = +v
+      openWorkspace(+v, true)
+    }
+  }
+)
+
 watch(workspacesSuccessData, (v) => {
   setWorkspaceData(workspacesSuccessData.value)
 })

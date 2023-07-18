@@ -57,7 +57,7 @@ watch(forgotSuccessData, (v) => {})
 
 watch(forgotErrorData, (v) => {
   if (v) {
-    error.value = `You have exceeded the maximum number of reset password requests.`
+    error.value = `You have exceeded the maximum number of email requests.`
   }
 })
 
