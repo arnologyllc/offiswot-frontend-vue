@@ -1,6 +1,22 @@
 <template>
   <div class="teams">
-    <table class="teams__container">
+    <div v-if="!inviteUsersCount" class="teams__container--empty">
+      <div class="teams__container--empty__images">
+        <img
+          src="~/assets/images/icons/invite-background.svg"
+          alt="background"
+          class="teams__container--empty__images--background"
+        />
+        <img src="~/assets/images/icons/invite-empty.svg" alt="empty" class="teams__container--empty__images--box" />
+      </div>
+      <div class="teams__container--empty__text">
+        <span class="teams__container--empty__title">No teams found!</span>
+        <span class="teams__container--empty__subtitle">
+          You can see workspace teams here <br />once you create a team.
+        </span>
+      </div>
+    </div>
+    <table v-else class="teams__container">
       <thead class="teams__container--header">
         <tr>
           <td class="teams__container--header__element">Team</td>
@@ -187,6 +203,43 @@ const goToPage = (page) => {
           background: #d5e9fa;
           border-radius: 6px;
         }
+      }
+    }
+    &--empty {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 620px;
+      gap: 14px;
+      &__text {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      &__images {
+        position: relative;
+        &--box {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+      }
+      &__title {
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 22px;
+        color: #1d1d1d;
+        text-align: center;
+      }
+      &__subtitle {
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 17px;
+        color: #717a7f;
+        text-align: center;
       }
     }
   }

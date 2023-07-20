@@ -162,7 +162,8 @@ watch(
 )
 
 watch(workspacesSuccessData, (v) => {
-  setWorkspaceData(workspacesSuccessData.value)
+  console.log(v)
+  setWorkspaceData(v)
 })
 
 watch(profileSuccessData, (v) => {

@@ -20,7 +20,7 @@ import { computed } from 'vue'
 
 const route = useRoute()
 
-const buttonText = computed(() => (route.path === '/login' ? 'Sign up' : 'Sign in'))
+const buttonText = computed(() => (route.path.includes('/login') ? 'Sign up' : 'Sign in'))
 
 const onRightButtonClick = () => {
   route.path === '/login' ? navigateTo('/register') : navigateTo('/login')

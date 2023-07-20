@@ -76,7 +76,6 @@
 
 <script setup>
 import { getCurrentInstance, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import $cookies from 'js-cookie'
 import ConfirmModal from '@/components/shared/OvConfirmPINChangeModal.vue'
@@ -89,8 +88,6 @@ const profileStore = useProfileStore()
 const dialogWidth = ref('450px')
 const dialogHeight = ref('400px')
 const instance = getCurrentInstance()
-const $route = useRoute()
-const $router = useRouter()
 const pinStore = usePinStore()
 const { checkPinData, checkPinFailureData, forgotPinData, forgotPinFailureData, isLoadingSubmit } =
   storeToRefs(pinStore)
@@ -99,6 +96,10 @@ const { profileSuccessData } = storeToRefs(profileStore)
 const props = defineProps({
   dialogVisible: {
     type: Boolean,
+    required: false,
+  },
+  email: {
+    type: String,
     required: false,
   },
 })
@@ -135,10 +136,10 @@ const showPIN = ref(false)
 const isOpenEmailDialog = ref(false)
 
 watch(checkPinData, ({ data: v }) => {
-  const userID = $cookies.get('currentAccountID') ? $cookies.get('currentAccountID') : 0
-
   if (process.client) {
     const initAccountValue = JSON.parse(localStorage.getItem('accounts'))
+
+    const userID = initAccountValue.findIndex((user) => user.email === payload.value.email)
     if (!$cookies.get('login_pin_token') && $cookies.get('login_pin_token') !== v.login_pin_token) {
       const loginPinTokenExpires = new Date()
       loginPinTokenExpires.setDate(loginPinTokenExpires.getDate() + 30)
@@ -172,10 +173,6 @@ watch(checkPinFailureData, (v) => {
   } else {
     errors.value.global.value = v
   }
-  if ($route.path !== '/')
-    setTimeout(() => {
-      $router.go(-1)
-    }, 1000)
 })
 
 watch(forgotPinFailureData, (v) => {
@@ -199,6 +196,8 @@ watch(forgotPinData, (v) => {
 onMounted(() => {
   if (profileSuccessData.value?.user.email) {
     payload.value.email = profileSuccessData.value?.user.email
+  } else if (props.email) {
+    payload.value.email = props.email
   }
   if (document.documentElement.clientWidth <= 425) {
     dialogWidth.value = '315px'
