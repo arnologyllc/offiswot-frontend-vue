@@ -241,6 +241,12 @@
       @close="isOpenInviteModal = false"
       @save="onSave"
     ></OvInviteMemberModal>
+    <edit-profile
+      v-if="openEditProfile"
+      :dialog-visible="openEditProfile"
+      :required-fields="requiredFields"
+      @close="navigateTo('/')"
+    ></edit-profile>
   </div>
 </template>
 
@@ -249,6 +255,7 @@ import { getCurrentInstance, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
 import draggable from 'vuedraggable'
 import OvInviteMemberModal from '@/components/shared/OvInviteMemberModal'
+import editProfile from '@/components/invite/edit-profile.vue'
 import tableTopLeft from '@/assets/images/tables/table-top-left.svg'
 import tableTopRigth from '@/assets/images/tables/table-top-right.svg'
 import tableBottomLeft from '@/assets/images/tables/table-bottom-left.svg'
@@ -270,6 +277,7 @@ const footerFutureIndex = ref(null)
 const footerMovingIndex = ref(null)
 const footerFutureItem = ref(null)
 const footerMovingElement = ref(null)
+const openEditProfile = ref(null)
 const movingItem = ref(null)
 const movingIndex = ref(null)
 const futureItem = ref(null)
@@ -282,6 +290,17 @@ const tablesCount = ref(1)
 const columnsCount = ref(1)
 const isFirstEnter = ref(true)
 const hasRequirements = ref(false)
+const requiredFields = ref({
+  display_name: false,
+  avatar: false,
+  gender: false,
+  languages: false,
+  phone_number: false,
+  experience: false,
+  date_of_birth: false,
+  speciality_id: false,
+  cv: false,
+})
 const hints = ref([
   { name: 'Marketing', color: '#4156F6', id: 1 },
   { name: 'Team Marketing', color: '#E4AC1A', id: 2 },
@@ -328,7 +347,6 @@ onMounted(() => {
     }
   }
   workspaceStore.getMembers(workspaceID.value)
-  workspaceStore.getSeats(workspaceID.value)
 })
 
 const setAvailableMembers = () => {
@@ -449,6 +467,7 @@ const handleDragEnd = (index, subIndex) => {
       })
     })
   })
+  console.log(movingItem.value.user)
   if (!movingItem.value.user) {
     return
   }
@@ -494,8 +513,11 @@ const handleDragEnd = (index, subIndex) => {
 
 const handleMove = (e) => {
   const { index, element } = e.draggedContext
+  const { element: relElement } = e.relatedContext
   movingItem.value = element
   movingIndex.value = index
+  if (!element.user || (!element.user && !relElement.user)) return false
+
   futureItem.value = e.relatedContext.element
   const cordinates = e.related.id.split('_')
   tablesList.value.forEach((row, rowIndex) => {
@@ -676,17 +698,23 @@ const getAvatar = (url) => {
 
 watch(getMembersSuccess, (v) => {
   if (v) {
+    workspaceStore.getSeats(workspaceID.value)
     AllUsersList.value = v.members.map((item) => ({
       user: item,
     }))
     usersList.value = JSON.parse(JSON.stringify(AllUsersList.value))
     hasRequirements.value = v.hasRequirements
-    setTables(getSeatsSuccess.value)
+    if (getSeatsSuccess.value) {
+      setTables(getSeatsSuccess.value)
+    }
     setAvailableMembers()
   }
 })
 
-watch(getMembersError, (v) => {})
+watch(getMembersError, (v) => {
+  openEditProfile.value = true
+  requiredFields.value = v.requiredFields
+})
 
 watch(getSeatsSuccess, (v) => {
   if (v) {
@@ -698,9 +726,7 @@ watch(getSeatsSuccess, (v) => {
 
 watch(getSeatsError, (v) => {})
 
-watch(setSeatsSuccess, (v) => {
-  alert('Success')
-})
+watch(setSeatsSuccess, (v) => {})
 
 watch(setSeatsError, (v) => {})
 

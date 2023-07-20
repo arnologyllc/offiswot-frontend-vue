@@ -57,7 +57,7 @@ const useAuthStore = defineStore('auth', {
         body: formData,
       })
         .then((data) => {
-          this.registerSuccessData = data.user
+          this.registerSuccessData = data
         })
         .catch((e) => {
           try {

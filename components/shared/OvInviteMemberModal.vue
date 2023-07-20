@@ -197,7 +197,7 @@ const querySearch = async (queryString, cb) => {
     } else {
       error.value.value = ''
     }
-    return value?.includes('@') && !emailRegex.test(value)
+    return value?.includes('@') && emailRegex.test(value)
   }
 }
 

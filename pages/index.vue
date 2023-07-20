@@ -155,7 +155,7 @@
           </div>
           <div v-if="inviteWorkspaces?.length" class="user-workspaces__body">
             <div
-              v-for="(item, i) in inviteWorkspaces"
+              v-for="({workspace: item}, i) in inviteWorkspaces"
               :key="`workspace_${i}`"
               class="user-workspaces__container"
               @click="openWorkspace(item.id)"

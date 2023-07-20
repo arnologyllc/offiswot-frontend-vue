@@ -1,10 +1,32 @@
 <template>
   <div class="invites">
     <div class="invites__container">
-      <div class="invites__container--header">
-        <div class="invites__container--header__info">USER</div>
-        <div class="invites__container--header__buttons">Actions</div>
+      <div v-if="!inviteUsersCount" class="invites__container--empty">
+        <div class="invites__container--empty__images">
+          <img
+            src="~/assets/images/icons/invite-background.svg"
+            alt="background"
+            class="invites__container--empty__images--background"
+          />
+          <img
+            src="~/assets/images/icons/invite-empty.svg"
+            alt="empty"
+            class="invites__container--empty__images--box"
+          />
+        </div>
+        <div class="invites__container--empty__text">
+          <span class="invites__container--empty__title">No invites found!</span>
+          <span class="invites__container--empty__subtitle">
+            You can see workspace invitations here<br />once you invite a team member.
+          </span>
+        </div>
       </div>
+      <template v-else>
+        <div class="invites__container--header">
+          <div class="invites__container--header__info">USER</div>
+          <div class="invites__container--header__buttons">Actions</div>
+        </div>
+      </template>
       <div v-for="user in paginatedElements" :key="user" class="invites__container--element">
         <div class="invites__container--element__info">
           <img
@@ -81,6 +103,7 @@ const inviteUsersList = ref([])
 const currentPage = ref(1)
 const elementsPerPage = ref(7)
 const totalPages = ref(null)
+const inviteUsersCount = ref(0)
 
 const isOpenInviteDialog = ref(null)
 const inviteDialogType = ref('resend')
@@ -103,6 +126,7 @@ onMounted(() => {
   if (getMembersSuccess.value) {
     inviteUsersList.value = getMembersSuccess.value.invites_list.filter((item) => item.status !== 'accepted')
     totalPages.value = Math.ceil(inviteUsersList.value.length / elementsPerPage.value)
+    inviteUsersCount.value = inviteUsersList.value.length
   }
   if (process.client) {
     const path = window.location.pathname.split('/')
@@ -114,6 +138,7 @@ onMounted(() => {
 
 watch(getMembersSuccess, (v) => {
   inviteUsersList.value = v.invites_list.filter((item) => item.status !== 'accepted')
+  inviteUsersCount.value = inviteUsersList.value.length
   totalPages.value = Math.ceil(inviteUsersList.value.length / elementsPerPage.value)
 })
 
@@ -268,6 +293,43 @@ const getAvatar = (url) => {
             opacity: 0.7;
           }
         }
+      }
+    }
+    &--empty {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 620px;
+      gap: 14px;
+      &__text {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      &__images {
+        position: relative;
+        &--box {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+      }
+      &__title {
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 22px;
+        color: #1d1d1d;
+        text-align: center;
+      }
+      &__subtitle {
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 17px;
+        color: #717a7f;
+        text-align: center;
       }
     }
   }

@@ -1,6 +1,9 @@
+import { useRoute } from 'vue-router'
 import useProfileStore from '../stores/profile'
 
 export default defineNuxtRouteMiddleware((to, from) => {
+  const $route = useRoute()
+  if ($route.fullPath === '/create-account') return
   const tokenCookies = useCookie('token')
   const rememberToken = useCookie('remember_token')
   if (process.client) {

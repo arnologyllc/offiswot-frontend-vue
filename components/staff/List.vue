@@ -56,7 +56,7 @@ import OvInviteMemberModal from '@/components/shared/OvInviteMemberModal'
 
 const workspaceStore = useWorkspaceStore()
 const { getMembersSuccess } = storeToRefs(workspaceStore)
-const currentComponent = ref('invites')
+const currentComponent = ref('users')
 
 const invites = resolveDynamicComponent(Invites)
 const teams = resolveDynamicComponent(Teams)
@@ -93,6 +93,7 @@ watch(getMembersSuccess, (v) => {
   inviteUsersCount.value = v.invites_list.filter((item) => item.status !== 'accepted').length
   hasRequirements.value = v.hasRequirements
   memberUsersCount.value = v.members.length
+  currentComponent.value = inviteUsersCount.value ? 'invites' : 'users'
 })
 </script>
 

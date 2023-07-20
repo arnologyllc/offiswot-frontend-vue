@@ -23,11 +23,12 @@ const useProfileStore = defineStore('profile', {
     }
   },
   actions: {
-    getProfile() {
+    getProfile(workspaceID) {
       if ($cookies.get('token')) {
         const { $myFetch } = useNuxtApp()
         this.profileLoading = true
-        $myFetch('user-profile', { retry: 5 })
+        const url = workspaceID ? `user-profile?workspace_id=${workspaceID}` : 'user-profile'
+        $myFetch(url, { retry: 5 })
           .then((data) => {
             this.profileSuccessData = data
           })

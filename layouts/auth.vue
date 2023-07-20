@@ -1,7 +1,7 @@
 <template>
   <div class="main-layout-auth__outer">
     <Header />
-    <div class="main-layout-auth" :class="checkPage() === '/expired' ? '' : 'main-layout-auth__background'">
+    <div class="main-layout-auth" :class="checkPage() ? '' : 'main-layout-auth__background'">
       <slot />
       <div v-if="checkPage === '/expired'" class="go-back">
         <el-button @click="$router.go(-1)">
@@ -10,7 +10,7 @@
         </el-button>
       </div>
     </div>
-    <Footer />
+    <Footer v-if="route.path !== '/create-account'" />
   </div>
 </template>
 
@@ -23,7 +23,7 @@ await login()
 const route = useRoute()
 
 const checkPage = () => {
-  return route.path
+  return route.path === '/expired' || route.path === '/create-account'
 }
 </script>
 
