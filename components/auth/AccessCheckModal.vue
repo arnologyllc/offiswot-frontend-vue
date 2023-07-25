@@ -175,6 +175,12 @@ watch(checkPinFailureData, (v) => {
   }
 })
 
+watch(profileSuccessData, (v) => {
+  if (v && checkPinData.value) {
+    instance.emit('close')
+  }
+})
+
 watch(forgotPinFailureData, (v) => {
   for (const i in v) {
     if (typeof v[i] !== 'string') {

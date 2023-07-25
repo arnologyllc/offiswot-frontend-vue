@@ -57,10 +57,12 @@ export default defineNuxtConfig({
   },
 
   pwa: {
+    registerType: 'autoUpdate',
     manifest: {
       name: 'offisewot PWA',
       short_name: 'offisewot',
       start_url: '/login',
+      theme_color: '#ffffff',
       icons: [
         { src: 'android-chrome-64x64.png', sizes: '64x64', type: 'image/png' },
         { src: 'android-chrome-144x144.png', sizes: '144x144', type: 'image/png' },
@@ -71,9 +73,17 @@ export default defineNuxtConfig({
 
     workbox: {
       navigateFallback: '/login',
+      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+    },
+
+    client: {
+      installPrompt: true,
+      periodicSyncForUpdates: 20,
     },
     devOptions: {
       enabled: true,
+      suppressWarnings: true,
+      navigateFallbackAllowlist: [/^\/$/],
       type: 'module',
     },
   },
