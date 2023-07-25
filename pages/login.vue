@@ -144,7 +144,6 @@ import ErrorMassage from '~/components/auth/ErrorMassageModal.vue'
 import useAuthStore from '~/stores/auth'
 import showEyeIcon from '@/assets/images/icons/eye-open-icon.svg'
 import hideEyeIcon from '@/assets/images/icons/eye-close-icon.svg'
-
 definePageMeta({ layout: 'auth' })
 
 const authStore = useAuthStore()

@@ -162,7 +162,6 @@ watch(
 )
 
 watch(workspacesSuccessData, (v) => {
-  console.log(v)
   setWorkspaceData(v)
 })
 
