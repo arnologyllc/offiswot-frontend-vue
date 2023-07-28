@@ -504,7 +504,7 @@
               <el-form-item prop="languages">
                 <el-select
                   ref="languagesList"
-                  v-model="payload.editForm.languagesList"
+                  v-model="payload.editForm.languages"
                   multiple
                   class="main__form--input select"
                   placeholder="Languages"
@@ -712,7 +712,7 @@ const payload = ref({
     gender: null,
     phone_number: null,
     speciality_id: null,
-    languagesList: null,
+    languages: null,
     experience: null,
     timezone: null,
     cv: null,
@@ -982,11 +982,13 @@ const setPIN = () => {
 const submitEdit = () => {
   const isValid = []
   for (const i in requiredFields.value) {
-    isValid.push(requiredFields.value[i] && payload.value[i])
+    if (requiredFields.value[i]) isValid.push(payload.value.editForm[i])
   }
+
   if (isValid.every((elem) => elem)) {
-    const data = payload.value
+    const data = payload.value.editForm
     data.workspace_id = payload.workspace_id
+    data.languagesList = data.languages
     profileStore.editProfile(data)
   }
 }
@@ -1017,7 +1019,7 @@ const setProfileData = (v) => {
     }
   }
   if (v?.user.languages) {
-    payload.value.editForm.languagesList = v?.user.languages.split(',')
+    payload.value.editForm.languages = v?.user.languages.split(',')
   }
   if (payload.value.editForm.phone_number) {
     payload.value.editForm.phone_number = payload.value.editForm.phone_number.toString()
@@ -1059,7 +1061,7 @@ const onAvatarUpload = (e, file) => {
   data.avatar = file.raw
   payload.value.editForm.avatar = file.raw
   avatarSrc.value = URL.createObjectURL(file.raw)
-  profileStore.editProfile(data)
+  // profileStore.editProfile(data)
 }
 
 const handleDeleteAvatar = () => {
@@ -1067,7 +1069,7 @@ const handleDeleteAvatar = () => {
   avatarSrc.value = 'default'
   const data = payload.value.editForm
   data.workspace_id = payload.value.workspace_id
-  profileStore.editProfile(data)
+  // profileStore.editProfile(data)
 }
 
 const hoveringStart = () => {
@@ -1135,7 +1137,7 @@ watch(setPinData, ({ data }) => {
     localStorage.setItem('accounts', JSON.stringify(initAccountValue))
     step.value = 4
     workspaceStore.acceptInvite({
-      email: payload.email,
+      email: $route.query.email,
       token: $route.query.inviteToken,
     })
     profileStore.getProfile()
@@ -1144,6 +1146,8 @@ watch(setPinData, ({ data }) => {
 
 watch(editProfileData, (v) => {
   setProfileData(v)
+
+  navigateTo('/')
 })
 
 watch(checkPinData, (v) => {

@@ -72,7 +72,7 @@ const checkPage = () => {
         &__input {
           height: 48px;
           .el-input__inner {
-            height: 48px;
+            height: 46px;
             border-radius: 6px;
             border-color: $ov-border--light;
             padding-left: 37px;

@@ -144,9 +144,16 @@ const setWorkspaceData = (v) => {
   if (process.client) {
     currentAccountID.value = +$cookies.get('currentAccountID')
     accounts.value = JSON.parse(localStorage.getItem('accounts'))
-    if (accounts.value[currentAccountID.value] && (v?.myWorkspaces.length || v?.inviteWorkspaces.length))
-      accounts.value[currentAccountID.value].workspaces = [...v?.myWorkspaces, ...v?.inviteWorkspaces]
-
+    if (accounts.value[currentAccountID.value] && (v?.myWorkspaces.length || v?.inviteWorkspaces.length)) {
+      let invitedWorkspaces = []
+      if (v?.inviteWorkspaces.length) {
+        invitedWorkspaces = v.inviteWorkspaces.map((item) => {
+          item.id = item.workspace_id
+          return item
+        })
+      }
+      accounts.value[currentAccountID.value].workspaces = [...v?.myWorkspaces, ...invitedWorkspaces]
+    }
     localStorage.setItem('accounts', JSON.stringify(accounts.value))
   }
 }

@@ -138,8 +138,8 @@ const isOpenEmailDialog = ref(false)
 watch(checkPinData, ({ data: v }) => {
   if (process.client) {
     const initAccountValue = JSON.parse(localStorage.getItem('accounts'))
-
-    const userID = initAccountValue.findIndex((user) => user.email === payload.value.email)
+    const userIndex = initAccountValue.findIndex((user) => user.email === payload.value.email)
+    const userID = userIndex >= 0 ? userIndex : $cookies.get('currentAccountID')
     if (!$cookies.get('login_pin_token') && $cookies.get('login_pin_token') !== v.login_pin_token) {
       const loginPinTokenExpires = new Date()
       loginPinTokenExpires.setDate(loginPinTokenExpires.getDate() + 30)
