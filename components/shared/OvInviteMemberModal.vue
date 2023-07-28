@@ -161,8 +161,19 @@ const goNextPage = () => {
   showPage.value = 2
 }
 
+function validateEmail(value) {
+  const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/
+  if (value?.includes('@') && !emailRegex.test(value)) {
+    error.value.value = 'Email is not valid.'
+  } else {
+    error.value.value = ''
+  }
+  return value?.includes('@') && emailRegex.test(value)
+}
+
 const handleSelect = (item) => {
-  if (!item.status) {
+  const emailValidationResult = validateEmail(item.email)
+  if (item.status !== 'accepted' && emailValidationResult) {
     if (!selectedEmails.value.includes(item)) {
       selectedEmails.value.push(item)
       userEmail.value = ''
@@ -172,7 +183,7 @@ const handleSelect = (item) => {
 }
 
 const querySearch = async (queryString, cb) => {
-  const suggestions = []
+  const suggestions = [{ email: queryString, status: null }]
   const responseDelay = 1000
 
   await workspaceStore.getUsersList(workspaceID.value, queryString)
@@ -181,23 +192,10 @@ const querySearch = async (queryString, cb) => {
   }, responseDelay)
 
   function autocompleteSearch(queryString) {
-    const emailValidationResult = validateEmail(queryString)
-    if (getUsersListSuccess.value && getUsersListSuccess.value.length && !emailValidationResult) {
+    if (getUsersListSuccess.value && getUsersListSuccess.value.length) {
       suggestions.push(...getUsersListSuccess.value)
-    } else if (emailValidationResult) {
-      suggestions.push({ email: queryString, status: null })
     }
     cb(suggestions)
-  }
-
-  function validateEmail(value) {
-    const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/
-    if (value?.includes('@') && !emailRegex.test(value)) {
-      error.value.value = 'Email is not valid.'
-    } else {
-      error.value.value = ''
-    }
-    return value?.includes('@') && emailRegex.test(value)
   }
 }
 
@@ -205,8 +203,6 @@ const removeChip = (item) => {
   selectedEmails.value = selectedEmails.value.filter((el) => el.email !== item.email)
   emails.value.push(item)
 }
-
-const validateEmail = (value) => {}
 
 const showError = () => {
   error.value.isShow = true

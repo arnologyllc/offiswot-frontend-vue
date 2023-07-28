@@ -137,7 +137,7 @@
           <el-form-item prop="languages">
             <el-select
               ref="languagesList"
-              v-model="payload.languagesList"
+              v-model="payload.languages"
               multiple
               class="main__form--input select"
               placeholder="Languages"
@@ -290,7 +290,7 @@ const payload = ref({
   gender: null,
   phone_number: null,
   speciality_id: null,
-  languagesList: null,
+  languages: null,
   experience: null,
   timezone: null,
   cv: null,
@@ -347,7 +347,7 @@ const setProfileData = (v) => {
     payload.value.cv = v?.user.cv
   }
   if (v?.user.languages) {
-    payload.value.languagesList = v?.user.languages.split(',')
+    payload.value.languages = v?.user.languages.split(',')
   }
   if (payload.value.phone_number) {
     payload.value.phone_number = payload.value.phone_number.toString()
@@ -409,6 +409,7 @@ const handleDeleteAvatar = () => {
 }
 
 const onSubmit = () => {
+  payload.value.languagesList = payload.value.languages
   profileStore.editProfile(payload.value)
 }
 

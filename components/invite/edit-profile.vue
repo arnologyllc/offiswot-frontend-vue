@@ -360,11 +360,12 @@ const languages = ref([
 const submitEdit = () => {
   const isValid = []
   for (const i in requiredFields.value) {
-    isValid.push(requiredFields.value[i] && payload.value[i])
+    if (i === 'languages') continue
+    if (requiredFields.value[i]) isValid.push(payload.value[i])
   }
   if (isValid.every((elem) => elem)) {
     const data = payload.value
-    data.workspace_id = payload.workspace_id
+    data.languagesList = data.languages
     profileStore.editProfile(data)
   }
 }
@@ -388,7 +389,7 @@ const setProfileData = (v) => {
     avatarUrl.value = defaultAvatar
   }
   for (const i in payload.value) {
-    if (!isNaN(v?.user[i]) && v?.user[i]) {
+    if (!isNaN(v?.user[i]) && v?.user[i] && i !== 'workspace_id') {
       payload.value[i] = +v?.user[i]
     } else {
       payload.value[i] = v?.user[i]
@@ -433,11 +434,11 @@ const hoveringEnd = () => {
 }
 
 onBeforeMount(() => {
-  payload.value.workspace_id = $route.params.id
   setProfileData(profileSuccessData.value)
 })
 
 onMounted(() => {
+  payload.value.workspace_id = $route.params.id
   for (const i in props.requiredFields) {
     requiredFields.value[i] = true
   }

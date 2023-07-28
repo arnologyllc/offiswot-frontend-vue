@@ -155,7 +155,7 @@
           </div>
           <div v-if="inviteWorkspaces?.length" class="user-workspaces__body">
             <div
-              v-for="({workspace: item}, i) in inviteWorkspaces"
+              v-for="({ workspace: item }, i) in inviteWorkspaces"
               :key="`workspace_${i}`"
               class="user-workspaces__container"
               @click="openWorkspace(item.id)"
@@ -250,7 +250,10 @@ const setProfileData = (v) => {
 const setWorkspaceData = (v) => {
   responseWorkspaces.value = v
   pendingWorkspaces.value = v?.pendingWorkspaces
-  inviteWorkspaces.value = v?.inviteWorkspaces
+  inviteWorkspaces.value = v?.inviteWorkspaces.map((item) => {
+    item.id = item.workspace_id
+    return item
+  })
   if (v) loading.value = false
 }
 
