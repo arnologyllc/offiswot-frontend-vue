@@ -51,10 +51,10 @@
             height="44"
             placeholder="Enter email"
             @select="handleSelect"
-            @input="validateEmail"
+            @input="validateSelect"
             @keydown.enter="addEmail"
           >
-            <template v-if="!error.value" #default="{ item }">
+            <template #default="{ item }">
               <span v-html="showingEmail(item, userEmail.length)"></span>
               <span v-if="item.status === 'accepted'" class="list_item_isMember">Member</span>
             </template>
@@ -171,14 +171,29 @@ function validateEmail(value) {
   return value?.includes('@') && emailRegex.test(value)
 }
 
+function validateSelect(value) {
+  const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/
+  if (!emailRegex.test(value)) {
+    error.value.value = 'Email is not valid.'
+  } else {
+    error.value.value = ''
+  }
+  return emailRegex.test(value)
+}
+
 const handleSelect = (item) => {
   const emailValidationResult = validateEmail(item.email)
   if (item.status !== 'accepted' && emailValidationResult) {
-    if (!selectedEmails.value.includes(item)) {
+    if (!selectedEmails.value.find((user) => user.email === item.email)) {
       selectedEmails.value.push(item)
       userEmail.value = ''
+      error.value.global = ''
     }
     emails.value = emails.value.filter((el) => el.email !== item.email)
+  } else if (item.status === 'accepted') {
+    error.value.global = 'Email already invited.'
+  } else {
+    error.value.global = 'Email is not valid.'
   }
 }
 
@@ -193,7 +208,12 @@ const querySearch = async (queryString, cb) => {
 
   function autocompleteSearch(queryString) {
     if (getUsersListSuccess.value && getUsersListSuccess.value.length) {
-      suggestions.push(...getUsersListSuccess.value)
+      const newEmails = getUsersListSuccess.value.reduce((acc, elem) => {
+        if (!selectedEmails.value.find((user) => user.email === elem.email)) acc.push(elem)
+        return acc
+      }, [])
+
+      suggestions.push(...newEmails)
     }
     cb(suggestions)
   }
