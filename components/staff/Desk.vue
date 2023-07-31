@@ -467,7 +467,7 @@ const handleDragEnd = (index, subIndex) => {
       })
     })
   })
-  console.log(movingItem.value.user)
+
   if (!movingItem.value.user) {
     return
   }
