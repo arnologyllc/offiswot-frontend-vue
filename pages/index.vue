@@ -229,6 +229,7 @@ const inviteWorkspaces = ref(null)
 const userEmail = ref(null)
 const formattedText = ref(null)
 const loading = ref(null)
+// const userID = ref(null)
 
 const avatarUrl = ref(defaultAvatar)
 
@@ -274,6 +275,17 @@ watch(checkPinData, async (v) => {
 })
 
 onMounted(() => {
+
+  // const ctx = useNuxtApp()
+  //   const socket = ctx.$nuxtSocket({
+  //     name: 'home',
+  //     channel: '/',
+  //     econnection: false
+  //   })
+  //   console.log(socket.connect())
+  // socket.io.on('getMessage', (state) => {
+  //   console.log(state)
+  // })
   loading.value = true
   auth()
 

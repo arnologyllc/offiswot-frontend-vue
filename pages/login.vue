@@ -295,6 +295,13 @@ onMounted(() => {
   const currentDate = new Date()
   currentDate.setDate(currentDate.getDate() + 30)
 
+  // const ctx = useNuxtApp()
+  //   const socket = ctx.$nuxtSocket({
+  //     name: 'home',
+  //     channel: '/index',
+  //     econnection: false
+  //   })
+  //   console.log(socket)
   window.addEventListener('resize', handleResize)
 })
 
