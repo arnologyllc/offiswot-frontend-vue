@@ -51,8 +51,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       env: {
-        apiUrl: 'http://93.188.164.8:8088/api/',
-        serverUrl: 'http://93.188.164.8:8088/',
+        apiUrl: 'https://backend.offiswot.app/api/',
+        serverUrl: 'https://backend.offiswot.app/',
       },
     },
   },
